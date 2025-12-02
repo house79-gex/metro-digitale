@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'screens/home_screen. dart';
+import 'screens/home_screen.dart';
 import 'services/bluetooth_service.dart';
 import 'providers/vetri_provider.dart';
 
