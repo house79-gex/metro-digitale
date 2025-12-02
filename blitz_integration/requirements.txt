@@ -1,0 +1,4 @@
+# Requisiti Python per integrazione BLITZ
+
+bleak>=0.21.0
+asyncio>=3.4.3
