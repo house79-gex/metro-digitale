@@ -1,0 +1,53 @@
+# Firmware (ESP-IDF)
+firmware/build/
+firmware/sdkconfig
+firmware/sdkconfig.old
+firmware/*.bin
+firmware/*.elf
+firmware/*.map
+
+# Flutter/Dart
+app_android/.dart_tool/
+app_android/.flutter-plugins
+app_android/.flutter-plugins-dependencies
+app_android/.packages
+app_android/build/
+app_android/.pub-cache/
+app_android/.pub/
+app_android/pubspec.lock
+app_android/android/.gradle/
+app_android/android/app/build/
+app_android/ios/Pods/
+app_android/ios/.symlinks/
+app_android/ios/Flutter/Flutter.framework
+app_android/ios/Flutter/Flutter.podspec
+
+# Python
+blitz_integration/__pycache__/
+blitz_integration/*.pyc
+blitz_integration/*.pyo
+blitz_integration/.pytest_cache/
+blitz_integration/*.egg-info/
+blitz_integration/venv/
+blitz_integration/.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.exe
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak

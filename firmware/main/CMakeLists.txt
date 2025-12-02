@@ -1,0 +1,25 @@
+idf_component_register(
+    SRCS 
+        "main.c"
+        "config.c"
+        "encoder.c"
+        "bluetooth.c"
+        "storage.c"
+        "ui/ui_manager.c"
+        "ui/ui_styles.c"
+        "ui/ui_main.c"
+        "ui/ui_calibro.c"
+        "ui/ui_vetri.c"
+        "ui/ui_astine.c"
+        "ui/ui_mode_select.c"
+        "ui/ui_settings.c"
+    INCLUDE_DIRS 
+        "."
+        "ui"
+    REQUIRES 
+        nvs_flash 
+        bt 
+        driver 
+        esp_timer
+        lvgl
+)
