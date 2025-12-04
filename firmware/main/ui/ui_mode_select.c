@@ -12,9 +12,9 @@ static void btn_vetri_clicked(lv_event_t *e) {
     ui_manager_show_screen(UI_SCREEN_VETRI);
 }
 
-static void btn_astine_clicked(lv_event_t *e) {
-    g_config.modalita_corrente = MODE_ASTINA;
-    ui_manager_show_screen(UI_SCREEN_ASTINE);
+static void btn_rilievi_speciali_clicked(lv_event_t *e) {
+    g_config.modalita_corrente = MODE_RILIEVI_SPECIALI;
+    ui_manager_show_screen(UI_SCREEN_RILIEVI_SPECIALI);
 }
 
 static void btn_calibro_clicked(lv_event_t *e) {
@@ -64,13 +64,13 @@ lv_obj_t* ui_mode_select_create(void) {
     lv_obj_set_style_text_font(lbl, &lv_font_montserrat_24, 0);
     lv_obj_center(lbl);
     
-    // Pulsante Astine
-    lv_obj_t *btn_astine = lv_btn_create(container);
-    lv_obj_set_size(btn_astine, 320, 150);
-    lv_obj_add_style(btn_astine, &style_button_primary, 0);
-    lv_obj_add_event_cb(btn_astine, btn_astine_clicked, LV_EVENT_CLICKED, NULL);
-    lbl = lv_label_create(btn_astine);
-    lv_label_set_text(lbl, "Astine");
+    // Pulsante Rilievi Speciali
+    lv_obj_t *btn_rilievi = lv_btn_create(container);
+    lv_obj_set_size(btn_rilievi, 320, 150);
+    lv_obj_add_style(btn_rilievi, &style_button_primary, 0);
+    lv_obj_add_event_cb(btn_rilievi, btn_rilievi_speciali_clicked, LV_EVENT_CLICKED, NULL);
+    lbl = lv_label_create(btn_rilievi);
+    lv_label_set_text(lbl, "📐 Rilievi Speciali");
     lv_obj_set_style_text_font(lbl, &lv_font_montserrat_24, 0);
     lv_obj_center(lbl);
     

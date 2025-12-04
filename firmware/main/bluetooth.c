@@ -214,6 +214,22 @@ esp_err_t bluetooth_send_vetro(float larghezza_raw, float altezza_raw,
     return bluetooth_send_json(json);
 }
 
+esp_err_t bluetooth_send_rilievo_speciale(const char *tipologia, const char *elemento,
+                                          const char *formula, float misura_mm,
+                                          uint8_t num_pezzi, bool auto_start) {
+    char json[512];
+    uint64_t timestamp = esp_timer_get_time() / 1000; // milliseconds
+    
+    snprintf(json, sizeof(json),
+             "{\"type\":\"rilievo_speciale\",\"dest\":\"troncatrice\","
+             "\"tipologia\":\"%s\",\"elemento\":\"%s\",\"formula\":\"%s\","
+             "\"misura_mm\":%.1f,\"num_pezzi\":%u,\"auto_start\":%s,\"timestamp\":%llu}",
+             tipologia, elemento, formula, misura_mm, num_pezzi,
+             auto_start ? "true" : "false", timestamp);
+    
+    return bluetooth_send_json(json);
+}
+
 void bluetooth_task(void *pvParameters) {
     ESP_LOGI(TAG, "Task Bluetooth avviato su core %d", xPortGetCoreID());
     

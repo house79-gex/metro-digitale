@@ -79,45 +79,49 @@ class SemiAutoBluetoothMixin:
             logger.info(f"Misura Bluetooth ricevuta: {data}")
             
             # Verifica tipo misura
-            if data.get('type') != 'fermavetro':
-                logger.warning(f"Tipo misura non supportato: {data.get('type')}")
+            msg_type = data.get('type', 'fermavetro')
+            if msg_type not in ['fermavetro', 'rilievo_speciale']:
+                logger.warning(f"Tipo misura non supportato: {msg_type}")
                 return
             
             misura_mm = data.get('misura_mm')
             auto_start = data.get('auto_start', False)
+            num_pezzi = data.get('num_pezzi', 1)
             
             if misura_mm is None:
                 logger.warning("Misura non valida")
                 return
             
             # Aggiorna UI (deve essere chiamato nel thread principale)
-            self._schedule_ui_update(misura_mm, auto_start)
+            self._schedule_ui_update(misura_mm, auto_start, num_pezzi)
             
         except Exception as e:
             logger.error(f"Errore gestione misura Bluetooth: {e}")
     
-    def _schedule_ui_update(self, misura_mm: float, auto_start: bool):
+    def _schedule_ui_update(self, misura_mm: float, auto_start: bool, num_pezzi: int = 1):
         """
         Pianifica l'aggiornamento dell'UI nel thread principale.
         
         Args:
             misura_mm: Misura ricevuta in millimetri
             auto_start: Se True, trigge automaticamente START
+            num_pezzi: Numero di pezzi da tagliare
         """
         # Usa after() di tkinter per eseguire nel thread principale
         if hasattr(self, 'after'):
-            self.after(0, lambda: self._update_misura_and_start(misura_mm, auto_start))
+            self.after(0, lambda: self._update_misura_and_start(misura_mm, auto_start, num_pezzi))
         else:
             # Fallback se after() non disponibile
-            self._update_misura_and_start(misura_mm, auto_start)
+            self._update_misura_and_start(misura_mm, auto_start, num_pezzi)
     
-    def _update_misura_and_start(self, misura_mm: float, auto_start: bool):
+    def _update_misura_and_start(self, misura_mm: float, auto_start: bool, num_pezzi: int = 1):
         """
         Aggiorna il campo misura e opzionalmente avvia il taglio.
         
         Args:
             misura_mm: Misura da inserire
             auto_start: Se True, preme il pulsante START
+            num_pezzi: Numero di pezzi da tagliare
         """
         try:
             # Aggiorna campo misura
@@ -127,8 +131,17 @@ class SemiAutoBluetoothMixin:
                 self.entry_misura.insert(0, f"{misura_mm:.1f}")
                 logger.info(f"Misura aggiornata: {misura_mm:.1f} mm")
             
+            # Popola contapezzi se presente e num_pezzi > 1
+            if hasattr(self, 'spin_count') and num_pezzi > 1:
+                self.spin_count.delete(0, 'end')
+                self.spin_count.insert(0, str(num_pezzi))
+                logger.info(f"Contapezzi aggiornato: {num_pezzi} pz")
+            
             # Aggiorna status
-            self._update_bt_status(f"Ricevuto: {misura_mm:.1f} mm")
+            status_msg = f"Ricevuto: {misura_mm:.1f} mm"
+            if num_pezzi > 1:
+                status_msg += f" × {num_pezzi} pz"
+            self._update_bt_status(status_msg)
             
             # Trigger START se richiesto
             if auto_start:

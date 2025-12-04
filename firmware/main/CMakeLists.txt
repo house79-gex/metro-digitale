@@ -5,6 +5,7 @@ idf_component_register(
         "encoder.c"
         "bluetooth.c"
         "storage.c"
+        "formula_parser.c"
         "ui/ui_manager.c"
         "ui/ui_styles.c"
         "ui/ui_main.c"
@@ -13,6 +14,8 @@ idf_component_register(
         "ui/ui_astine.c"
         "ui/ui_mode_select.c"
         "ui/ui_settings.c"
+        "ui/ui_rilievi_speciali.c"
+        "ui/ui_tipologie.c"
     INCLUDE_DIRS 
         "."
         "ui"

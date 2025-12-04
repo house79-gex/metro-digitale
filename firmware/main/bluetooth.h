@@ -21,6 +21,9 @@ esp_err_t bluetooth_send_fermavetro(float misura_mm, bool auto_start);
 esp_err_t bluetooth_send_vetro(float larghezza_raw, float altezza_raw,
                                 float larghezza_netta, float altezza_netta,
                                 const char *materiale, uint32_t quantita, float gioco);
+esp_err_t bluetooth_send_rilievo_speciale(const char *tipologia, const char *elemento,
+                                          const char *formula, float misura_mm,
+                                          uint8_t num_pezzi, bool auto_start);
 esp_err_t bluetooth_send_json(const char *json_str);
 
 // Task Bluetooth
