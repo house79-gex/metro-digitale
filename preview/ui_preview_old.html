@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📐 Metro Digitale - UI Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .device-frame {
+            background: #2a2a40;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .screen {
+            background: #1a1a2e;
+            border-radius: 15px;
+            width: 100%;
+            aspect-ratio: 800 / 480;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .screen-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            flex-direction: column;
+        }
+
+        .screen-content.active {
+            display: flex;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 32px;
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: #b0b0b0;
+        }
+
+        .value-display {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .value-large {
+            font-size: 64px;
+            color: #e94560;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #b0b0b0;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: #e94560;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ff5577;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: #0f3460;
+            color: white;
+            border: 2px solid #e94560;
+        }
+
+        .btn-secondary:hover {
+            background: #16213e;
+            transform: translateY(-2px);
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .mode-card {
+            background: #0f3460;
+            border: 2px solid #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mode-card:hover {
+            border-color: #e94560;
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+        }
+
+        .mode-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .mode-name {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .card {
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+
+        .card-title {
+            font-size: 18px;
+            color: #b0b0b0;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .astina-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .astina-group {
+            margin-bottom: 20px;
+        }
+
+        .group-header {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .group-anta-ribalta {
+            background: #9b59b6;
+        }
+
+        .group-persiana {
+            background: #3498db;
+        }
+
+        .group-cremonese {
+            background: #2ecc71;
+        }
+
+        .group-personalizzati {
+            background: #f1c40f;
+        }
+
+        .astina-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .astina-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .astina-item.active {
+            background: #e94560;
+        }
+
+        .astina-name {
+            color: white;
+            font-size: 18px;
+        }
+
+        .astina-offset {
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        .measurement-card {
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .measurement-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .measurement-label {
+            font-size: 18px;
+            color: #b0b0b0;
+        }
+
+        .measurement-value {
+            font-size: 28px;
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2ecc71;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .controls {
+            margin-top: 30px;
+            padding: 20px;
+            background: #16213e;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .controls h3 {
+            color: #e94560;
+            margin-bottom: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .control-label {
+            color: #b0b0b0;
+            min-width: 150px;
+            text-align: right;
+        }
+
+        input[type="range"] {
+            width: 300px;
+            height: 8px;
+            border-radius: 5px;
+            background: #0f3460;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e94560;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e94560;
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-output {
+            color: #ffffff;
+            font-weight: bold;
+            min-width: 100px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            min-width: 80px;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 8px;
+            background: #0f3460;
+            color: white;
+            border: 2px solid #16213e;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+
+        .info-text {
+            color: #b0b0b0;
+            font-size: 14px;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .value-large {
+                font-size: 48px;
+            }
+            
+            .btn {
+                min-width: 120px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="device-frame">
+        <div class="screen">
+            <!-- Main Screen -->
+            <div id="screen-main" class="screen-content active">
+                <div class="header">
+                    <div class="title">Metro Digitale</div>
+                    <div class="subtitle" id="mode-label">Modalità: Fermavetro</div>
+                </div>
+
+                <div class="value-display">
+                    <div class="value-large" id="main-value">0.00 mm</div>
+                </div>
+
+                <div class="status-bar">
+                    <span id="status-bt">🔵 BT Connesso</span>
+                    <span id="status-zero">Zero: SI</span>
+                    <span id="status-battery">🔋 85%</span>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-secondary" onclick="showScreen('mode-select')">Modalità</button>
+                    <button class="btn btn-primary" onclick="performZero()">ZERO</button>
+                    <button class="btn btn-secondary" onclick="showScreen('settings')">Impostazioni</button>
+                </div>
+            </div>
+
+            <!-- Mode Select Screen -->
+            <div id="screen-mode-select" class="screen-content">
+                <div class="header">
+                    <div class="title">Seleziona Modalità</div>
+                </div>
+
+                <div class="mode-grid">
+                    <div class="mode-card" onclick="setMode('fermavetro')">
+                        <div class="mode-icon">📏</div>
+                        <div class="mode-name">Fermavetro</div>
+                    </div>
+                    <div class="mode-card" onclick="setMode('vetri')">
+                        <div class="mode-icon">🪟</div>
+                        <div class="mode-name">Vetri</div>
+                    </div>
+                    <div class="mode-card" onclick="setMode('astine')">
+                        <div class="mode-icon">📐</div>
+                        <div class="mode-name">Astine</div>
+                    </div>
+                    <div class="mode-card" onclick="setMode('calibro')">
+                        <div class="mode-icon">⚙️</div>
+                        <div class="mode-name">Calibro</div>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-secondary" onclick="showScreen('main')">Indietro</button>
+                </div>
+            </div>
+
+            <!-- Calibro Screen -->
+            <div id="screen-calibro" class="screen-content">
+                <div class="header">
+                    <div class="title">CALIBRO</div>
+                </div>
+
+                <div class="value-display">
+                    <div class="value-large" id="calibro-value" style="color: #2ecc71;">0.00 mm</div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-primary" style="font-size: 32px; padding: 30px 60px;" onclick="performZero()">ZERO</button>
+                </div>
+
+                <div class="button-container" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="showScreen('mode-select')">Indietro</button>
+                </div>
+            </div>
+
+            <!-- Vetri Screen -->
+            <div id="screen-vetri" class="screen-content">
+                <div class="header">
+                    <div class="title">Modalità Vetri</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Materiale Selezionato</div>
+                    <div class="card-value" id="vetri-materiale">Alluminio (gioco: 12mm)</div>
+                </div>
+
+                <div class="measurement-card">
+                    <div class="measurement-row">
+                        <span class="measurement-label">Larghezza:</span>
+                        <span class="measurement-value" id="vetri-larghezza">-- mm</span>
+                    </div>
+                    <div class="measurement-row">
+                        <span class="measurement-label">Altezza:</span>
+                        <span class="measurement-value" id="vetri-altezza">0.00 mm</span>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-primary btn-small" onclick="salvaLarghezza()">Salva Larghezza</button>
+                    <button class="btn btn-primary btn-small" onclick="salvaMisuraVetro()">Salva Misura</button>
+                </div>
+
+                <div class="button-container" style="margin-top: 10px;">
+                    <button class="btn btn-secondary btn-small" onclick="cambioMateriale()">Cambia Materiale</button>
+                    <button class="btn btn-secondary btn-small" onclick="showScreen('main')">Indietro</button>
+                </div>
+            </div>
+
+            <!-- Astine Screen -->
+            <div id="screen-astine" class="screen-content">
+                <div class="header">
+                    <div class="title">Modalità Astine</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title" id="astina-nome">Inferiore AR</div>
+                    <div class="card-value" id="astina-value">1234.50 mm</div>
+                    <div class="info-text">Offset: -65mm</div>
+                </div>
+
+                <div class="astina-list">
+                    <div class="astina-group">
+                        <div class="group-header group-anta-ribalta">Anta Ribalta</div>
+                        <div class="astina-item active" onclick="selectAstina(this, 'Inferiore AR', -65)">
+                            <span class="astina-name">Inferiore AR</span>
+                            <span class="astina-offset">-65mm</span>
+                        </div>
+                        <div class="astina-item" onclick="selectAstina(this, 'Superiore AR', -65)">
+                            <span class="astina-name">Superiore AR</span>
+                            <span class="astina-offset">-65mm</span>
+                        </div>
+                        <div class="astina-item" onclick="selectAstina(this, 'Laterale AR', -45)">
+                            <span class="astina-name">Laterale AR</span>
+                            <span class="astina-offset">-45mm</span>
+                        </div>
+                        <div class="astina-item" onclick="selectAstina(this, 'Cremonese AR', -30)">
+                            <span class="astina-name">Cremonese AR</span>
+                            <span class="astina-offset">-30mm</span>
+                        </div>
+                    </div>
+
+                    <div class="astina-group">
+                        <div class="group-header group-persiana">Persiana</div>
+                        <div class="astina-item" onclick="selectAstina(this, 'Inferiore Persiana', -55)">
+                            <span class="astina-name">Inferiore Persiana</span>
+                            <span class="astina-offset">-55mm</span>
+                        </div>
+                        <div class="astina-item" onclick="selectAstina(this, 'Superiore Persiana', -55)">
+                            <span class="astina-name">Superiore Persiana</span>
+                            <span class="astina-offset">-55mm</span>
+                        </div>
+                    </div>
+
+                    <div class="astina-group">
+                        <div class="group-header group-cremonese">Cremonese Normale</div>
+                        <div class="astina-item" onclick="selectAstina(this, 'Cremonese Std', -25)">
+                            <span class="astina-name">Cremonese Std</span>
+                            <span class="astina-offset">-25mm</span>
+                        </div>
+                        <div class="astina-item" onclick="selectAstina(this, 'Cremonese Corta', -20)">
+                            <span class="astina-name">Cremonese Corta</span>
+                            <span class="astina-offset">-20mm</span>
+                        </div>
+                    </div>
+
+                    <div class="astina-group">
+                        <div class="group-header group-personalizzati">Personalizzati</div>
+                        <div class="astina-item" onclick="selectAstina(this, 'Custom 1', -40)">
+                            <span class="astina-name">Custom 1</span>
+                            <span class="astina-offset">-40mm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-secondary btn-small" onclick="showScreen('main')">Indietro</button>
+                </div>
+            </div>
+
+            <!-- Settings Screen -->
+            <div id="screen-settings" class="screen-content">
+                <div class="header">
+                    <div class="title">Impostazioni</div>
+                </div>
+
+                <div style="flex: 1; overflow-y: auto; padding: 10px;">
+                    <div class="card">
+                        <div class="card-title">Bluetooth</div>
+                        <div style="color: white; font-size: 16px; margin-top: 10px;">
+                            Stato: <span style="color: #2ecc71;">Connesso</span>
+                        </div>
+                        <div style="color: #b0b0b0; font-size: 14px; margin-top: 5px;">
+                            Dispositivo: Metro-Digitale-001
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Display</div>
+                        <div class="control-group">
+                            <span style="color: white;">Luminosità:</span>
+                            <input type="range" min="20" max="100" value="80" id="brightness-slider" oninput="updateBrightness(this.value)">
+                            <span style="color: white;" id="brightness-value">80%</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Encoder</div>
+                        <div style="color: white; font-size: 16px; margin-top: 10px;">
+                            Risoluzione: 0.005mm
+                        </div>
+                        <div style="color: #b0b0b0; font-size: 14px; margin-top: 5px;">
+                            Auto-zero: Attivo
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Informazioni</div>
+                        <div style="color: #b0b0b0; font-size: 14px; line-height: 1.8;">
+                            Firmware: v1.0.0<br>
+                            Hardware: ESP32-S3<br>
+                            Display: 800x480<br>
+                            Batteria: LiPo 3.7V
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-primary" onclick="saveConfig()">Salva Configurazione</button>
+                    <button class="btn btn-secondary" onclick="showScreen('main')">Indietro</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulator Controls -->
+        <div class="controls">
+            <h3>🎮 Controlli Simulatore</h3>
+            
+            <div class="control-group">
+                <span class="control-label">Posizione Encoder:</span>
+                <input type="range" min="0" max="2000" value="1234.5" step="0.5" id="position-slider" oninput="updatePosition(this.value)">
+                <span class="value-output" id="position-output">1234.5 mm</span>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">Materiale:</span>
+                <select id="material-select" onchange="updateMaterial(this.value)">
+                    <option value="alluminio">Alluminio (-12mm)</option>
+                    <option value="legno">Legno (-6mm)</option>
+                    <option value="pvc">PVC (-10mm)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">Velocità Auto:</span>
+                <button class="btn btn-secondary btn-small" onclick="startAutoIncrement()">▶️ Avvia</button>
+                <button class="btn btn-secondary btn-small" onclick="stopAutoIncrement()">⏸️ Stop</button>
+            </div>
+
+            <p class="info-text">
+                💡 Suggerimento: Muovi il cursore per simulare il movimento dell'encoder
+            </p>
+        </div>
+
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script>
+        // State
+        let currentMode = 'fermavetro';
+        let currentPosition = 1234.5;
+        let isZeroed = true;
+        let zeroOffset = 0;
+        let larghezzaSaved = false;
+        let larghezzaValue = 0;
+        let currentMaterial = 'alluminio';
+        let currentAstinaOffset = -65;
+        let autoIncrementInterval = null;
+
+        const materials = {
+            alluminio: { name: 'Alluminio', gioco: 12 },
+            legno: { name: 'Legno', gioco: 6 },
+            pvc: { name: 'PVC', gioco: 10 }
+        };
+
+        // Screen management
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen-content').forEach(s => s.classList.remove('active'));
+            document.getElementById(`screen-${screenId}`).classList.add('active');
+            
+            if (screenId === 'main') {
+                updateMainScreen();
+            } else if (screenId === 'calibro') {
+                updateCalibroScreen();
+            } else if (screenId === 'vetri') {
+                updateVetriScreen();
+            } else if (screenId === 'astine') {
+                updateAstineScreen();
+            }
+        }
+
+        // Mode management
+        function setMode(mode) {
+            currentMode = mode;
+            const modeNames = {
+                'fermavetro': 'Modalità: Fermavetro',
+                'vetri': 'Modalità: Vetri',
+                'astine': 'Modalità: Astine',
+                'calibro': 'Modalità: Calibro'
+            };
+            document.getElementById('mode-label').textContent = modeNames[mode];
+            
+            if (mode === 'calibro') {
+                showScreen('calibro');
+            } else if (mode === 'vetri') {
+                showScreen('vetri');
+            } else if (mode === 'astine') {
+                showScreen('astine');
+            } else {
+                showScreen('main');
+            }
+            
+            showToast(`Modalità cambiata: ${modeNames[mode]}`);
+        }
+
+        // Update functions
+        function updatePosition(value) {
+            currentPosition = parseFloat(value);
+            document.getElementById('position-output').textContent = value + ' mm';
+            updateAllScreens();
+        }
+
+        function updateAllScreens() {
+            updateMainScreen();
+            updateCalibroScreen();
+            updateVetriScreen();
+            updateAstineScreen();
+        }
+
+        function updateMainScreen() {
+            let displayValue = currentPosition - zeroOffset;
+            if (currentMode === 'astine') {
+                displayValue += currentAstinaOffset;
+            }
+            document.getElementById('main-value').textContent = displayValue.toFixed(2) + ' mm';
+        }
+
+        function updateCalibroScreen() {
+            const value = currentPosition - zeroOffset;
+            document.getElementById('calibro-value').textContent = value.toFixed(2) + ' mm';
+        }
+
+        function updateVetriScreen() {
+            const currentValue = currentPosition - zeroOffset;
+            
+            if (larghezzaSaved) {
+                document.getElementById('vetri-larghezza').textContent = larghezzaValue.toFixed(0) + ' mm';
+                document.getElementById('vetri-altezza').textContent = currentValue.toFixed(2) + ' mm';
+            } else {
+                document.getElementById('vetri-larghezza').textContent = '-- mm';
+                document.getElementById('vetri-altezza').textContent = currentValue.toFixed(2) + ' mm';
+            }
+
+            const mat = materials[currentMaterial];
+            document.getElementById('vetri-materiale').textContent = 
+                `${mat.name} (gioco: ${mat.gioco}mm)`;
+        }
+
+        function updateAstineScreen() {
+            const rawValue = currentPosition - zeroOffset;
+            const finalValue = rawValue + currentAstinaOffset;
+            document.getElementById('astina-value').textContent = finalValue.toFixed(2) + ' mm';
+        }
+
+        // Actions
+        function performZero() {
+            zeroOffset = currentPosition;
+            isZeroed = true;
+            document.getElementById('status-zero').textContent = 'Zero: SI';
+            showToast('✅ Zero impostato!');
+            updateAllScreens();
+        }
+
+        function salvaLarghezza() {
+            larghezzaValue = currentPosition - zeroOffset;
+            larghezzaSaved = true;
+            showToast(`✅ Larghezza salvata: ${larghezzaValue.toFixed(0)} mm`);
+            performZero();
+            updateVetriScreen();
+        }
+
+        function salvaMisuraVetro() {
+            if (!larghezzaSaved) {
+                showToast('⚠️ Salvare prima la larghezza!', 'warning');
+                return;
+            }
+
+            const altezzaRaw = currentPosition - zeroOffset;
+            const mat = materials[currentMaterial];
+            const larghezzaNetta = larghezzaValue - mat.gioco;
+            const altezzaNetta = altezzaRaw - mat.gioco;
+
+            showToast(`✅ Misura inviata: ${Math.round(larghezzaNetta)} x ${Math.round(altezzaNetta)} mm`);
+            
+            // Reset
+            larghezzaSaved = false;
+            performZero();
+            updateVetriScreen();
+        }
+
+        function cambioMateriale() {
+            const materials = ['alluminio', 'legno', 'pvc'];
+            const currentIndex = materials.indexOf(currentMaterial);
+            const nextIndex = (currentIndex + 1) % materials.length;
+            currentMaterial = materials[nextIndex];
+            document.getElementById('material-select').value = currentMaterial;
+            updateMaterial(currentMaterial);
+        }
+
+        function updateMaterial(material) {
+            currentMaterial = material;
+            const mat = materials[material];
+            showToast(`Materiale: ${mat.name} (gioco ${mat.gioco}mm)`);
+            updateVetriScreen();
+        }
+
+        function selectAstina(element, nome, offset) {
+            document.querySelectorAll('.astina-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            
+            currentAstinaOffset = offset;
+            document.getElementById('astina-nome').textContent = nome;
+            document.querySelector('#screen-astine .info-text').textContent = `Offset: ${offset}mm`;
+            
+            showToast(`Astina selezionata: ${nome}`);
+            updateAstineScreen();
+        }
+
+        function updateBrightness(value) {
+            document.getElementById('brightness-value').textContent = value + '%';
+        }
+
+        function saveConfig() {
+            showToast('✅ Configurazione salvata in NVS');
+        }
+
+        // Auto increment
+        function startAutoIncrement() {
+            if (autoIncrementInterval) return;
+            
+            autoIncrementInterval = setInterval(() => {
+                currentPosition += 0.5;
+                if (currentPosition > 2000) currentPosition = 0;
+                
+                document.getElementById('position-slider').value = currentPosition;
+                document.getElementById('position-output').textContent = currentPosition.toFixed(1) + ' mm';
+                updateAllScreens();
+            }, 100);
+            
+            showToast('▶️ Auto-incremento avviato');
+        }
+
+        function stopAutoIncrement() {
+            if (autoIncrementInterval) {
+                clearInterval(autoIncrementInterval);
+                autoIncrementInterval = null;
+                showToast('⏸️ Auto-incremento fermato');
+            }
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            if (type === 'warning') {
+                toast.style.background = '#f1c40f';
+            } else if (type === 'error') {
+                toast.style.background = '#e74c3c';
+            } else {
+                toast.style.background = '#2ecc71';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize
+        updateAllScreens();
+        
+        console.log('📐 Metro Digitale UI Preview');
+        console.log('✅ Simulator ready');
+        console.log('💡 Use slider to simulate encoder movement');
+    </script>
+</body>
+</html>
