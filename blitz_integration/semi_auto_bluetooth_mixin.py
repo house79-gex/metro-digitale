@@ -131,8 +131,8 @@ class SemiAutoBluetoothMixin:
                 self.entry_misura.insert(0, f"{misura_mm:.1f}")
                 logger.info(f"Misura aggiornata: {misura_mm:.1f} mm")
             
-            # Popola contapezzi se presente e num_pezzi > 1
-            if hasattr(self, 'spin_count') and num_pezzi > 1:
+            # Popola contapezzi se presente (sempre, anche per 1 pezzo)
+            if hasattr(self, 'spin_count'):
                 self.spin_count.delete(0, 'end')
                 self.spin_count.insert(0, str(num_pezzi))
                 logger.info(f"Contapezzi aggiornato: {num_pezzi} pz")

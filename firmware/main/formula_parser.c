@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "esp_log.h"
 
 static const char *TAG = "FORMULA_PARSER";
@@ -181,14 +182,27 @@ static float parse_term(ParserContext *ctx) {
         float right = parse_factor(ctx);
         
         if (op == '*') {
-            value *= right;
+            // Check for potential overflow
+            float result = value * right;
+            if (!isfinite(result)) {
+                snprintf(ctx->error, sizeof(ctx->error), "Multiplication overflow");
+                ctx->current_token.type = TOKEN_ERROR;
+                return 0.0f;
+            }
+            value = result;
         } else {
             if (right == 0.0f) {
                 snprintf(ctx->error, sizeof(ctx->error), "Division by zero");
                 ctx->current_token.type = TOKEN_ERROR;
                 return 0.0f;
             }
-            value /= right;
+            float result = value / right;
+            if (!isfinite(result)) {
+                snprintf(ctx->error, sizeof(ctx->error), "Division overflow");
+                ctx->current_token.type = TOKEN_ERROR;
+                return 0.0f;
+            }
+            value = result;
         }
     }
     
@@ -257,21 +271,21 @@ ParseResult formula_parser_evaluate(const char *formula,
     return result;
 }
 
+// Dummy variables for formula validation
+static const VariabileRilievo VALIDATION_VARS[4] = {
+    {"L", "Larghezza", 1000.0f, true, true},
+    {"H", "Altezza", 1000.0f, true, true},
+    {"B", "Battuta", 50.0f, true, false},
+    {"S", "Spessore", 20.0f, true, false}
+};
+
 // Validate formula
 bool formula_parser_validate(const char *formula) {
     if (!formula || !formula[0]) {
         return false;
     }
     
-    // Create dummy variables for validation
-    VariabileRilievo dummy_vars[4] = {
-        {"L", "Larghezza", 1000.0f, true, true},
-        {"H", "Altezza", 1000.0f, true, true},
-        {"B", "Battuta", 50.0f, false, false},
-        {"S", "Spessore", 20.0f, false, false}
-    };
-    
-    ParseResult result = formula_parser_evaluate(formula, dummy_vars, 4);
+    ParseResult result = formula_parser_evaluate(formula, VALIDATION_VARS, 4);
     return result.success;
 }
 

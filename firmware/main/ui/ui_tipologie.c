@@ -255,8 +255,12 @@ void ui_tipologie_update(void) {
     TipologiaInfisso *tip = &g_config.tipologie[g_config.tipologia_corrente_idx];
     
     // Aggiorna nome tipologia
-    char nome_str[64];
-    snprintf(nome_str, sizeof(nome_str), "%s %s", tip->icona, tip->nome);
+    char nome_str[96]; // Larger buffer to safely accommodate icon + name
+    int written = snprintf(nome_str, sizeof(nome_str), "%s %s", tip->icona, tip->nome);
+    if (written >= sizeof(nome_str)) {
+        // Truncation occurred, ensure null termination
+        nome_str[sizeof(nome_str) - 1] = '\0';
+    }
     lv_label_set_text(label_tipologia, nome_str);
     
     // Aggiorna status
@@ -273,45 +277,61 @@ void ui_tipologie_update(void) {
     }
     
     // Aggiorna lista variabili
-    char var_str[256] = "";
+    char var_str[512] = ""; // Increased buffer size for safety
+    size_t remaining = sizeof(var_str) - 1;
+    char *ptr = var_str;
+    
     for (uint8_t i = 0; i < tip->num_variabili; i++) {
         VariabileRilievo *var = &tip->variabili[i];
-        char line[64];
+        char line[96];
+        int len;
         
         if (i == variabile_corrente_idx && modalita_rilievo) {
-            snprintf(line, sizeof(line), "▶ %s: %.1f mm\n", 
+            len = snprintf(line, sizeof(line), "▶ %s: %.1f mm\n", 
                     var->descrizione, encoder_get_position_mm());
         } else if (var->rilevato) {
-            snprintf(line, sizeof(line), "✅ %s: %.1f mm\n", 
+            len = snprintf(line, sizeof(line), "✅ %s: %.1f mm\n", 
                     var->descrizione, var->valore);
         } else {
-            snprintf(line, sizeof(line), "⭕ %s: ---\n", var->descrizione);
+            len = snprintf(line, sizeof(line), "⭕ %s: ---\n", var->descrizione);
         }
         
-        strcat(var_str, line);
+        if (len > 0 && (size_t)len < remaining) {
+            strncat(ptr, line, remaining);
+            remaining -= len;
+            ptr += len;
+        }
     }
     lv_label_set_text(label_variabili, var_str);
     
     // Aggiorna lista elementi
-    char elem_str[512] = "";
+    char elem_str[768] = ""; // Increased buffer size for safety
+    size_t remaining = sizeof(elem_str) - 1;
+    char *ptr = elem_str;
+    
     for (uint8_t i = 0; i < tip->num_elementi; i++) {
         ElementoCalcolato *elem = &tip->elementi[i];
-        char line[96];
+        char line[128];
+        int len;
         
         if (i == variabile_corrente_idx && !modalita_rilievo) {
-            snprintf(line, sizeof(line), "▶ %s\n  %.1f mm × %u pz\n", 
+            len = snprintf(line, sizeof(line), "▶ %s\n  %.1f mm × %u pz\n", 
                     elem->nome, elem->risultato, elem->quantita_attuale);
         } else if (elem->inviato) {
-            snprintf(line, sizeof(line), "✅ %s: %.1f mm\n", 
+            len = snprintf(line, sizeof(line), "✅ %s: %.1f mm\n", 
                     elem->nome, elem->risultato);
         } else if (!modalita_rilievo) {
-            snprintf(line, sizeof(line), "⭕ %s: %.1f mm\n", 
+            len = snprintf(line, sizeof(line), "⭕ %s: %.1f mm\n", 
                     elem->nome, elem->risultato);
         } else {
-            snprintf(line, sizeof(line), "⭕ %s\n", elem->nome);
+            len = snprintf(line, sizeof(line), "⭕ %s\n", elem->nome);
         }
         
-        strcat(elem_str, line);
+        if (len > 0 && (size_t)len < remaining) {
+            strncat(ptr, line, remaining);
+            remaining -= len;
+            ptr += len;
+        }
     }
     lv_label_set_text(label_elementi, elem_str);
 }
