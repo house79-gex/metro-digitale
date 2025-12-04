@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📐 Metro Digitale - UI Preview</title>
+    <title>📐 Metro Digitale - UI Preview Completa</title>
     <style>
         * {
             margin: 0;
@@ -11,908 +11,1161 @@
             box-sizing: border-box;
         }
 
+        :root {
+            /* Colori moderni */
+            --bg-dark: #1a1a2e;
+            --bg-panel: #16213e;
+            --accent-primary: #00ff88;
+            --accent-secondary: #00aaff;
+            --accent-purple: #9b59b6;
+            --accent-orange: #ff6600;
+            --text-white: #ffffff;
+            --text-gray: #b0b0b0;
+            --text-dark: #2c3e50;
+            
+            /* Ombre */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 20px rgba(0, 255, 136, 0.3);
+            
+            /* Border radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-panel) 100%);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 30px 20px;
+            overflow-x: hidden;
         }
 
+        /* Header preview controls */
+        .preview-controls {
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-controls h1 {
+            color: var(--accent-primary);
+            font-size: 28px;
+            flex: 1 0 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .preview-btn {
+            background: linear-gradient(135deg, var(--accent-secondary), #0088cc);
+            color: var(--text-white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .preview-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .preview-btn.active {
+            background: linear-gradient(135deg, var(--accent-primary), #00cc66);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* Device frame */
         .device-frame {
-            background: #2a2a40;
+            background: linear-gradient(135deg, #2a2a40 0%, #1f1f35 100%);
             border-radius: 30px;
-            padding: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 25px;
+            box-shadow: var(--shadow-lg);
             max-width: 900px;
             width: 100%;
+            position: relative;
         }
 
+        .device-frame::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 6px;
+            background: #444;
+            border-radius: 3px;
+        }
+
+        /* Screen */
         .screen {
-            background: #1a1a2e;
+            background: var(--bg-dark);
             border-radius: 15px;
             width: 100%;
             aspect-ratio: 800 / 480;
             overflow: hidden;
             position: relative;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
         }
 
         .screen-content {
             display: none;
             width: 100%;
             height: 100%;
-            padding: 20px;
+            padding: 25px;
             flex-direction: column;
+            animation: fadeIn 0.3s ease;
         }
 
         .screen-content.active {
             display: flex;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Header */
         .header {
             text-align: center;
             margin-bottom: 20px;
         }
 
         .title {
-            font-size: 32px;
-            color: #ffffff;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 36px;
+            color: var(--text-white);
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
         }
 
         .subtitle {
-            font-size: 24px;
-            color: #b0b0b0;
+            font-size: 20px;
+            color: var(--text-gray);
+            font-weight: 300;
         }
 
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: var(--radius-md);
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--text-gray);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bt-connected {
+            color: var(--accent-primary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Value display */
         .value-display {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            min-height: 200px;
         }
 
         .value-large {
-            font-size: 64px;
-            color: #e94560;
-            font-weight: bold;
+            font-size: 72px;
+            color: var(--accent-primary);
+            font-weight: 700;
             margin: 20px 0;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            animation: glow 2s ease-in-out infinite;
         }
 
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background: rgba(15, 52, 96, 0.5);
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #b0b0b0;
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+            50% { text-shadow: 0 0 30px rgba(0, 255, 136, 0.8); }
         }
 
+        .value-unit {
+            font-size: 24px;
+            color: var(--text-gray);
+            font-weight: 300;
+        }
+
+        .value-label {
+            font-size: 18px;
+            color: var(--text-gray);
+            margin-bottom: 10px;
+        }
+
+        /* Button container */
         .button-container {
             display: flex;
             gap: 15px;
             justify-content: center;
+            align-items: center;
             flex-wrap: wrap;
-            margin-top: 20px;
         }
 
+        /* Button styles */
         .btn {
             padding: 15px 30px;
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            min-width: 150px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-primary {
-            background: #e94560;
-            color: white;
+            background: linear-gradient(135deg, var(--accent-primary), #00cc66);
+            color: var(--text-dark);
         }
 
         .btn-primary:hover {
-            background: #ff5577;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-glow);
         }
 
         .btn-secondary {
-            background: #0f3460;
-            color: white;
-            border: 2px solid #e94560;
+            background: linear-gradient(135deg, var(--accent-secondary), #0088cc);
+            color: var(--text-white);
         }
 
         .btn-secondary:hover {
-            background: #16213e;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(0, 170, 255, 0.4);
         }
 
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: var(--text-white);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, var(--accent-purple), #8e44ad);
+            color: var(--text-white);
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, var(--accent-orange), #ff4400);
+            color: var(--text-white);
+        }
+
+        .btn-large {
+            font-size: 22px;
+            padding: 20px 40px;
+            min-width: 200px;
+        }
+
+        .btn-small {
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            font-size: 20px;
+            color: var(--text-white);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-content {
+            color: var(--text-gray);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Grid layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        /* Mode selection grid */
         .mode-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+            padding: 20px;
             flex: 1;
-            padding: 20px 0;
         }
 
         .mode-card {
-            background: #0f3460;
-            border: 2px solid #16213e;
-            border-radius: 15px;
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
             padding: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 15px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: var(--shadow-md);
         }
 
         .mode-card:hover {
-            border-color: #e94560;
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-glow);
         }
 
         .mode-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 56px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
-        .mode-name {
+        .mode-title {
             font-size: 24px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .card {
-            background: #0f3460;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 10px 0;
-        }
-
-        .card-title {
-            font-size: 18px;
-            color: #b0b0b0;
-            margin-bottom: 10px;
-        }
-
-        .card-value {
-            font-size: 32px;
-            color: #ffffff;
-            font-weight: bold;
-        }
-
-        .astina-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 0;
-        }
-
-        .astina-group {
-            margin-bottom: 20px;
-        }
-
-        .group-header {
-            font-size: 20px;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            color: white;
-        }
-
-        .group-anta-ribalta {
-            background: #9b59b6;
-        }
-
-        .group-persiana {
-            background: #3498db;
-        }
-
-        .group-cremonese {
-            background: #2ecc71;
-        }
-
-        .group-personalizzati {
-            background: #f1c40f;
-        }
-
-        .astina-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            margin: 5px 0;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .astina-item:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
-        }
-
-        .astina-item.active {
-            background: #e94560;
-        }
-
-        .astina-name {
-            color: white;
-            font-size: 18px;
-        }
-
-        .astina-offset {
-            color: #b0b0b0;
-            font-size: 14px;
-        }
-
-        .measurement-card {
-            background: #0f3460;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 15px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .measurement-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .measurement-label {
-            font-size: 18px;
-            color: #b0b0b0;
-        }
-
-        .measurement-value {
-            font-size: 28px;
-            color: #e94560;
-            font-weight: bold;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #2ecc71;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 1000;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .controls {
-            margin-top: 30px;
-            padding: 20px;
-            background: #16213e;
-            border-radius: 15px;
+            color: var(--text-white);
+            font-weight: 600;
             text-align: center;
         }
 
-        .controls h3 {
-            color: #e94560;
+        .mode-desc {
+            font-size: 14px;
+            color: var(--text-gray);
+            text-align: center;
+        }
+
+        /* Rilievi Speciali menu */
+        .rilievi-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .rilievi-card {
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .rilievi-card:hover {
+            transform: translateX(10px);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .rilievi-icon {
+            font-size: 48px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .rilievi-content {
+            flex: 1;
+        }
+
+        .rilievi-title {
+            font-size: 22px;
+            color: var(--text-white);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .rilievi-subtitle {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        /* Tipologie screen */
+        .tipologie-header {
+            text-align: center;
             margin-bottom: 15px;
         }
 
-        .control-group {
+        .tipologia-name {
+            font-size: 28px;
+            color: var(--text-white);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .tipologia-status {
+            font-size: 16px;
+            color: var(--accent-secondary);
+        }
+
+        .tipologie-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            margin-bottom: 15px;
+        }
+
+        .tipologie-panel {
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            color: var(--accent-primary);
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .variable-item,
+        .element-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: rgba(0, 255, 136, 0.05);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .variable-item.active,
+        .element-item.active {
+            background: rgba(0, 255, 136, 0.15);
+            border-left-color: var(--accent-secondary);
+        }
+
+        .variable-item.done,
+        .element-item.done {
+            opacity: 0.6;
+            border-left-color: var(--text-gray);
+        }
+
+        /* Vetri screen */
+        .vetri-input-group {
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .input-label {
+            font-size: 18px;
+            color: var(--text-white);
+            font-weight: 500;
+        }
+
+        .input-value {
+            font-size: 28px;
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        /* Material selector */
+        .material-selector {
             display: flex;
             gap: 10px;
-            justify-content: center;
-            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .material-chip {
+            padding: 10px 20px;
+            background: var(--bg-panel);
+            border: 2px solid var(--text-gray);
+            border-radius: 20px;
+            color: var(--text-gray);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .material-chip.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        /* Astine groups */
+        .astina-group {
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent-purple);
+        }
+
+        .astina-group-name {
+            font-size: 18px;
+            color: var(--text-white);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .astina-value {
+            font-size: 32px;
+            color: var(--accent-primary);
+            font-weight: 700;
             margin: 10px 0;
         }
 
-        .control-label {
-            color: #b0b0b0;
-            min-width: 150px;
-            text-align: right;
-        }
-
-        input[type="range"] {
-            width: 300px;
-            height: 8px;
-            border-radius: 5px;
-            background: #0f3460;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #e94560;
-            cursor: pointer;
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #e94560;
-            cursor: pointer;
-            border: none;
-        }
-
-        .value-output {
-            color: #ffffff;
-            font-weight: bold;
-            min-width: 100px;
-        }
-
-        .btn-small {
-            padding: 8px 15px;
+        .astina-offset {
             font-size: 14px;
-            min-width: 80px;
+            color: var(--text-gray);
         }
 
-        select {
-            padding: 10px;
-            border-radius: 8px;
-            background: #0f3460;
-            color: white;
-            border: 2px solid #16213e;
+        /* Navigation arrows */
+        .nav-arrows {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .nav-arrow {
+            background: var(--bg-panel);
+            border: 2px solid var(--accent-secondary);
+            color: var(--text-white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-arrow:hover {
+            background: var(--accent-secondary);
+            transform: scale(1.1);
+        }
+
+        /* Settings screen */
+        .settings-section {
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .settings-title {
+            font-size: 20px;
+            color: var(--accent-primary);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            color: var(--text-white);
             font-size: 16px;
+        }
+
+        .setting-value {
+            color: var(--accent-secondary);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Toggle switch */
+        .toggle {
+            width: 50px;
+            height: 26px;
+            background: var(--text-gray);
+            border-radius: 13px;
+            position: relative;
             cursor: pointer;
+            transition: background 0.3s;
         }
 
-        select:focus {
-            outline: none;
-            border-color: #e94560;
+        .toggle.active {
+            background: var(--accent-primary);
         }
 
-        .info-text {
-            color: #b0b0b0;
-            font-size: 14px;
-            font-style: italic;
-            margin-top: 10px;
+        .toggle::after {
+            content: '';
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
         }
 
+        .toggle.active::after {
+            transform: translateX(24px);
+        }
+
+        /* Scrollbar custom */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-secondary);
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 768px) {
             .mode-grid {
                 grid-template-columns: 1fr;
             }
             
-            .title {
-                font-size: 24px;
+            .tipologie-main {
+                grid-template-columns: 1fr;
             }
             
-            .value-large {
-                font-size: 48px;
+            .grid-2,
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
             }
-            
-            .btn {
-                min-width: 120px;
-                font-size: 16px;
-            }
+        }
+
+        /* Loading animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
         }
     </style>
 </head>
 <body>
+    <!-- Preview Controls -->
+    <div class="preview-controls">
+        <h1>📐 Metro Digitale - Anteprima UI Completa</h1>
+        <button class="preview-btn active" onclick="showScreen('main')">🏠 Home</button>
+        <button class="preview-btn" onclick="showScreen('mode-select')">📋 Modalità</button>
+        <button class="preview-btn" onclick="showScreen('calibro')">📏 Calibro</button>
+        <button class="preview-btn" onclick="showScreen('vetri')">🪟 Vetri</button>
+        <button class="preview-btn" onclick="showScreen('rilievi-speciali')">📐 Rilievi Speciali</button>
+        <button class="preview-btn" onclick="showScreen('astine')">🔩 Astine</button>
+        <button class="preview-btn" onclick="showScreen('tipologie')">🪟 Tipologie</button>
+        <button class="preview-btn" onclick="showScreen('settings')">⚙️ Impostazioni</button>
+    </div>
+
+    <!-- Device Frame -->
     <div class="device-frame">
         <div class="screen">
-            <!-- Main Screen -->
+            <!-- SCREEN: Main/Home -->
             <div id="screen-main" class="screen-content active">
                 <div class="header">
-                    <div class="title">Metro Digitale</div>
-                    <div class="subtitle" id="mode-label">Modalità: Fermavetro</div>
-                </div>
-
-                <div class="value-display">
-                    <div class="value-large" id="main-value">0.00 mm</div>
+                    <div class="title">📐 Metro Digitale</div>
+                    <div class="subtitle">Multifunzione Professionale</div>
                 </div>
 
                 <div class="status-bar">
-                    <span id="status-bt">🔵 BT Connesso</span>
-                    <span id="status-zero">Zero: SI</span>
-                    <span id="status-battery">🔋 85%</span>
+                    <div class="status-item">
+                        <span>⚡</span>
+                        <span>100%</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="bt-connected">🔵</span>
+                        <span>Connesso</span>
+                    </div>
+                    <div class="status-item">
+                        <span>📏</span>
+                        <span>Fermavetro</span>
+                    </div>
+                </div>
+
+                <div class="value-display">
+                    <div class="value-label">Misura Corrente</div>
+                    <div class="value-large">1250.5</div>
+                    <div class="value-unit">millimetri</div>
                 </div>
 
                 <div class="button-container">
-                    <button class="btn btn-secondary" onclick="showScreen('mode-select')">Modalità</button>
-                    <button class="btn btn-primary" onclick="performZero()">ZERO</button>
-                    <button class="btn btn-secondary" onclick="showScreen('settings')">Impostazioni</button>
+                    <button class="btn btn-primary btn-large">🎯 ZERO</button>
+                    <button class="btn btn-secondary btn-large" onclick="showScreen('mode-select')">📋 MODALITÀ</button>
+                </div>
+
+                <div class="button-container" style="margin-top: 15px;">
+                    <button class="btn btn-secondary">📤 Invia BT</button>
+                    <button class="btn btn-secondary" onclick="showScreen('settings')">⚙️ Impostazioni</button>
                 </div>
             </div>
 
-            <!-- Mode Select Screen -->
+            <!-- SCREEN: Mode Select -->
             <div id="screen-mode-select" class="screen-content">
                 <div class="header">
                     <div class="title">Seleziona Modalità</div>
                 </div>
 
                 <div class="mode-grid">
-                    <div class="mode-card" onclick="setMode('fermavetro')">
-                        <div class="mode-icon">📏</div>
-                        <div class="mode-name">Fermavetro</div>
+                    <div class="mode-card">
+                        <div class="mode-icon">🔲</div>
+                        <div class="mode-title">Fermavetro</div>
+                        <div class="mode-desc">Misura rapida con invio automatico</div>
                     </div>
-                    <div class="mode-card" onclick="setMode('vetri')">
+
+                    <div class="mode-card" onclick="showScreen('vetri')">
                         <div class="mode-icon">🪟</div>
-                        <div class="mode-name">Vetri</div>
+                        <div class="mode-title">Vetri</div>
+                        <div class="mode-desc">Larghezza × Altezza con gioco materiale</div>
                     </div>
-                    <div class="mode-card" onclick="setMode('astine')">
+
+                    <div class="mode-card" onclick="showScreen('rilievi-speciali')">
                         <div class="mode-icon">📐</div>
-                        <div class="mode-name">Astine</div>
+                        <div class="mode-title">Rilievi Speciali</div>
+                        <div class="mode-desc">Astine, Tipologie e Formule</div>
                     </div>
-                    <div class="mode-card" onclick="setMode('calibro')">
-                        <div class="mode-icon">⚙️</div>
-                        <div class="mode-name">Calibro</div>
+
+                    <div class="mode-card" onclick="showScreen('calibro')">
+                        <div class="mode-icon">📏</div>
+                        <div class="mode-title">Calibro</div>
+                        <div class="mode-desc">Interfaccia minimale essenziale</div>
                     </div>
                 </div>
 
                 <div class="button-container">
-                    <button class="btn btn-secondary" onclick="showScreen('main')">Indietro</button>
+                    <button class="btn btn-secondary" onclick="showScreen('main')">← Indietro</button>
                 </div>
             </div>
 
-            <!-- Calibro Screen -->
+            <!-- SCREEN: Calibro -->
             <div id="screen-calibro" class="screen-content">
                 <div class="header">
-                    <div class="title">CALIBRO</div>
+                    <div class="title">📏 Calibro Digitale</div>
+                    <div class="subtitle">Precisione 0.01 mm</div>
                 </div>
 
-                <div class="value-display">
-                    <div class="value-large" id="calibro-value" style="color: #2ecc71;">0.00 mm</div>
+                <div class="value-display" style="flex: 1.5;">
+                    <div class="value-large" style="font-size: 96px;">875.25</div>
+                    <div class="value-unit" style="font-size: 32px;">mm</div>
                 </div>
 
                 <div class="button-container">
-                    <button class="btn btn-primary" style="font-size: 32px; padding: 30px 60px;" onclick="performZero()">ZERO</button>
-                </div>
-
-                <div class="button-container" style="margin-top: 20px;">
-                    <button class="btn btn-secondary" onclick="showScreen('mode-select')">Indietro</button>
+                    <button class="btn btn-primary btn-large">🎯 ZERO</button>
+                    <button class="btn btn-secondary" onclick="showScreen('mode-select')">📋 Modalità</button>
                 </div>
             </div>
 
-            <!-- Vetri Screen -->
+            <!-- SCREEN: Vetri -->
             <div id="screen-vetri" class="screen-content">
                 <div class="header">
-                    <div class="title">Modalità Vetri</div>
+                    <div class="title">🪟 Modalità Vetri</div>
+                    <div class="subtitle">Larghezza × Altezza</div>
+                </div>
+
+                <div class="vetri-input-group">
+                    <div class="input-row">
+                        <span class="input-label">Larghezza:</span>
+                        <span class="input-value">1200.0 mm</span>
+                    </div>
+                    <div class="input-row">
+                        <span class="input-label">Altezza:</span>
+                        <span class="input-value">1500.0 mm</span>
+                    </div>
                 </div>
 
                 <div class="card">
-                    <div class="card-title">Materiale Selezionato</div>
-                    <div class="card-value" id="vetri-materiale">Alluminio (gioco: 12mm)</div>
+                    <div class="card-title">🎨 Materiale</div>
+                    <div class="material-selector">
+                        <div class="material-chip active">Alluminio (-12mm)</div>
+                        <div class="material-chip">Legno (-6mm)</div>
+                        <div class="material-chip">PVC (-10mm)</div>
+                    </div>
                 </div>
 
-                <div class="measurement-card">
-                    <div class="measurement-row">
-                        <span class="measurement-label">Larghezza:</span>
-                        <span class="measurement-value" id="vetri-larghezza">-- mm</span>
+                <div class="card" style="margin-top: 15px;">
+                    <div class="card-title">📊 Risultato</div>
+                    <div class="card-content">
+                        <div style="font-size: 20px; color: var(--accent-primary);">
+                            Vetro: 1188.0 × 1488.0 mm
+                        </div>
+                        <div style="margin-top: 8px;">Quantità: 1 pezzo</div>
                     </div>
-                    <div class="measurement-row">
-                        <span class="measurement-label">Altezza:</span>
-                        <span class="measurement-value" id="vetri-altezza">0.00 mm</span>
+                </div>
+
+                <div class="button-container" style="margin-top: 15px;">
+                    <button class="btn btn-primary">💾 Salva</button>
+                    <button class="btn btn-secondary">📤 Invia App</button>
+                    <button class="btn btn-secondary" onclick="showScreen('mode-select')">← Indietro</button>
+                </div>
+            </div>
+
+            <!-- SCREEN: Rilievi Speciali Menu -->
+            <div id="screen-rilievi-speciali" class="screen-content">
+                <div class="header">
+                    <div class="title">📐 RILIEVI SPECIALI</div>
+                    <div class="subtitle">Menu Completo</div>
+                </div>
+
+                <div class="rilievi-menu">
+                    <div class="rilievi-card" onclick="showScreen('astine')">
+                        <div class="rilievi-icon">🔩</div>
+                        <div class="rilievi-content">
+                            <div class="rilievi-title">ASTINE</div>
+                            <div class="rilievi-subtitle">Anta Ribalta • Persiana • Cremonese</div>
+                        </div>
+                    </div>
+
+                    <div class="rilievi-card" onclick="showScreen('tipologie')">
+                        <div class="rilievi-icon">🪟</div>
+                        <div class="rilievi-content">
+                            <div class="rilievi-title">TIPOLOGIE INFISSO</div>
+                            <div class="rilievi-subtitle">Con formule e calcoli automatici</div>
+                        </div>
+                    </div>
+
+                    <div class="rilievi-card" onclick="showScreen('main')">
+                        <div class="rilievi-icon">🔲</div>
+                        <div class="rilievi-content">
+                            <div class="rilievi-title">FERMAVETRI</div>
+                            <div class="rilievi-subtitle">Con offset battute per materiale</div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="button-container">
-                    <button class="btn btn-primary btn-small" onclick="salvaLarghezza()">Salva Larghezza</button>
-                    <button class="btn btn-primary btn-small" onclick="salvaMisuraVetro()">Salva Misura</button>
-                </div>
-
-                <div class="button-container" style="margin-top: 10px;">
-                    <button class="btn btn-secondary btn-small" onclick="cambioMateriale()">Cambia Materiale</button>
-                    <button class="btn btn-secondary btn-small" onclick="showScreen('main')">Indietro</button>
+                    <button class="btn btn-secondary" onclick="showScreen('mode-select')">← Indietro</button>
                 </div>
             </div>
 
-            <!-- Astine Screen -->
+            <!-- SCREEN: Astine -->
             <div id="screen-astine" class="screen-content">
                 <div class="header">
-                    <div class="title">Modalità Astine</div>
+                    <div class="title">🔩 Modalità Astine</div>
                 </div>
 
-                <div class="card">
-                    <div class="card-title" id="astina-nome">Inferiore AR</div>
-                    <div class="card-value" id="astina-value">1234.50 mm</div>
-                    <div class="info-text">Offset: -65mm</div>
+                <div class="astina-group">
+                    <div class="astina-group-name" style="color: var(--accent-purple);">
+                        Anta Ribalta
+                    </div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <div style="font-size: 20px; color: var(--text-white); font-weight: 600;">
+                            Inferiore AR
+                        </div>
+                        <div class="astina-value">1185.0 mm</div>
+                        <div class="astina-offset">Offset: -65.0 mm</div>
+                    </div>
                 </div>
 
-                <div class="astina-list">
-                    <div class="astina-group">
-                        <div class="group-header group-anta-ribalta">Anta Ribalta</div>
-                        <div class="astina-item active" onclick="selectAstina(this, 'Inferiore AR', -65)">
-                            <span class="astina-name">Inferiore AR</span>
-                            <span class="astina-offset">-65mm</span>
-                        </div>
-                        <div class="astina-item" onclick="selectAstina(this, 'Superiore AR', -65)">
-                            <span class="astina-name">Superiore AR</span>
-                            <span class="astina-offset">-65mm</span>
-                        </div>
-                        <div class="astina-item" onclick="selectAstina(this, 'Laterale AR', -45)">
-                            <span class="astina-name">Laterale AR</span>
-                            <span class="astina-offset">-45mm</span>
-                        </div>
-                        <div class="astina-item" onclick="selectAstina(this, 'Cremonese AR', -30)">
-                            <span class="astina-name">Cremonese AR</span>
-                            <span class="astina-offset">-30mm</span>
+                <div class="nav-arrows">
+                    <div class="nav-arrow">◀</div>
+                    <div style="display: flex; align-items: center; gap: 10px; color: var(--text-gray);">
+                        <span>1 / 9</span>
+                    </div>
+                    <div class="nav-arrow">▶</div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-primary">📤 Invia</button>
+                    <button class="btn btn-secondary">✏️ Modifica</button>
+                </div>
+
+                <div class="button-container" style="margin-top: 15px;">
+                    <button class="btn btn-secondary btn-small" onclick="showScreen('rilievi-speciali')">← Indietro</button>
+                </div>
+            </div>
+
+            <!-- SCREEN: Tipologie Infisso -->
+            <div id="screen-tipologie" class="screen-content">
+                <div class="tipologie-header">
+                    <div class="tipologia-name">🪟 Finestra 2 Ante</div>
+                    <div class="tipologia-status">Rileva variabili: 2/2 • Calcolo completato</div>
+                </div>
+
+                <div class="tipologie-main">
+                    <div class="tipologie-panel">
+                        <div class="panel-title">📊 VARIABILI</div>
+                        <div class="panel-content">
+                            <div class="variable-item done">
+                                ✅ Larghezza (L): 1200.0 mm
+                            </div>
+                            <div class="variable-item done">
+                                ✅ Altezza (H): 1500.0 mm
+                            </div>
                         </div>
                     </div>
 
-                    <div class="astina-group">
-                        <div class="group-header group-persiana">Persiana</div>
-                        <div class="astina-item" onclick="selectAstina(this, 'Inferiore Persiana', -55)">
-                            <span class="astina-name">Inferiore Persiana</span>
-                            <span class="astina-offset">-55mm</span>
-                        </div>
-                        <div class="astina-item" onclick="selectAstina(this, 'Superiore Persiana', -55)">
-                            <span class="astina-name">Superiore Persiana</span>
-                            <span class="astina-offset">-55mm</span>
-                        </div>
-                    </div>
-
-                    <div class="astina-group">
-                        <div class="group-header group-cremonese">Cremonese Normale</div>
-                        <div class="astina-item" onclick="selectAstina(this, 'Cremonese Std', -25)">
-                            <span class="astina-name">Cremonese Std</span>
-                            <span class="astina-offset">-25mm</span>
-                        </div>
-                        <div class="astina-item" onclick="selectAstina(this, 'Cremonese Corta', -20)">
-                            <span class="astina-name">Cremonese Corta</span>
-                            <span class="astina-offset">-20mm</span>
-                        </div>
-                    </div>
-
-                    <div class="astina-group">
-                        <div class="group-header group-personalizzati">Personalizzati</div>
-                        <div class="astina-item" onclick="selectAstina(this, 'Custom 1', -40)">
-                            <span class="astina-name">Custom 1</span>
-                            <span class="astina-offset">-40mm</span>
+                    <div class="tipologie-panel">
+                        <div class="panel-title">🔧 ELEMENTI</div>
+                        <div class="panel-content">
+                            <div class="element-item active">
+                                ▶ Montante<br>
+                                <strong style="color: var(--accent-primary);">1490.0 mm</strong> × 2 pz<br>
+                                <small style="color: var(--text-gray);">Formula: H-10</small>
+                            </div>
+                            <div class="element-item">
+                                ⭕ Traversa Anta<br>
+                                <strong style="color: var(--accent-primary);">603.0 mm</strong> × 4 pz<br>
+                                <small style="color: var(--text-gray);">Formula: (L+6)/2</small>
+                            </div>
+                            <div class="element-item">
+                                ⭕ Centrale<br>
+                                <strong style="color: var(--accent-primary);">1480.0 mm</strong> × 1 pz<br>
+                                <small style="color: var(--text-gray);">Formula: H-20</small>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="button-container">
-                    <button class="btn btn-secondary btn-small" onclick="showScreen('main')">Indietro</button>
+                    <button class="btn btn-primary">📤 Invia</button>
+                    <button class="btn btn-secondary">🔄 Reset</button>
+                </div>
+
+                <div class="nav-arrows" style="margin-top: 10px;">
+                    <button class="btn btn-secondary btn-small">◀ Prec</button>
+                    <span style="color: var(--text-gray);">Finestra 2 Ante</span>
+                    <button class="btn btn-secondary btn-small">Succ ▶</button>
+                    <button class="btn btn-secondary btn-small" onclick="showScreen('rilievi-speciali')">← Menu</button>
                 </div>
             </div>
 
-            <!-- Settings Screen -->
+            <!-- SCREEN: Settings -->
             <div id="screen-settings" class="screen-content">
                 <div class="header">
-                    <div class="title">Impostazioni</div>
+                    <div class="title">⚙️ Impostazioni</div>
                 </div>
 
-                <div style="flex: 1; overflow-y: auto; padding: 10px;">
-                    <div class="card">
-                        <div class="card-title">Bluetooth</div>
-                        <div style="color: white; font-size: 16px; margin-top: 10px;">
-                            Stato: <span style="color: #2ecc71;">Connesso</span>
+                <div style="overflow-y: auto; flex: 1;">
+                    <div class="settings-section">
+                        <div class="settings-title">🔵 Bluetooth</div>
+                        <div class="setting-item">
+                            <span class="setting-label">Bluetooth</span>
+                            <div class="toggle active"></div>
                         </div>
-                        <div style="color: #b0b0b0; font-size: 14px; margin-top: 5px;">
-                            Dispositivo: Metro-Digitale-001
+                        <div class="setting-item">
+                            <span class="setting-label">Auto-invio Troncatrice</span>
+                            <div class="toggle active"></div>
                         </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-title">Display</div>
-                        <div class="control-group">
-                            <span style="color: white;">Luminosità:</span>
-                            <input type="range" min="20" max="100" value="80" id="brightness-slider" oninput="updateBrightness(this.value)">
-                            <span style="color: white;" id="brightness-value">80%</span>
+                        <div class="setting-item">
+                            <span class="setting-label">Nome Dispositivo</span>
+                            <span class="setting-value">Metro-Digitale</span>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-title">Encoder</div>
-                        <div style="color: white; font-size: 16px; margin-top: 10px;">
-                            Risoluzione: 0.005mm
+                    <div class="settings-section">
+                        <div class="settings-title">📏 Encoder</div>
+                        <div class="setting-item">
+                            <span class="setting-label">Risoluzione</span>
+                            <span class="setting-value">0.005 mm</span>
                         </div>
-                        <div style="color: #b0b0b0; font-size: 14px; margin-top: 5px;">
-                            Auto-zero: Attivo
+                        <div class="setting-item">
+                            <span class="setting-label">Auto-Zero</span>
+                            <div class="toggle active"></div>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-title">Informazioni</div>
-                        <div style="color: #b0b0b0; font-size: 14px; line-height: 1.8;">
-                            Firmware: v1.0.0<br>
-                            Hardware: ESP32-S3<br>
-                            Display: 800x480<br>
-                            Batteria: LiPo 3.7V
+                    <div class="settings-section">
+                        <div class="settings-title">🎨 Display</div>
+                        <div class="setting-item">
+                            <span class="setting-label">Luminosità</span>
+                            <span class="setting-value">80%</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Sleep Mode</span>
+                            <div class="toggle active"></div>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Timeout Sleep</span>
+                            <span class="setting-value">5 min</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="button-container">
-                    <button class="btn btn-primary" onclick="saveConfig()">Salva Configurazione</button>
-                    <button class="btn btn-secondary" onclick="showScreen('main')">Indietro</button>
+                    <button class="btn btn-primary">💾 Salva</button>
+                    <button class="btn btn-secondary" onclick="showScreen('main')">← Indietro</button>
                 </div>
             </div>
         </div>
-
-        <!-- Simulator Controls -->
-        <div class="controls">
-            <h3>🎮 Controlli Simulatore</h3>
-            
-            <div class="control-group">
-                <span class="control-label">Posizione Encoder:</span>
-                <input type="range" min="0" max="2000" value="1234.5" step="0.5" id="position-slider" oninput="updatePosition(this.value)">
-                <span class="value-output" id="position-output">1234.5 mm</span>
-            </div>
-
-            <div class="control-group">
-                <span class="control-label">Materiale:</span>
-                <select id="material-select" onchange="updateMaterial(this.value)">
-                    <option value="alluminio">Alluminio (-12mm)</option>
-                    <option value="legno">Legno (-6mm)</option>
-                    <option value="pvc">PVC (-10mm)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <span class="control-label">Velocità Auto:</span>
-                <button class="btn btn-secondary btn-small" onclick="startAutoIncrement()">▶️ Avvia</button>
-                <button class="btn btn-secondary btn-small" onclick="stopAutoIncrement()">⏸️ Stop</button>
-            </div>
-
-            <p class="info-text">
-                💡 Suggerimento: Muovi il cursore per simulare il movimento dell'encoder
-            </p>
-        </div>
-
-        <div id="toast" class="toast"></div>
     </div>
 
     <script>
-        // State
-        let currentMode = 'fermavetro';
-        let currentPosition = 1234.5;
-        let isZeroed = true;
-        let zeroOffset = 0;
-        let larghezzaSaved = false;
-        let larghezzaValue = 0;
-        let currentMaterial = 'alluminio';
-        let currentAstinaOffset = -65;
-        let autoIncrementInterval = null;
-
-        const materials = {
-            alluminio: { name: 'Alluminio', gioco: 12 },
-            legno: { name: 'Legno', gioco: 6 },
-            pvc: { name: 'PVC', gioco: 10 }
-        };
-
-        // Screen management
         function showScreen(screenId) {
-            document.querySelectorAll('.screen-content').forEach(s => s.classList.remove('active'));
-            document.getElementById(`screen-${screenId}`).classList.add('active');
+            // Hide all screens
+            document.querySelectorAll('.screen-content').forEach(screen => {
+                screen.classList.remove('active');
+            });
             
-            if (screenId === 'main') {
-                updateMainScreen();
-            } else if (screenId === 'calibro') {
-                updateCalibroScreen();
-            } else if (screenId === 'vetri') {
-                updateVetriScreen();
-            } else if (screenId === 'astine') {
-                updateAstineScreen();
-            }
-        }
-
-        // Mode management
-        function setMode(mode) {
-            currentMode = mode;
-            const modeNames = {
-                'fermavetro': 'Modalità: Fermavetro',
-                'vetri': 'Modalità: Vetri',
-                'astine': 'Modalità: Astine',
-                'calibro': 'Modalità: Calibro'
-            };
-            document.getElementById('mode-label').textContent = modeNames[mode];
-            
-            if (mode === 'calibro') {
-                showScreen('calibro');
-            } else if (mode === 'vetri') {
-                showScreen('vetri');
-            } else if (mode === 'astine') {
-                showScreen('astine');
-            } else {
-                showScreen('main');
+            // Show selected screen
+            const targetScreen = document.getElementById('screen-' + screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
             }
             
-            showToast(`Modalità cambiata: ${modeNames[mode]}`);
-        }
-
-        // Update functions
-        function updatePosition(value) {
-            currentPosition = parseFloat(value);
-            document.getElementById('position-output').textContent = value + ' mm';
-            updateAllScreens();
-        }
-
-        function updateAllScreens() {
-            updateMainScreen();
-            updateCalibroScreen();
-            updateVetriScreen();
-            updateAstineScreen();
-        }
-
-        function updateMainScreen() {
-            let displayValue = currentPosition - zeroOffset;
-            if (currentMode === 'astine') {
-                displayValue += currentAstinaOffset;
-            }
-            document.getElementById('main-value').textContent = displayValue.toFixed(2) + ' mm';
-        }
-
-        function updateCalibroScreen() {
-            const value = currentPosition - zeroOffset;
-            document.getElementById('calibro-value').textContent = value.toFixed(2) + ' mm';
-        }
-
-        function updateVetriScreen() {
-            const currentValue = currentPosition - zeroOffset;
+            // Update preview buttons
+            document.querySelectorAll('.preview-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
             
-            if (larghezzaSaved) {
-                document.getElementById('vetri-larghezza').textContent = larghezzaValue.toFixed(0) + ' mm';
-                document.getElementById('vetri-altezza').textContent = currentValue.toFixed(2) + ' mm';
-            } else {
-                document.getElementById('vetri-larghezza').textContent = '-- mm';
-                document.getElementById('vetri-altezza').textContent = currentValue.toFixed(2) + ' mm';
-            }
-
-            const mat = materials[currentMaterial];
-            document.getElementById('vetri-materiale').textContent = 
-                `${mat.name} (gioco: ${mat.gioco}mm)`;
+            event.target.classList.add('active');
         }
 
-        function updateAstineScreen() {
-            const rawValue = currentPosition - zeroOffset;
-            const finalValue = rawValue + currentAstinaOffset;
-            document.getElementById('astina-value').textContent = finalValue.toFixed(2) + ' mm';
-        }
+        // Add some interactivity
+        document.querySelectorAll('.toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
 
-        // Actions
-        function performZero() {
-            zeroOffset = currentPosition;
-            isZeroed = true;
-            document.getElementById('status-zero').textContent = 'Zero: SI';
-            showToast('✅ Zero impostato!');
-            updateAllScreens();
-        }
+        document.querySelectorAll('.material-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.material-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
 
-        function salvaLarghezza() {
-            larghezzaValue = currentPosition - zeroOffset;
-            larghezzaSaved = true;
-            showToast(`✅ Larghezza salvata: ${larghezzaValue.toFixed(0)} mm`);
-            performZero();
-            updateVetriScreen();
-        }
-
-        function salvaMisuraVetro() {
-            if (!larghezzaSaved) {
-                showToast('⚠️ Salvare prima la larghezza!', 'warning');
-                return;
-            }
-
-            const altezzaRaw = currentPosition - zeroOffset;
-            const mat = materials[currentMaterial];
-            const larghezzaNetta = larghezzaValue - mat.gioco;
-            const altezzaNetta = altezzaRaw - mat.gioco;
-
-            showToast(`✅ Misura inviata: ${Math.round(larghezzaNetta)} x ${Math.round(altezzaNetta)} mm`);
-            
-            // Reset
-            larghezzaSaved = false;
-            performZero();
-            updateVetriScreen();
-        }
-
-        function cambioMateriale() {
-            const materials = ['alluminio', 'legno', 'pvc'];
-            const currentIndex = materials.indexOf(currentMaterial);
-            const nextIndex = (currentIndex + 1) % materials.length;
-            currentMaterial = materials[nextIndex];
-            document.getElementById('material-select').value = currentMaterial;
-            updateMaterial(currentMaterial);
-        }
-
-        function updateMaterial(material) {
-            currentMaterial = material;
-            const mat = materials[material];
-            showToast(`Materiale: ${mat.name} (gioco ${mat.gioco}mm)`);
-            updateVetriScreen();
-        }
-
-        function selectAstina(element, nome, offset) {
-            document.querySelectorAll('.astina-item').forEach(item => item.classList.remove('active'));
-            element.classList.add('active');
-            
-            currentAstinaOffset = offset;
-            document.getElementById('astina-nome').textContent = nome;
-            document.querySelector('#screen-astine .info-text').textContent = `Offset: ${offset}mm`;
-            
-            showToast(`Astina selezionata: ${nome}`);
-            updateAstineScreen();
-        }
-
-        function updateBrightness(value) {
-            document.getElementById('brightness-value').textContent = value + '%';
-        }
-
-        function saveConfig() {
-            showToast('✅ Configurazione salvata in NVS');
-        }
-
-        // Auto increment
-        function startAutoIncrement() {
-            if (autoIncrementInterval) return;
-            
-            autoIncrementInterval = setInterval(() => {
-                currentPosition += 0.5;
-                if (currentPosition > 2000) currentPosition = 0;
-                
-                document.getElementById('position-slider').value = currentPosition;
-                document.getElementById('position-output').textContent = currentPosition.toFixed(1) + ' mm';
-                updateAllScreens();
-            }, 100);
-            
-            showToast('▶️ Auto-incremento avviato');
-        }
-
-        function stopAutoIncrement() {
-            if (autoIncrementInterval) {
-                clearInterval(autoIncrementInterval);
-                autoIncrementInterval = null;
-                showToast('⏸️ Auto-incremento fermato');
-            }
-        }
-
-        // Toast notifications
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            
-            if (type === 'warning') {
-                toast.style.background = '#f1c40f';
-            } else if (type === 'error') {
-                toast.style.background = '#e74c3c';
-            } else {
-                toast.style.background = '#2ecc71';
-            }
-            
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // Initialize
-        updateAllScreens();
-        
-        console.log('📐 Metro Digitale UI Preview');
-        console.log('✅ Simulator ready');
-        console.log('💡 Use slider to simulate encoder movement');
+        // Simulate live value updates
+        setInterval(() => {
+            const valueLarge = document.querySelectorAll('.value-large');
+            valueLarge.forEach(elem => {
+                if (elem.textContent.includes('.')) {
+                    const currentValue = parseFloat(elem.textContent);
+                    const newValue = currentValue + (Math.random() - 0.5) * 2;
+                    elem.textContent = newValue.toFixed(1);
+                }
+            });
+        }, 2000);
     </script>
 </body>
 </html>

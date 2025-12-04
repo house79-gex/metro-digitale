@@ -11,7 +11,9 @@ typedef enum {
     UI_SCREEN_CALIBRO,
     UI_SCREEN_VETRI,
     UI_SCREEN_ASTINE,
-    UI_SCREEN_SETTINGS
+    UI_SCREEN_SETTINGS,
+    UI_SCREEN_RILIEVI_SPECIALI,
+    UI_SCREEN_TIPOLOGIE
 } UIScreen;
 
 // Inizializzazione UI
@@ -34,11 +36,15 @@ lv_obj_t* ui_vetri_create(void);
 lv_obj_t* ui_astine_create(void);
 lv_obj_t* ui_mode_select_create(void);
 lv_obj_t* ui_settings_create(void);
+lv_obj_t* ui_rilievi_speciali_create(void);
+lv_obj_t* ui_tipologie_create(void);
 
 // Funzioni aggiornamento schermate
 void ui_main_update(void);
 void ui_calibro_update(void);
 void ui_vetri_update(void);
 void ui_astine_update(void);
+void ui_rilievi_speciali_update(void);
+void ui_tipologie_update(void);
 
 #endif // UI_MANAGER_H

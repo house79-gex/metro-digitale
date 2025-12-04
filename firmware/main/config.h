@@ -9,7 +9,8 @@ typedef enum {
     MODE_FERMAVETRO = 0,
     MODE_VETRO = 1,
     MODE_ASTINA = 2,
-    MODE_CALIBRO = 3
+    MODE_CALIBRO = 3,
+    MODE_RILIEVI_SPECIALI = 4
 } OperatingMode;
 
 // Configurazione puntale (per modalità fermavetro)
@@ -47,6 +48,41 @@ typedef struct {
     bool attivo;
 } AstinaConfig;
 
+// Variabile per formula (RILIEVI SPECIALI)
+typedef struct {
+    char nome[16];           // "L", "H", "B"
+    char descrizione[48];    // "Larghezza", "Altezza", "Battuta"
+    float valore;
+    bool rilevato;
+    bool obbligatorio;
+} VariabileRilievo;
+
+// Elemento calcolato (RILIEVI SPECIALI)
+typedef struct {
+    char nome[48];           // "Traversa Anta"
+    char formula[64];        // "(L+6)/2"
+    float risultato;
+    uint8_t quantita_default;
+    uint8_t quantita_attuale;
+    bool inviato;
+} ElementoCalcolato;
+
+// Tipologia infisso (RILIEVI SPECIALI)
+#define MAX_VARIABILI_RILIEVO 8
+#define MAX_ELEMENTI_CALCOLATI 16
+#define MAX_TIPOLOGIE_INFISSO 16
+
+typedef struct {
+    char nome[48];           // "Finestra 2 Ante"
+    char icona[8];           // emoji
+    char categoria[32];      // "Finestre"
+    VariabileRilievo variabili[MAX_VARIABILI_RILIEVO];
+    uint8_t num_variabili;
+    ElementoCalcolato elementi[MAX_ELEMENTI_CALCOLATI];
+    uint8_t num_elementi;
+    bool attivo;
+} TipologiaInfisso;
+
 // Configurazione globale
 #define MAX_PUNTALI 8
 #define MAX_MATERIALI 8
@@ -77,6 +113,11 @@ typedef struct {
     uint8_t num_astine;
     AstinaConfig astine[MAX_ASTINE];
     uint8_t astina_corrente_idx;
+    
+    // Tipologie Infisso (RILIEVI SPECIALI)
+    uint8_t num_tipologie;
+    TipologiaInfisso tipologie[MAX_TIPOLOGIE_INFISSO];
+    uint8_t tipologia_corrente_idx;
     
     // Bluetooth
     bool bluetooth_enabled;
@@ -134,6 +175,15 @@ void config_add_astina(GlobalConfig *cfg, const char *nome,
                        float offset, uint8_t gruppo_idx);
 void config_set_astina_corrente(GlobalConfig *cfg, uint8_t idx);
 void config_remove_astina(GlobalConfig *cfg, uint8_t idx);
+
+// Funzioni di gestione tipologie infisso
+void config_add_tipologia(GlobalConfig *cfg, const char *nome, 
+                          const char *icona, const char *categoria);
+void config_add_variabile(TipologiaInfisso *tip, const char *nome,
+                          const char *descrizione, bool obbligatorio);
+void config_add_elemento(TipologiaInfisso *tip, const char *nome,
+                         const char *formula, uint8_t quantita_default);
+void config_set_tipologia_corrente(GlobalConfig *cfg, uint8_t idx);
 
 // Variabili globali (extern)
 extern GlobalConfig g_config;

@@ -60,7 +60,58 @@ if data['type'] == 'fermavetro':
         start_taglio(misura)
 ```
 
-### 2. Modalità Vetri → App Android
+### 2. Modalità Rilievi Speciali → Troncatrice
+
+**Direzione:** Metro Digitale → Troncatrice BLITZ
+
+**Trigger:** Invio elemento da Tipologia Infisso
+
+```json
+{
+  "type": "rilievo_speciale",
+  "dest": "troncatrice",
+  "tipologia": "Finestra 2 Ante",
+  "elemento": "Traversa Anta",
+  "formula": "(L+6)/2",
+  "misura_mm": 603.0,
+  "num_pezzi": 4,
+  "auto_start": false,
+  "timestamp": 1701234567890
+}
+```
+
+**Campi:**
+- `type` (string): Tipo di misura, sempre "rilievo_speciale"
+- `dest` (string): Destinazione del messaggio ("troncatrice")
+- `tipologia` (string): Nome tipologia infisso (es. "Finestra 2 Ante")
+- `elemento` (string): Nome elemento calcolato (es. "Traversa Anta")
+- `formula` (string): Formula usata per il calcolo (es. "(L+6)/2")
+- `misura_mm` (float): Misura calcolata in millimetri
+- `num_pezzi` (int): Numero di pezzi da tagliare (default: 1)
+- `auto_start` (bool): Se `true`, troncatrice avvia taglio automaticamente
+- `timestamp` (number): Unix timestamp in millisecondi
+
+**Esempio Python (receiver - BLITZ integration):**
+```python
+import json
+
+data = json.loads(message)
+if data['type'] == 'rilievo_speciale':
+    misura = data['misura_mm']
+    num_pezzi = data.get('num_pezzi', 1)
+    
+    # Popola campo misura
+    self.ext_len.setText(f"{misura:.1f}")
+    
+    # Popola contapezzi
+    if hasattr(self, 'spin_count'):
+        self.spin_count.setValue(num_pezzi)
+    
+    if data.get('auto_start'):
+        self._start_positioning()
+```
+
+### 3. Modalità Vetri → App Android
 
 **Direzione:** Metro Digitale → App Android
 
@@ -105,13 +156,13 @@ if (data['type'] == 'vetro') {
 }
 ```
 
-### 3. Comandi da Client → Metro
+### 4. Comandi da Client → Metro
 
 **Direzione:** Client → Metro Digitale
 
 **Caratteristica:** RX (Write)
 
-#### 3.1 Zero Encoder
+#### 4.1 Zero Encoder
 ```json
 {
   "command": "zero",
@@ -119,16 +170,16 @@ if (data['type'] == 'vetro') {
 }
 ```
 
-#### 3.2 Cambio Modalità
+#### 4.2 Cambio Modalità
 ```json
 {
   "command": "set_mode",
   "mode": "calibro"
 }
 ```
-Valori `mode`: "fermavetro", "vetro", "astina", "calibro"
+Valori `mode`: "fermavetro", "vetro", "astina", "calibro", "rilievi_speciali"
 
-#### 3.3 Cambio Materiale
+#### 4.3 Cambio Materiale
 ```json
 {
   "command": "set_materiale",
@@ -136,7 +187,7 @@ Valori `mode`: "fermavetro", "vetro", "astina", "calibro"
 }
 ```
 
-#### 3.4 Cambio Astina
+#### 4.4 Cambio Astina
 ```json
 {
   "command": "set_astina",
@@ -144,7 +195,15 @@ Valori `mode`: "fermavetro", "vetro", "astina", "calibro"
 }
 ```
 
-#### 3.5 Request Status
+#### 4.5 Cambio Tipologia Infisso
+```json
+{
+  "command": "set_tipologia",
+  "tipologia_idx": 1
+}
+```
+
+#### 4.6 Request Status
 ```json
 {
   "command": "get_status"

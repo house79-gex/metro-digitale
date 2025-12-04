@@ -63,6 +63,47 @@ void config_init_defaults(GlobalConfig *cfg) {
     
     cfg->astina_corrente_idx = 0;
     
+    // Tipologie infisso default (RILIEVI SPECIALI)
+    cfg->num_tipologie = 0;
+    
+    // Finestra 1 Anta
+    config_add_tipologia(cfg, "Finestra 1 Anta", "🪟", "Finestre");
+    TipologiaInfisso *tip = &cfg->tipologie[cfg->num_tipologie - 1];
+    config_add_variabile(tip, "L", "Larghezza", true);
+    config_add_variabile(tip, "H", "Altezza", true);
+    config_add_elemento(tip, "Montante Fisso", "H-10", 1);
+    config_add_elemento(tip, "Montante Mobile", "H-15", 1);
+    config_add_elemento(tip, "Traversa", "L+6", 2);
+    
+    // Finestra 2 Ante
+    config_add_tipologia(cfg, "Finestra 2 Ante", "🪟", "Finestre");
+    tip = &cfg->tipologie[cfg->num_tipologie - 1];
+    config_add_variabile(tip, "L", "Larghezza", true);
+    config_add_variabile(tip, "H", "Altezza", true);
+    config_add_elemento(tip, "Montante", "H-10", 2);
+    config_add_elemento(tip, "Traversa Anta", "(L+6)/2", 4);
+    config_add_elemento(tip, "Centrale", "H-20", 1);
+    
+    // Porta Finestra 1 Anta
+    config_add_tipologia(cfg, "Porta Finestra 1 Anta", "🪟", "Porte Finestre");
+    tip = &cfg->tipologie[cfg->num_tipologie - 1];
+    config_add_variabile(tip, "L", "Larghezza", true);
+    config_add_variabile(tip, "H", "Altezza", true);
+    config_add_elemento(tip, "Montante Fisso", "H-10", 1);
+    config_add_elemento(tip, "Montante Mobile", "H-15", 1);
+    config_add_elemento(tip, "Traversa Sup", "L+6", 1);
+    
+    // Scorrevole 2 Ante
+    config_add_tipologia(cfg, "Scorrevole 2 Ante", "🪟", "Scorrevoli");
+    tip = &cfg->tipologie[cfg->num_tipologie - 1];
+    config_add_variabile(tip, "L", "Larghezza", true);
+    config_add_variabile(tip, "H", "Altezza", true);
+    config_add_elemento(tip, "Montante Fisso", "H-8", 2);
+    config_add_elemento(tip, "Montante Mobile", "H-12", 2);
+    config_add_elemento(tip, "Traversa", "(L+10)/2", 4);
+    
+    cfg->tipologia_corrente_idx = 0;
+    
     // Bluetooth
     cfg->bluetooth_enabled = true;
     strncpy(cfg->bt_device_name, "Metro-Digitale", sizeof(cfg->bt_device_name) - 1);
@@ -233,4 +274,67 @@ void config_remove_astina(GlobalConfig *cfg, uint8_t idx) {
     }
     
     ESP_LOGI(TAG, "Astina rimossa, totale: %d", cfg->num_astine);
+}
+
+// Gestione tipologie infisso
+void config_add_tipologia(GlobalConfig *cfg, const char *nome, 
+                          const char *icona, const char *categoria) {
+    if (cfg->num_tipologie >= MAX_TIPOLOGIE_INFISSO) {
+        ESP_LOGW(TAG, "Raggiunto limite massimo tipologie");
+        return;
+    }
+    
+    TipologiaInfisso *tip = &cfg->tipologie[cfg->num_tipologie];
+    memset(tip, 0, sizeof(TipologiaInfisso));
+    strncpy(tip->nome, nome, sizeof(tip->nome) - 1);
+    strncpy(tip->icona, icona, sizeof(tip->icona) - 1);
+    strncpy(tip->categoria, categoria, sizeof(tip->categoria) - 1);
+    tip->attivo = true;
+    tip->num_variabili = 0;
+    tip->num_elementi = 0;
+    
+    cfg->num_tipologie++;
+    ESP_LOGI(TAG, "Tipologia aggiunta: %s", nome);
+}
+
+void config_add_variabile(TipologiaInfisso *tip, const char *nome,
+                          const char *descrizione, bool obbligatorio) {
+    if (!tip || tip->num_variabili >= MAX_VARIABILI_RILIEVO) {
+        ESP_LOGW(TAG, "Impossibile aggiungere variabile");
+        return;
+    }
+    
+    VariabileRilievo *var = &tip->variabili[tip->num_variabili];
+    strncpy(var->nome, nome, sizeof(var->nome) - 1);
+    strncpy(var->descrizione, descrizione, sizeof(var->descrizione) - 1);
+    var->valore = 0.0f;
+    var->rilevato = false;
+    var->obbligatorio = obbligatorio;
+    
+    tip->num_variabili++;
+}
+
+void config_add_elemento(TipologiaInfisso *tip, const char *nome,
+                         const char *formula, uint8_t quantita_default) {
+    if (!tip || tip->num_elementi >= MAX_ELEMENTI_CALCOLATI) {
+        ESP_LOGW(TAG, "Impossibile aggiungere elemento");
+        return;
+    }
+    
+    ElementoCalcolato *elem = &tip->elementi[tip->num_elementi];
+    strncpy(elem->nome, nome, sizeof(elem->nome) - 1);
+    strncpy(elem->formula, formula, sizeof(elem->formula) - 1);
+    elem->risultato = 0.0f;
+    elem->quantita_default = quantita_default;
+    elem->quantita_attuale = quantita_default;
+    elem->inviato = false;
+    
+    tip->num_elementi++;
+}
+
+void config_set_tipologia_corrente(GlobalConfig *cfg, uint8_t idx) {
+    if (idx < cfg->num_tipologie) {
+        cfg->tipologia_corrente_idx = idx;
+        ESP_LOGI(TAG, "Tipologia corrente: %s", cfg->tipologie[idx].nome);
+    }
 }
