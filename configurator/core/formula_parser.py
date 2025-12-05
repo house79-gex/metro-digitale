@@ -81,15 +81,16 @@ class FormulaParser:
             return False, "Formula vuota"
         
         try:
-            # Controlla sintassi
-            self.parse(formula)
-            
             # Controlla variabili utilizzate
             used_vars = self.get_variables(formula)
             invalid_vars = [v for v in used_vars if v not in variabili]
             
             if invalid_vars:
                 return False, f"Variabili non definite: {', '.join(invalid_vars)}"
+            
+            # Prova a valutare con valori test per verificare sintassi
+            test_values = {var: 100.0 for var in variabili}
+            self.evaluate(formula, test_values)
             
             return True, ""
             
