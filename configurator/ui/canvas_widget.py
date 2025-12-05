@@ -41,7 +41,7 @@ class CanvasElement(QGraphicsRectItem):
         "MaterialSelector": {"color": "#00ff88", "text_color": "#000", "default_size": (180, 100)},
     }
     
-    def __init__(self, element_type: str, x: float, y: float):
+    def __init__(self, element_type: str, x: float, y: float, canvas_widget=None):
         style = self.ELEMENT_STYLES.get(element_type, {"color": "#888888", "text_color": "#fff", "default_size": (100, 50)})
         width, height = style["default_size"]
         
@@ -49,6 +49,7 @@ class CanvasElement(QGraphicsRectItem):
         
         self.element_type = element_type
         self.is_selected = False
+        self.canvas_widget = canvas_widget
         
         # Stile elemento
         self.setBrush(QBrush(QColor(style["color"])))
@@ -86,10 +87,26 @@ class CanvasElement(QGraphicsRectItem):
     def contextMenuEvent(self, event):
         """Menu contestuale"""
         menu = QMenu()
-        delete_action = menu.addAction("Elimina")
-        duplicate_action = menu.addAction("Duplica")
+        menu.setStyleSheet("""
+            QMenu {
+                background: #16213e;
+                color: #ffffff;
+                border: 1px solid #3b4b5a;
+                border-radius: 4px;
+            }
+            QMenu::item {
+                padding: 8px 20px;
+            }
+            QMenu::item:selected {
+                background: #00ff88;
+                color: #1a1a2e;
+            }
+        """)
+        
+        delete_action = menu.addAction("🗑️ Elimina")
+        duplicate_action = menu.addAction("📋 Duplica")
         menu.addSeparator()
-        properties_action = menu.addAction("Proprietà")
+        properties_action = menu.addAction("⚙️ Proprietà")
         
         action = menu.exec(event.screenPos())
         
@@ -101,12 +118,14 @@ class CanvasElement(QGraphicsRectItem):
                 new_elem = CanvasElement(
                     self.element_type, 
                     self.x() + self.DUPLICATE_OFFSET_X, 
-                    self.y() + self.DUPLICATE_OFFSET_Y
+                    self.y() + self.DUPLICATE_OFFSET_Y,
+                    self.canvas_widget
                 )
                 self.scene().addItem(new_elem)
         elif action == properties_action:
-            # TODO: Open properties dialog
-            pass
+            # Emetti segnale per aprire proprietà
+            if self.canvas_widget:
+                self.canvas_widget.open_properties_requested.emit(self)
 
 
 class CanvasWidget(QGraphicsView):
@@ -114,6 +133,7 @@ class CanvasWidget(QGraphicsView):
     
     selection_changed = pyqtSignal(list)
     mouse_position_changed = pyqtSignal(int, int)
+    open_properties_requested = pyqtSignal(object)
     
     # Metro Digitale display dimensions (5" screen)
     DISPLAY_WIDTH = 800
@@ -231,7 +251,7 @@ class CanvasWidget(QGraphicsView):
                 y = round(y / self.grid_size) * self.grid_size
             
             # Crea elemento
-            element = CanvasElement(element_type, x, y)
+            element = CanvasElement(element_type, x, y, canvas_widget=self)
             self.scene.addItem(element)
             
             event.acceptProposedAction()
@@ -273,6 +293,10 @@ class CanvasWidget(QGraphicsView):
 
 class DisplayPreviewWidget(QWidget):
     """Widget contenitore con header, canvas e footer"""
+    
+    # Dimensioni reali display 5" in pixel
+    DISPLAY_WIDTH = 800
+    DISPLAY_HEIGHT = 480
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -340,30 +364,67 @@ class DisplayPreviewWidget(QWidget):
         return header
     
     def _create_canvas_container(self) -> QWidget:
-        """Crea container con cornice 3D e canvas"""
+        """Crea container con display 5 pollici proporzionato"""
         container = QWidget()
-        container.setStyleSheet("background: #0a0e1a;")
-        container_layout = QVBoxLayout(container)
+        container.setStyleSheet("background: #0a0a15;")
+        container_layout = QHBoxLayout(container)
         container_layout.setContentsMargins(20, 20, 20, 20)
         
-        # Frame con cornice 3D
+        # Widget centrale che contiene la cornice
+        center_widget = QWidget()
+        center_layout = QVBoxLayout(center_widget)
+        center_layout.setContentsMargins(0, 0, 0, 0)
+        center_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        # Frame con cornice 3D (simula case dello strumento)
+        # Proporzioni: display 800x480 + bezel 25px per lato
+        bezel = 25
+        frame_width = self.DISPLAY_WIDTH + bezel * 2
+        frame_height = self.DISPLAY_HEIGHT + bezel * 2
+        
         frame = QWidget()
+        frame.setFixedSize(frame_width, frame_height)
         frame.setStyleSheet("""
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                stop:0 #4a4a5a, stop:0.5 #6a6a7a, stop:1 #3a3a4a);
-            border: 3px solid #2a2a3a;
-            border-radius: 8px;
-            padding: 15px;
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #4a5a6a, stop:0.3 #3a4a5a, stop:0.7 #2a3a4a, stop:1 #1a2a3a);
+            border: 2px solid #5a6a7a;
+            border-radius: 12px;
         """)
         frame_layout = QVBoxLayout(frame)
-        frame_layout.setContentsMargins(15, 15, 15, 15)
+        frame_layout.setContentsMargins(bezel, bezel, bezel, bezel)
+        frame_layout.setSpacing(0)
         
-        # Canvas
+        # Canvas con dimensione fissa proporzionata
         self.canvas = CanvasWidget()
-        self.canvas.setStyleSheet("border: 3px solid #00ff88; background: #16213e;")
+        self.canvas.setFixedSize(self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT)
+        self.canvas.setStyleSheet("""
+            border: 2px solid #00ff88;
+            background: #1a1a2e;
+            border-radius: 4px;
+        """)
         frame_layout.addWidget(self.canvas)
         
-        container_layout.addWidget(frame, 0, Qt.AlignmentFlag.AlignCenter)
+        # Label "5 IPS" sulla cornice
+        label_5inch = QLabel("5\" IPS Touch", frame)
+        label_5inch.setStyleSheet("""
+            color: #888;
+            font-size: 10px;
+            background: transparent;
+            border: none;
+        """)
+        label_5inch.move(frame_width - 80, 8)
+        
+        center_layout.addWidget(frame)
+        
+        # Indicatori dimensioni sotto il frame
+        dims_label = QLabel(f"Display: {self.DISPLAY_WIDTH} × {self.DISPLAY_HEIGHT} px (Aspect 5:3)")
+        dims_label.setStyleSheet("color: #00ff88; font-size: 11px; margin-top: 8px;")
+        dims_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        center_layout.addWidget(dims_label)
+        
+        container_layout.addStretch()
+        container_layout.addWidget(center_widget)
+        container_layout.addStretch()
         
         return container
     
