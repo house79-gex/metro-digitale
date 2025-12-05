@@ -86,5 +86,17 @@ class TipologiaEditor(QWidget):
         """Modifica tipologia selezionata"""
         current_row = self.list.currentRow()
         if current_row >= 0:
-            # TODO: Apri dialog editing tipologia
-            pass
+            # TODO: Implementare dialog editing tipologia con:
+            # - Nome e categoria
+            # - Icona (con IconBrowserDialog)
+            # - Lista variabili (nome, descrizione, valore test)
+            # - Lista elementi calcolati (nome, formula, quantità, colore)
+            # - Anteprima calcoli con valori test
+            # Per ora, gli utenti possono rimuovere e ricreare tipologie
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.information(
+                self,
+                "Funzione in sviluppo",
+                "L'editing delle tipologie esistenti sarà disponibile in una versione futura.\n"
+                "Per ora, rimuovi e ricrea la tipologia con le modifiche desiderate."
+            )

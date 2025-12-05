@@ -2,7 +2,6 @@
 
 # GUI Framework
 PyQt6>=6.5.0
-PyQt6-WebEngine>=6.5.0
 
 # Comunicazione seriale ESP32
 pyserial>=3.5

@@ -130,5 +130,17 @@ class MenuEditor(QWidget):
         if not current:
             return
         
-        # TODO: Apri dialog editing menu
-        pass
+        # TODO: Implementare dialog editing menu con campi:
+        # - Nome menu
+        # - Icona (con IconBrowserDialog)
+        # - Colore (con ColorPickerDialog)
+        # - Azione (navigate/function)
+        # - Parametri azione
+        # Per ora, gli utenti possono rimuovere e ricreare menu
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(
+            self,
+            "Funzione in sviluppo",
+            "L'editing dei menu esistenti sarà disponibile in una versione futura.\n"
+            "Per ora, rimuovi e ricrea il menu con le modifiche desiderate."
+        )

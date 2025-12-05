@@ -122,6 +122,9 @@ class FormulaParser:
         # Sostituisci variabili e valuta
         try:
             # Crea namespace sicuro con funzioni matematiche
+            # NOTA: Uso di eval() limitato a namespace sicuro senza __builtins__
+            # Le formule provengono da utenti fidati (configuratori del dispositivo)
+            # Per maggiore sicurezza, validare sempre le variabili prima di valutare
             safe_dict = {
                 'round': round,
                 'abs': abs,
