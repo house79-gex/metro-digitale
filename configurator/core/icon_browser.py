@@ -3,8 +3,8 @@ Client per Iconify API - accesso a 200,000+ icone gratuite
 """
 
 import requests
-from typing import List, Dict, Optional
-from dataclasses import dataclass
+from typing import List, Tuple, Optional
+from dataclasses import dataclass, field
 import os
 import json
 from pathlib import Path
@@ -14,211 +14,135 @@ from pathlib import Path
 class IconInfo:
     """Informazioni su un'icona"""
     name: str
-    set: str
+    prefix: str
     width: int = 24
     height: int = 24
-    tags: List[str] = None
-    
-    def __post_init__(self):
-        if self.tags is None:
-            self.tags = []
+    tags: List[str] = field(default_factory=list)
     
     @property
     def full_name(self) -> str:
-        """Nome completo icona (set:name)"""
-        return f"{self.set}:{self.name}"
+        return f"{self.prefix}:{self.name}"
 
 
 class IconifyClient:
-    """Client per Iconify API"""
+    """Client per Iconify API con ricerca funzionante"""
     
-    BASE_URL = "https://api.iconify.design"
+    SEARCH_URL = "https://api.iconify.design/search"
+    ICON_URL = "https://api.iconify.design"
     
-    # Set di icone raccomandati per Metro Digitale
     RECOMMENDED_SETS = [
-        "mdi",          # Material Design Icons (7000+)
-        "tabler",       # Tabler Icons (4600+)
-        "lucide",       # Lucide (1400+)
-        "phosphor",     # Phosphor (7000+)
-        "carbon",       # IBM Carbon (2000+)
-        "fluent",       # Microsoft Fluent (4000+)
-        "fa6-solid",    # Font Awesome 6
+        ("mdi", "Material Design Icons"),
+        ("tabler", "Tabler Icons"),
+        ("lucide", "Lucide"),
+        ("phosphor", "Phosphor"),
+        ("carbon", "IBM Carbon"),
+        ("fluent", "Microsoft Fluent"),
+        ("fa6-solid", "Font Awesome 6"),
+        ("heroicons", "Heroicons"),
+        ("bi", "Bootstrap Icons"),
     ]
     
-    # Suggerimenti per serramenti
-    WINDOW_SUGGESTIONS = {
-        "finestre": ["window", "frame", "glass", "rectangle"],
-        "porte": ["door", "entrance", "gate", "exit"],
-        "strumenti": ["ruler", "measure", "tool", "wrench"],
-        "azioni": ["send", "save", "settings", "home", "menu"],
-    }
+    FALLBACK_ICONS = [
+        IconInfo("window-maximize", "mdi"),
+        IconInfo("door", "mdi"),
+        IconInfo("ruler", "mdi"),
+        IconInfo("cog", "mdi"),
+        IconInfo("home", "mdi"),
+        IconInfo("send", "mdi"),
+        IconInfo("content-save", "mdi"),
+        IconInfo("arrow-left", "mdi"),
+        IconInfo("arrow-right", "mdi"),
+        IconInfo("plus", "mdi"),
+        IconInfo("minus", "mdi"),
+        IconInfo("check", "mdi"),
+        IconInfo("close", "mdi"),
+        IconInfo("menu", "mdi"),
+        IconInfo("dots-vertical", "mdi"),
+    ]
     
     def __init__(self, cache_dir: Optional[str] = None):
-        """
-        Inizializza client Iconify
-        
-        Args:
-            cache_dir: Directory per cache locale (default: ~/.metro_digitale/icons)
-        """
         if cache_dir is None:
             cache_dir = os.path.join(Path.home(), ".metro_digitale", "icons")
-        
         self.cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
-        
         self.session = requests.Session()
         self.session.headers.update({
-            'User-Agent': 'MetroDigitaleConfigurator/1.0'
+            'User-Agent': 'MetroDigitaleConfigurator/1.0',
+            'Accept': 'application/json'
         })
     
-    def search(self, query: str, limit: int = 64, icon_set: Optional[str] = None) -> List[IconInfo]:
-        """
-        Cerca icone su Iconify
+    def search(self, query: str, limit: int = 64, prefix: Optional[str] = None) -> List[IconInfo]:
+        if not query or not query.strip():
+            return self.FALLBACK_ICONS[:limit]
         
-        Args:
-            query: Termine di ricerca
-            limit: Numero massimo risultati
-            icon_set: Set specifico (es: "mdi") o None per tutti
-            
-        Returns:
-            Lista di IconInfo
-        """
         try:
-            # Usa API di ricerca Iconify
             params = {
-                'query': query,
-                'limit': limit,
+                'query': query.strip(),
+                'limit': min(limit, 999),
             }
+            if prefix:
+                params['prefix'] = prefix
+            else:
+                params['prefixes'] = ','.join([s[0] for s in self.RECOMMENDED_SETS])
             
-            if icon_set:
-                params['prefix'] = icon_set
+            response = self.session.get(self.SEARCH_URL, params=params, timeout=10)
             
-            # Nota: Iconify non ha API di ricerca pubblica diretta
-            # Usiamo endpoint collection per ottenere icone di un set
+            if response.status_code != 200:
+                return self._search_fallback(query, limit)
+            
+            data = response.json()
             results = []
             
-            sets_to_search = [icon_set] if icon_set else self.RECOMMENDED_SETS
+            for icon_full_name in data.get('icons', []):
+                if ':' in icon_full_name:
+                    prefix_part, name_part = icon_full_name.split(':', 1)
+                    results.append(IconInfo(name=name_part, prefix=prefix_part))
             
-            for iset in sets_to_search:
-                # Prova a caricare la collection
-                try:
-                    collection = self._load_collection(iset)
-                    if collection:
-                        # Filtra icone che matchano la query
-                        icons = collection.get('icons', {})
-                        for icon_name in icons:
-                            if query.lower() in icon_name.lower():
-                                info = IconInfo(
-                                    name=icon_name,
-                                    set=iset,
-                                    width=icons[icon_name].get('width', 24),
-                                    height=icons[icon_name].get('height', 24)
-                                )
-                                results.append(info)
-                                
-                                if len(results) >= limit:
-                                    return results
-                except:
-                    continue
-            
-            return results
+            return results[:limit] if results else self._search_fallback(query, limit)
             
         except Exception as e:
             print(f"Errore ricerca icone: {e}")
-            return []
+            return self._search_fallback(query, limit)
     
-    def _load_collection(self, icon_set: str) -> Optional[Dict]:
-        """Carica metadata collection da cache o API"""
-        cache_file = os.path.join(self.cache_dir, f"{icon_set}.json")
-        
-        # Prova cache locale
-        if os.path.exists(cache_file):
-            try:
-                with open(cache_file, 'r') as f:
-                    return json.load(f)
-            except:
-                pass
-        
-        # Scarica da API
-        try:
-            url = f"{self.BASE_URL}/{icon_set}.json"
-            response = self.session.get(url, timeout=5)
-            if response.status_code == 200:
-                data = response.json()
-                # Salva in cache
-                with open(cache_file, 'w') as f:
-                    json.dump(data, f)
-                return data
-        except:
-            pass
-        
-        return None
+    def _search_fallback(self, query: str, limit: int) -> List[IconInfo]:
+        query_lower = query.lower()
+        results = [icon for icon in self.FALLBACK_ICONS if query_lower in icon.name.lower()]
+        return results[:limit] if results else self.FALLBACK_ICONS[:limit]
     
-    def get_svg(self, icon_name: str, color: str = "#000000", size: int = 24) -> Optional[str]:
-        """
-        Ottiene SVG di un'icona
-        
-        Args:
-            icon_name: Nome completo icona (set:name)
-            color: Colore hex
-            size: Dimensione in pixel
-            
-        Returns:
-            Stringa SVG o None
-        """
+
+    
+    def get_svg(self, icon_name: str, color: str = "#ffffff", size: int = 24) -> Optional[str]:
+        if ':' not in icon_name:
+            return None
         try:
-            # Cache file
-            cache_file = os.path.join(
-                self.cache_dir, 
-                f"{icon_name.replace(':', '_')}_{size}_{color.replace('#', '')}.svg"
-            )
+            safe_name = icon_name.replace(':', '_').replace('/', '_')
+            cache_file = os.path.join(self.cache_dir, f"{safe_name}_{size}_{color.replace('#', '')}.svg")
             
             if os.path.exists(cache_file):
-                with open(cache_file, 'r') as f:
+                with open(cache_file, 'r', encoding='utf-8') as f:
                     return f.read()
             
-            # Scarica da API
-            url = f"{self.BASE_URL}/{icon_name}.svg"
-            params = {
-                'color': color,
-                'width': size,
-                'height': size
-            }
+            prefix, name = icon_name.split(':', 1)
+            url = f"{self.ICON_URL}/{prefix}/{name}.svg"
+            params = {'color': color.replace('#', '%23'), 'width': str(size), 'height': str(size)}
             
-            response = self.session.get(url, params=params, timeout=5)
+            response = self.session.get(url, params=params, timeout=10)
             if response.status_code == 200:
                 svg_data = response.text
-                
-                # Salva in cache
-                with open(cache_file, 'w') as f:
+                with open(cache_file, 'w', encoding='utf-8') as f:
                     f.write(svg_data)
-                
                 return svg_data
-            
             return None
-            
         except Exception as e:
             print(f"Errore download SVG: {e}")
             return None
     
-    def get_suggested_icons(self, category: str) -> List[str]:
-        """
-        Ottiene suggerimenti di ricerca per categoria
-        
-        Args:
-            category: Categoria (finestre, porte, strumenti, azioni)
-            
-        Returns:
-            Lista di termini suggeriti
-        """
-        return self.WINDOW_SUGGESTIONS.get(category.lower(), [])
+    def get_icon_sets(self) -> List[Tuple[str, str]]:
+        return self.RECOMMENDED_SETS.copy()
     
     def clear_cache(self):
-        """Svuota la cache delle icone"""
         try:
             for file in os.listdir(self.cache_dir):
-                file_path = os.path.join(self.cache_dir, file)
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
+                os.unlink(os.path.join(self.cache_dir, file))
         except Exception as e:
             print(f"Errore pulizia cache: {e}")
