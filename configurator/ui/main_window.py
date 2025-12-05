@@ -13,7 +13,7 @@ from PyQt6.QtGui import QAction, QIcon, QKeySequence
 
 from core.project_manager import ProjectManager
 from core.config_model import ProgettoConfigurazione
-from .canvas_widget import CanvasWidget
+from .canvas_widget import DisplayPreviewWidget
 from .toolbox_widget import ToolboxWidget
 from .properties_panel import PropertiesPanel
 from .menu_editor import MenuEditor
@@ -44,9 +44,10 @@ class MainWindow(QMainWindow):
     
     def _init_ui(self):
         """Inizializza UI centrale"""
-        # Widget centrale: Canvas
-        self.canvas = CanvasWidget()
-        self.setCentralWidget(self.canvas)
+        # Widget centrale: Display Preview with Canvas
+        self.display_preview = DisplayPreviewWidget()
+        self.canvas = self.display_preview.canvas
+        self.setCentralWidget(self.display_preview)
         
         # Connect signals
         self.canvas.selection_changed.connect(self._on_selection_changed)
