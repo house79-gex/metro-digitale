@@ -1,0 +1,329 @@
+{
+  "version": "1.0.0",
+  "nome": "Configurazione Standard Serramenti",
+  "created": "2024-01-01T00:00:00.000000",
+  "modified": "2024-01-01T00:00:00.000000",
+  "menus": [
+    {
+      "id": "home",
+      "nome": "Home",
+      "icona": "mdi:home",
+      "colore": "#00ff88",
+      "ordine": 0,
+      "figli": [],
+      "azione": "navigate",
+      "azione_params": {}
+    },
+    {
+      "id": "rilievi",
+      "nome": "Rilievi Speciali",
+      "icona": "mdi:ruler",
+      "colore": "#00aaff",
+      "ordine": 1,
+      "figli": [
+        {
+          "id": "rilievi_fermavetro",
+          "nome": "Fermavetro",
+          "icona": "mdi:window-closed",
+          "colore": "#00aaff",
+          "ordine": 0,
+          "figli": [],
+          "azione": "function",
+          "azione_params": {"function": "measure_fermavetro"}
+        },
+        {
+          "id": "rilievi_astine",
+          "nome": "Astine",
+          "icona": "mdi:ruler-square",
+          "colore": "#00aaff",
+          "ordine": 1,
+          "figli": [],
+          "azione": "function",
+          "azione_params": {"function": "measure_astine"}
+        }
+      ],
+      "azione": "navigate",
+      "azione_params": {}
+    },
+    {
+      "id": "vetri",
+      "nome": "Vetri",
+      "icona": "mdi:mirror",
+      "colore": "#64ffda",
+      "ordine": 2,
+      "figli": [],
+      "azione": "function",
+      "azione_params": {"function": "measure_glass"}
+    },
+    {
+      "id": "calibro",
+      "nome": "Calibro",
+      "icona": "mdi:format-vertical-align-center",
+      "colore": "#9d4edd",
+      "ordine": 3,
+      "figli": [],
+      "azione": "function",
+      "azione_params": {"function": "caliper_mode"}
+    },
+    {
+      "id": "settings",
+      "nome": "Impostazioni",
+      "icona": "mdi:cog",
+      "colore": "#888888",
+      "ordine": 4,
+      "figli": [],
+      "azione": "navigate",
+      "azione_params": {}
+    }
+  ],
+  "tipologie": [
+    {
+      "id": "finestra_1_anta",
+      "nome": "Finestra 1 Anta",
+      "icona": "mdi:window-closed",
+      "categoria": "Finestre",
+      "variabili": [
+        {
+          "nome": "L",
+          "descrizione": "Larghezza",
+          "obbligatoria": true,
+          "valore_test": 1200.0
+        },
+        {
+          "nome": "H",
+          "descrizione": "Altezza",
+          "obbligatoria": true,
+          "valore_test": 1500.0
+        }
+      ],
+      "elementi": [
+        {
+          "nome": "Traversa Superiore",
+          "formula": "L + 6",
+          "quantita": 1,
+          "colore": "#00ff88"
+        },
+        {
+          "nome": "Traversa Inferiore",
+          "formula": "L + 6",
+          "quantita": 1,
+          "colore": "#00ff88"
+        },
+        {
+          "nome": "Montante Laterale",
+          "formula": "H - 12",
+          "quantita": 2,
+          "colore": "#00aaff"
+        }
+      ]
+    },
+    {
+      "id": "finestra_2_ante",
+      "nome": "Finestra 2 Ante",
+      "icona": "mdi:window-open",
+      "categoria": "Finestre",
+      "variabili": [
+        {
+          "nome": "L",
+          "descrizione": "Larghezza",
+          "obbligatoria": true,
+          "valore_test": 2400.0
+        },
+        {
+          "nome": "H",
+          "descrizione": "Altezza",
+          "obbligatoria": true,
+          "valore_test": 1500.0
+        }
+      ],
+      "elementi": [
+        {
+          "nome": "Traversa Anta",
+          "formula": "(L + 6) / 2",
+          "quantita": 4,
+          "colore": "#00ff88"
+        },
+        {
+          "nome": "Montante Anta",
+          "formula": "H - 12",
+          "quantita": 4,
+          "colore": "#00aaff"
+        }
+      ]
+    },
+    {
+      "id": "porta_finestra",
+      "nome": "Porta Finestra",
+      "icona": "mdi:door",
+      "categoria": "Porte",
+      "variabili": [
+        {
+          "nome": "L",
+          "descrizione": "Larghezza",
+          "obbligatoria": true,
+          "valore_test": 900.0
+        },
+        {
+          "nome": "H",
+          "descrizione": "Altezza",
+          "obbligatoria": true,
+          "valore_test": 2200.0
+        }
+      ],
+      "elementi": [
+        {
+          "nome": "Traversa",
+          "formula": "L + 6",
+          "quantita": 2,
+          "colore": "#00ff88"
+        },
+        {
+          "nome": "Montante",
+          "formula": "H - 12",
+          "quantita": 2,
+          "colore": "#00aaff"
+        }
+      ]
+    },
+    {
+      "id": "scorrevole",
+      "nome": "Finestra Scorrevole",
+      "icona": "mdi:swap-horizontal",
+      "categoria": "Finestre",
+      "variabili": [
+        {
+          "nome": "L",
+          "descrizione": "Larghezza",
+          "obbligatoria": true,
+          "valore_test": 3000.0
+        },
+        {
+          "nome": "H",
+          "descrizione": "Altezza",
+          "obbligatoria": true,
+          "valore_test": 1600.0
+        }
+      ],
+      "elementi": [
+        {
+          "nome": "Anta Scorrevole",
+          "formula": "L / 2",
+          "quantita": 2,
+          "colore": "#00ff88"
+        },
+        {
+          "nome": "Montante Anta",
+          "formula": "H - 15",
+          "quantita": 4,
+          "colore": "#00aaff"
+        }
+      ]
+    }
+  ],
+  "astine": [
+    {
+      "id": "ant_rib_inf",
+      "nome": "Inferiore AR",
+      "gruppo": "Anta Ribalta",
+      "offset": -3.0,
+      "colore": "#9d4edd",
+      "attivo": true,
+      "ordine": 0
+    },
+    {
+      "id": "ant_rib_sup",
+      "nome": "Superiore AR",
+      "gruppo": "Anta Ribalta",
+      "offset": -3.0,
+      "colore": "#9d4edd",
+      "attivo": true,
+      "ordine": 1
+    },
+    {
+      "id": "ant_rib_lat",
+      "nome": "Laterale AR",
+      "gruppo": "Anta Ribalta",
+      "offset": -6.0,
+      "colore": "#9d4edd",
+      "attivo": true,
+      "ordine": 2
+    },
+    {
+      "id": "ant_rib_crem",
+      "nome": "Cremonese AR",
+      "gruppo": "Anta Ribalta",
+      "offset": -9.0,
+      "colore": "#9d4edd",
+      "attivo": true,
+      "ordine": 3
+    },
+    {
+      "id": "pers_inf",
+      "nome": "Inferiore Persiana",
+      "gruppo": "Persiana",
+      "offset": -4.0,
+      "colore": "#00aaff",
+      "attivo": true,
+      "ordine": 0
+    },
+    {
+      "id": "pers_sup",
+      "nome": "Superiore Persiana",
+      "gruppo": "Persiana",
+      "offset": -4.0,
+      "colore": "#00aaff",
+      "attivo": true,
+      "ordine": 1
+    },
+    {
+      "id": "crem_std",
+      "nome": "Cremonese Std",
+      "gruppo": "Cremonese Normale",
+      "offset": -7.0,
+      "colore": "#52b788",
+      "attivo": true,
+      "ordine": 0
+    },
+    {
+      "id": "crem_corta",
+      "nome": "Cremonese Corta",
+      "gruppo": "Cremonese Normale",
+      "offset": -5.0,
+      "colore": "#52b788",
+      "attivo": true,
+      "ordine": 1
+    }
+  ],
+  "fermavetri": [
+    {
+      "id": "fv_alluminio",
+      "nome": "Fermavetro Alluminio",
+      "materiale": "Alluminio",
+      "offset": -12.0,
+      "colore": "#888888",
+      "attivo": true
+    },
+    {
+      "id": "fv_legno",
+      "nome": "Fermavetro Legno",
+      "materiale": "Legno",
+      "offset": -6.0,
+      "colore": "#8B4513",
+      "attivo": true
+    },
+    {
+      "id": "fv_pvc",
+      "nome": "Fermavetro PVC",
+      "materiale": "PVC",
+      "offset": -10.0,
+      "colore": "#ffffff",
+      "attivo": true
+    }
+  ],
+  "impostazioni": {
+    "display_brightness": 80,
+    "auto_zero": true,
+    "bluetooth_name": "MetroDigitale",
+    "units": "mm"
+  }
+}
