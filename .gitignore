@@ -42,7 +42,8 @@ configurator/venv/
 configurator/.venv/
 configurator/build/
 configurator/dist/
-configurator/*.spec
+# Allow build.spec but ignore generated specs
+!configurator/build.spec
 
 # IDEs
 .vscode/
