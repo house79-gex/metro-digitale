@@ -31,6 +31,19 @@ blitz_integration/*.egg-info/
 blitz_integration/venv/
 blitz_integration/.venv/
 
+# Configurator
+configurator/__pycache__/
+configurator/**/__pycache__/
+configurator/*.pyc
+configurator/*.pyo
+configurator/.pytest_cache/
+configurator/*.egg-info/
+configurator/venv/
+configurator/.venv/
+configurator/build/
+configurator/dist/
+configurator/*.spec
+
 # IDEs
 .vscode/
 .idea/
