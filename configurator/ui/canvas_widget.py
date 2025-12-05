@@ -404,7 +404,9 @@ class DisplayPreviewWidget(QWidget):
         """)
         frame_layout.addWidget(self.canvas)
         
-        # Label "5 IPS" sulla cornice
+        # Label "5 IPS" sulla cornice - posizionata con costanti
+        LABEL_RIGHT_MARGIN = 80
+        LABEL_TOP_MARGIN = 8
         label_5inch = QLabel("5\" IPS Touch", frame)
         label_5inch.setStyleSheet("""
             color: #888;
@@ -412,7 +414,7 @@ class DisplayPreviewWidget(QWidget):
             background: transparent;
             border: none;
         """)
-        label_5inch.move(frame_width - 80, 8)
+        label_5inch.move(frame_width - LABEL_RIGHT_MARGIN, LABEL_TOP_MARGIN)
         
         center_layout.addWidget(frame)
         

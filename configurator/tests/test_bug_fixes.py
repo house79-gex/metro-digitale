@@ -45,7 +45,8 @@ def test_display_dimensions_constants():
     """Test che DisplayPreviewWidget abbia le costanti corrette"""
     # Verifica leggendo il file invece di importare PyQt6
     import re
-    with open('ui/canvas_widget.py', 'r') as f:
+    file_path = os.path.join(os.path.dirname(__file__), '..', 'ui', 'canvas_widget.py')
+    with open(file_path, 'r') as f:
         content = f.read()
     
     # Cerca le costanti
@@ -63,7 +64,8 @@ def test_canvas_element_accepts_canvas_widget():
     """Test che CanvasElement accetti il parametro canvas_widget"""
     # Verifica leggendo il file
     import re
-    with open('ui/canvas_widget.py', 'r') as f:
+    file_path = os.path.join(os.path.dirname(__file__), '..', 'ui', 'canvas_widget.py')
+    with open(file_path, 'r') as f:
         content = f.read()
     
     # Cerca la definizione del costruttore di CanvasElement
@@ -74,7 +76,8 @@ def test_canvas_element_accepts_canvas_widget():
 def test_canvas_widget_has_properties_signal():
     """Test che CanvasWidget abbia il segnale open_properties_requested"""
     # Verifica leggendo il file
-    with open('ui/canvas_widget.py', 'r') as f:
+    file_path = os.path.join(os.path.dirname(__file__), '..', 'ui', 'canvas_widget.py')
+    with open(file_path, 'r') as f:
         content = f.read()
     
     assert 'open_properties_requested = pyqtSignal(object)' in content
