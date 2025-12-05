@@ -3,21 +3,6 @@ Metro Digitale Configurator - Dark Theme Stylesheet
 Colori coerenti con l'interfaccia Metro Digitale ESP32
 */
 
-/* Colori principali */
-* {
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --bg-tertiary: #0f3460;
-    --border-color: #3b4b5a;
-    --accent-primary: #00ff88;
-    --accent-secondary: #00aaff;
-    --warning: #ff6600;
-    --error: #e74c3c;
-    --text-primary: #ffffff;
-    --text-secondary: #888888;
-    --text-disabled: #555555;
-}
-
 /* Main Window */
 QMainWindow {
     background-color: #1a1a2e;
@@ -28,8 +13,6 @@ QMainWindow {
 QDockWidget {
     background-color: #16213e;
     color: #ffffff;
-    titlebar-close-icon: url(close.png);
-    titlebar-normal-icon: url(float.png);
 }
 
 QDockWidget::title {
@@ -73,18 +56,6 @@ QPushButton:checked {
     background-color: #00ff88;
     color: #1a1a2e;
     border-color: #00ff88;
-}
-
-/* Primary Action Button */
-QPushButton[primary="true"] {
-    background-color: #00ff88;
-    color: #1a1a2e;
-    border-color: #00ff88;
-    font-weight: bold;
-}
-
-QPushButton[primary="true"]:hover {
-    background-color: #00dd77;
 }
 
 /* Line Edit */
@@ -160,12 +131,6 @@ QComboBox:focus {
 QComboBox::drop-down {
     border: none;
     width: 20px;
-}
-
-QComboBox::down-arrow {
-    image: url(down_arrow.png);
-    width: 12px;
-    height: 12px;
 }
 
 QComboBox QAbstractItemView {
@@ -389,6 +354,10 @@ QScrollBar::add-line, QScrollBar::sub-line {
     border: none;
 }
 
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+}
+
 /* Scroll Area */
 QScrollArea {
     background-color: #16213e;
@@ -514,20 +483,6 @@ QLabel {
     background-color: transparent;
 }
 
-QLabel[heading="true"] {
-    font-size: 14pt;
-    font-weight: bold;
-    color: #00ff88;
-}
-
-QLabel[error="true"] {
-    color: #e74c3c;
-}
-
-QLabel[warning="true"] {
-    color: #ff6600;
-}
-
 /* Status Bar */
 QStatusBar {
     background-color: #0f3460;
@@ -563,4 +518,19 @@ QToolTip {
     border: 1px solid #00ff88;
     padding: 4px;
     border-radius: 3px;
+}
+
+/* Frame */
+QFrame {
+    background-color: transparent;
+}
+
+QFrame[frameShape="4"] {
+    background-color: #3b4b5a;
+    max-height: 1px;
+}
+
+QFrame[frameShape="5"] {
+    background-color: #3b4b5a;
+    max-width: 1px;
 }
