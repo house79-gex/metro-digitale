@@ -37,8 +37,8 @@ class IconBrowserDialog(QDialog):
         
         self.set_combo = QComboBox()
         self.set_combo.addItem("Tutti i set", "")
-        for iset in self.client.RECOMMENDED_SETS:
-            self.set_combo.addItem(iset, iset)
+        for prefix, name in self.client.RECOMMENDED_SETS:
+            self.set_combo.addItem(name, prefix)
         search_layout.addWidget(self.set_combo)
         
         search_btn = QPushButton("Cerca")
@@ -103,7 +103,7 @@ class IconBrowserDialog(QDialog):
         self.results_list.clear()
         
         # Cerca icone
-        results = self.client.search(query, limit=64, icon_set=icon_set)
+        results = self.client.search(query, limit=64, prefix=icon_set if icon_set else None)
         
         if not results:
             self.status_label.setText("Nessuna icona trovata")

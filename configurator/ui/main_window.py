@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
         
         self.setWindowTitle("Metro Digitale Configurator")
         self.resize(1400, 900)
+        self.showMaximized()
     
     def _init_ui(self):
         """Inizializza UI centrale"""
@@ -51,6 +52,7 @@ class MainWindow(QMainWindow):
         
         # Connect signals
         self.canvas.selection_changed.connect(self._on_selection_changed)
+        self.canvas.open_properties_requested.connect(self._on_open_properties)
     
     def _create_actions(self):
         """Crea azioni per menu e toolbar"""
@@ -247,6 +249,12 @@ class MainWindow(QMainWindow):
             self.properties_panel.set_item(selected_items[0])
         else:
             self.properties_panel.clear()
+    
+    def _on_open_properties(self, element):
+        """Apre pannello proprietà per elemento"""
+        self.properties_panel.set_item(element)
+        self.dock_properties.show()
+        self.dock_properties.raise_()
     
     def _on_new_project(self):
         """Crea nuovo progetto"""
