@@ -9,12 +9,17 @@ import json
 
 
 class DraggableTreeWidget(QTreeWidget):
-    """TreeWidget con supporto drag"""
+    """TreeWidget with drag support"""
     
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setDragEnabled(True)
         self.setDragDropMode(QTreeWidget.DragDropMode.DragOnly)
+        self._element_icons = set()
+    
+    def set_element_icons(self, icons):
+        """Set the list of icon prefixes used in elements"""
+        self._element_icons = set(icons)
     
     def startDrag(self, supportedActions):
         item = self.currentItem()
@@ -24,7 +29,8 @@ class DraggableTreeWidget(QTreeWidget):
         element_type = item.data(0, Qt.ItemDataRole.UserRole)
         if not element_type:
             element_type = item.text(0)
-            for prefix in ['📁 ', '□ ', '▢ ', '─ ', 'Aa ', '📏 ', 'fx ', '▣ ', '🔘 ', '◐ ', '123 ', '──●── ', '▼ ', '🪟 ', '📐 ', '🧱 ']:
+            # Remove any icon prefix from the element name
+            for prefix in self._element_icons:
                 if element_type.startswith(prefix):
                     element_type = element_type[len(prefix):]
                     break
@@ -93,6 +99,13 @@ class ToolboxWidget(QWidget):
         self.tree.setIndentation(20)
         self.tree.setAnimated(True)
         layout.addWidget(self.tree)
+        
+        # Collect all icon prefixes from elements
+        icon_prefixes = {'📁 '}  # Category icon
+        for elements in self.ELEMENTS.values():
+            for elem in elements:
+                icon_prefixes.add(elem['icon'] + ' ')
+        self.tree.set_element_icons(icon_prefixes)
         
         self._populate_tree()
     

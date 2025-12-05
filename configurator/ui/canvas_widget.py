@@ -1,6 +1,6 @@
 """
-Canvas widget per design UI drag & drop
-Simula display 800x480 del Metro Digitale con cornice realistica
+Canvas widget for UI design with drag & drop
+Simulates Metro Digitale 800x480 display with realistic frame
 """
 
 from PyQt6.QtWidgets import (
@@ -17,7 +17,11 @@ import json
 
 
 class CanvasElement(QGraphicsRectItem):
-    """Elemento grafico sul canvas"""
+    """Graphical element on canvas with type-specific styling"""
+    
+    # Duplicate element offset constants
+    DUPLICATE_OFFSET_X = 20
+    DUPLICATE_OFFSET_Y = 20
     
     ELEMENT_STYLES = {
         "Button": {"color": "#00ff88", "text_color": "#000", "default_size": (100, 40)},
@@ -94,20 +98,24 @@ class CanvasElement(QGraphicsRectItem):
                 self.scene().removeItem(self)
         elif action == duplicate_action:
             if self.scene():
-                new_elem = CanvasElement(self.element_type, self.x() + 20, self.y() + 20)
+                new_elem = CanvasElement(
+                    self.element_type, 
+                    self.x() + self.DUPLICATE_OFFSET_X, 
+                    self.y() + self.DUPLICATE_OFFSET_Y
+                )
                 self.scene().addItem(new_elem)
         elif action == properties_action:
-            # TODO: Apri dialog proprietà
+            # TODO: Open properties dialog
             pass
 
 
 class CanvasWidget(QGraphicsView):
-    """Canvas per design interfaccia con drag & drop"""
+    """Canvas for interface design with drag & drop support"""
     
     selection_changed = pyqtSignal(list)
     mouse_position_changed = pyqtSignal(int, int)
     
-    # Dimensioni display Metro Digitale
+    # Metro Digitale display dimensions (5" screen)
     DISPLAY_WIDTH = 800
     DISPLAY_HEIGHT = 480
     
