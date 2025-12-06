@@ -60,18 +60,22 @@ def test_tooltip_manager_hasattr_check():
         if stripped.startswith('#') or not stripped:
             continue
         
-        if 'setToolTipDuration' in line and 'hasattr' not in line:
-            # Verifica che la riga precedente contenga hasattr
-            if i > 0:
-                prev_line = lines[i-1].strip()
-                # Cerca hasattr nelle righe precedenti (massimo 3 righe indietro)
-                found_hasattr = False
-                for j in range(max(0, i-3), i+1):
-                    if 'hasattr' in lines[j]:
-                        found_hasattr = True
-                        break
-                assert found_hasattr, \
-                    f"Unprotected setToolTipDuration at line {i+1}: {line}"
+        # Se troviamo setToolTipDuration in una linea di codice (non commento)
+        if 'setToolTipDuration' in line:
+            # Se la stessa linea ha hasattr, è OK
+            if 'hasattr' in line:
+                continue
+            
+            # Altrimenti cerca hasattr nelle righe precedenti (massimo 3 righe indietro)
+            found_hasattr = False
+            for j in range(max(0, i-3), i):
+                if 'hasattr' in lines[j] and 'setToolTipDuration' in lines[j]:
+                    found_hasattr = True
+                    break
+            
+            # Deve esserci un if hasattr nelle righe precedenti
+            assert found_hasattr, \
+                f"Unprotected setToolTipDuration at line {i+1}: {line}"
     
     print("✓ All setToolTipDuration calls are protected with hasattr check")
 
@@ -85,6 +89,9 @@ def test_canvas_methods_exist():
     with open(probe_editor_file, 'r', encoding='utf-8') as f:
         content = f.read()
     
+    # Verifica che ProbeCanvas sia definito nel file (classe canvas)
+    assert 'class ProbeCanvas' in content, "ProbeCanvas class not found in file"
+    
     # Verifica che ProbeCanvas abbia i metodi undo_last e clear
     assert 'def undo_last(self):' in content, "ProbeCanvas.undo_last method not found"
     assert 'def clear(self):' in content, "ProbeCanvas.clear method not found"
@@ -94,6 +101,7 @@ def test_canvas_methods_exist():
     assert 'self.canvas.clear' in content or 'self._clear_canvas' in content, \
         "Toolbar doesn't call canvas.clear"
     
+    print("✓ ProbeCanvas class found in file")
     print("✓ Canvas methods undo_last and clear exist")
     print("✓ Toolbar correctly references canvas methods")
 
