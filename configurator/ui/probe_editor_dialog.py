@@ -357,13 +357,15 @@ class ProbeEditorDialog(QDialog):
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
         
-        # Toolbar
+        # IMPORTANTE: Creare canvas PRIMA della toolbar
+        self.canvas = ProbeCanvas()
+        self.canvas.shape_changed.connect(self._on_shape_changed)
+        
+        # Toolbar (ora self.canvas esiste)
         toolbar = self._create_toolbar()
         layout.addWidget(toolbar)
         
-        # Canvas
-        self.canvas = ProbeCanvas()
-        self.canvas.shape_changed.connect(self._on_shape_changed)
+        # Aggiungere canvas al layout
         layout.addWidget(self.canvas)
         
         # Info

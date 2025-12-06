@@ -154,7 +154,9 @@ class TooltipManager:
         tooltip_text = self.get_tooltip(category, key)
         if tooltip_text:
             widget.setToolTip(tooltip_text)
-            widget.setToolTipDuration(5000)  # 5 secondi
+            # setToolTipDuration esiste solo su QWidget, non su QAction
+            if hasattr(widget, 'setToolTipDuration'):
+                widget.setToolTipDuration(5000)  # 5 secondi
     
     def set_element_tooltip(self, widget: QWidget, element_type: str):
         """
@@ -180,7 +182,9 @@ class TooltipManager:
             if menu in menus_data and action in menus_data[menu]:
                 tooltip_text = menus_data[menu][action]
                 widget.setToolTip(tooltip_text)
-                widget.setToolTipDuration(3000)
+                # setToolTipDuration esiste solo su QWidget, non su QAction
+                if hasattr(widget, 'setToolTipDuration'):
+                    widget.setToolTipDuration(3000)
     
     def get_shortcuts(self, context: str = 'global') -> Dict[str, str]:
         """
