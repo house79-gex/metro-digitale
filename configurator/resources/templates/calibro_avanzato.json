@@ -1,0 +1,231 @@
+{
+  "name": "Calibro Avanzato",
+  "description": "Calibro con funzioni avanzate: min/max, tolleranze, puntali",
+  "version": "1.0.0",
+  "elements": [
+    {
+      "type": "Label",
+      "id": "title",
+      "x": 200,
+      "y": 15,
+      "width": 400,
+      "height": 35,
+      "properties": {
+        "text": "Calibro Avanzato",
+        "fontSize": 18,
+        "fontBold": true,
+        "textColor": "#00ff88",
+        "alignment": "center"
+      }
+    },
+    {
+      "type": "MeasureDisplay",
+      "id": "main_measure",
+      "x": 100,
+      "y": 60,
+      "width": 600,
+      "height": 100,
+      "properties": {
+        "fontSize": 48,
+        "fontBold": true,
+        "unit": "mm",
+        "precision": 2,
+        "textColor": "#00ff88",
+        "background": "#16213e",
+        "borderColor": "#00ff88",
+        "borderWidth": 3
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "stats_panel",
+      "x": 50,
+      "y": 175,
+      "width": 700,
+      "height": 80,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#333333",
+        "borderWidth": 1
+      }
+    },
+    {
+      "type": "Label",
+      "id": "min_label",
+      "x": 70,
+      "y": 185,
+      "width": 200,
+      "height": 30,
+      "properties": {
+        "text": "Min: 0.00 mm",
+        "fontSize": 12,
+        "textColor": "#888888"
+      }
+    },
+    {
+      "type": "Label",
+      "id": "max_label",
+      "x": 300,
+      "y": 185,
+      "width": 200,
+      "height": 30,
+      "properties": {
+        "text": "Max: 0.00 mm",
+        "fontSize": 12,
+        "textColor": "#888888"
+      }
+    },
+    {
+      "type": "Label",
+      "id": "avg_label",
+      "x": 530,
+      "y": 185,
+      "width": 200,
+      "height": 30,
+      "properties": {
+        "text": "Media: 0.00 mm",
+        "fontSize": 12,
+        "textColor": "#888888"
+      }
+    },
+    {
+      "type": "Label",
+      "id": "count_label",
+      "x": 70,
+      "y": 220,
+      "width": 200,
+      "height": 30,
+      "properties": {
+        "text": "Misure: 0",
+        "fontSize": 12,
+        "textColor": "#888888"
+      }
+    },
+    {
+      "type": "Label",
+      "id": "tolerance_label",
+      "x": 300,
+      "y": 220,
+      "width": 200,
+      "height": 30,
+      "properties": {
+        "text": "Tolleranza: ±2.0 mm",
+        "fontSize": 12,
+        "textColor": "#888888"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_zero",
+      "x": 50,
+      "y": 275,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "Zero",
+        "fontSize": 14,
+        "background": "#ff8800",
+        "action": "zero_measure"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_hold",
+      "x": 190,
+      "y": 275,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "Hold",
+        "fontSize": 14,
+        "background": "#0088ff",
+        "action": "hold_measure"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_save",
+      "x": 330,
+      "y": 275,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "Salva",
+        "fontSize": 14,
+        "background": "#00ff88",
+        "action": "save_measure"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_reset_stats",
+      "x": 470,
+      "y": 275,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "Reset",
+        "fontSize": 14,
+        "background": "#ff0088",
+        "action": "reset_stats"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_send_bt",
+      "x": 610,
+      "y": 275,
+      "width": 140,
+      "height": 50,
+      "properties": {
+        "text": "📤 Invia BT",
+        "fontSize": 14,
+        "background": "#0088ff",
+        "action": "send_bluetooth"
+      }
+    },
+    {
+      "type": "Dropdown",
+      "id": "puntale_selector",
+      "x": 50,
+      "y": 345,
+      "width": 250,
+      "height": 40,
+      "properties": {
+        "label": "Puntale:",
+        "options": ["Standard", "Interno", "Esterno", "Profondità", "Battuta"],
+        "default": "Standard"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "tolerance_input",
+      "x": 320,
+      "y": 345,
+      "width": 180,
+      "height": 40,
+      "properties": {
+        "label": "Tolleranza:",
+        "min": 0.0,
+        "max": 10.0,
+        "step": 0.5,
+        "default": 2.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_back",
+      "x": 50,
+      "y": 410,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "← Indietro",
+        "fontSize": 14,
+        "background": "#333333",
+        "action": "goto:home"
+      }
+    }
+  ]
+}

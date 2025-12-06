@@ -1,0 +1,163 @@
+{
+  "name": "Tipologia Finestra 1 Anta",
+  "description": "Template finestra singola anta",
+  "version": "1.0.0",
+  "elements": [
+    {
+      "type": "Label",
+      "id": "title",
+      "x": 200,
+      "y": 20,
+      "width": 400,
+      "height": 40,
+      "properties": {
+        "text": "Finestra 1 Anta",
+        "fontSize": 20,
+        "fontBold": true,
+        "textColor": "#8800ff",
+        "alignment": "center"
+      }
+    },
+    {
+      "type": "TipologiaWidget",
+      "id": "tipologia_widget",
+      "x": 100,
+      "y": 80,
+      "width": 600,
+      "height": 200,
+      "properties": {
+        "tipo": "finestra_1a",
+        "schema": "visual",
+        "editable": true
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "misure_panel",
+      "x": 50,
+      "y": 300,
+      "width": 700,
+      "height": 100,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#8800ff",
+        "borderWidth": 2
+      }
+    },
+    {
+      "type": "Label",
+      "id": "misure_title",
+      "x": 70,
+      "y": 310,
+      "width": 660,
+      "height": 25,
+      "properties": {
+        "text": "Misure Finestra",
+        "fontSize": 14,
+        "fontBold": true,
+        "textColor": "#8800ff"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "larghezza_totale",
+      "x": 70,
+      "y": 345,
+      "width": 200,
+      "height": 40,
+      "properties": {
+        "label": "Larghezza:",
+        "min": 300.0,
+        "max": 3000.0,
+        "step": 10.0,
+        "default": 800.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "altezza_totale",
+      "x": 290,
+      "y": 345,
+      "width": 200,
+      "height": 40,
+      "properties": {
+        "label": "Altezza:",
+        "min": 300.0,
+        "max": 3000.0,
+        "step": 10.0,
+        "default": 1200.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "Dropdown",
+      "id": "materiale_telaio",
+      "x": 510,
+      "y": 345,
+      "width": 180,
+      "height": 40,
+      "properties": {
+        "label": "Telaio:",
+        "options": ["PVC", "Alluminio", "Legno", "Misto"],
+        "default": "PVC"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_misura_larghezza",
+      "x": 150,
+      "y": 415,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "📏 Mis. Largh.",
+        "fontSize": 12,
+        "background": "#8800ff",
+        "action": "measure_larghezza"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_misura_altezza",
+      "x": 325,
+      "y": 415,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "📏 Mis. Altezza",
+        "fontSize": 12,
+        "background": "#8800ff",
+        "action": "measure_altezza"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_save",
+      "x": 500,
+      "y": 415,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "💾 Salva",
+        "fontSize": 14,
+        "background": "#00ff88",
+        "action": "save_tipologia"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_back",
+      "x": 50,
+      "y": 415,
+      "width": 80,
+      "height": 50,
+      "properties": {
+        "text": "← Back",
+        "fontSize": 14,
+        "background": "#333333",
+        "action": "goto:home"
+      }
+    }
+  ]
+}

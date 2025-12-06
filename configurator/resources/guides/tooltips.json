@@ -1,0 +1,288 @@
+{
+  "description": "Tooltip e guide per elementi UI Metro Digitale",
+  "tooltips": {
+    "canvas": {
+      "title": "Canvas di Design",
+      "description": "Area di disegno principale dove puoi creare la tua interfaccia trascinando elementi dalla Toolbox",
+      "shortcuts": [
+        "Trascina elementi dalla Toolbox",
+        "Click destro per menu contestuale",
+        "Doppio click per aprire proprietà"
+      ]
+    },
+    "toolbox": {
+      "title": "Toolbox Elementi",
+      "description": "Contiene tutti gli elementi UI disponibili per costruire l'interfaccia",
+      "categories": {
+        "buttons": "Pulsanti interattivi (Button, IconButton, ToggleButton)",
+        "display": "Elementi di visualizzazione (Label, MeasureDisplay)",
+        "containers": "Contenitori per organizzare elementi (Panel, Frame)",
+        "input": "Elementi di input (NumberInput, Slider, Dropdown)"
+      }
+    },
+    "properties": {
+      "title": "Pannello Proprietà",
+      "description": "Modifica le proprietà dell'elemento selezionato",
+      "sections": {
+        "position": "Posizione X, Y e dimensioni dell'elemento",
+        "background": "Colore di sfondo, opacità e gradiente",
+        "border": "Colore, spessore e stile del bordo",
+        "effects": "Effetti 3D come ombra, rilievo e incassato",
+        "text": "Proprietà del testo (font, dimensione, colore, stile)",
+        "icon": "Seleziona e configura icone da Iconify"
+      }
+    },
+    "elements": {
+      "Button": {
+        "title": "Pulsante Standard",
+        "description": "Pulsante cliccabile per azioni",
+        "use_cases": ["Navigazione menu", "Conferma azioni", "Salva/Carica"],
+        "properties": ["Testo", "Colore", "Azione al click"]
+      },
+      "IconButton": {
+        "title": "Pulsante Icona",
+        "description": "Pulsante con icona grafica",
+        "use_cases": ["Azioni rapide", "Toolbar", "Comandi visuali"],
+        "properties": ["Icona", "Colore", "Dimensione", "Azione"]
+      },
+      "ToggleButton": {
+        "title": "Pulsante Toggle",
+        "description": "Pulsante con stato ON/OFF",
+        "use_cases": ["Opzioni boolean", "Modalità operativa", "Filtri"],
+        "properties": ["Stato", "Colore ON", "Colore OFF"]
+      },
+      "Label": {
+        "title": "Etichetta Testo",
+        "description": "Testo statico informativo",
+        "use_cases": ["Titoli", "Descrizioni", "Istruzioni"],
+        "properties": ["Testo", "Font", "Colore", "Allineamento"]
+      },
+      "MeasureDisplay": {
+        "title": "Display Misura",
+        "description": "Visualizza misure del calibro digitale",
+        "use_cases": ["Misura corrente", "Risultati calcoli", "Valori in tempo reale"],
+        "properties": ["Formato", "Unità", "Precisione", "Colore"]
+      },
+      "FormulaResult": {
+        "title": "Risultato Formula",
+        "description": "Mostra risultato di una formula matematica",
+        "use_cases": ["Calcoli automatici", "Conversioni", "Formule personalizzate"],
+        "properties": ["Formula", "Formato output", "Unità"]
+      },
+      "Panel": {
+        "title": "Pannello Contenitore",
+        "description": "Contenitore per raggruppare elementi",
+        "use_cases": ["Sezioni interfaccia", "Raggruppamento logico", "Layout complessi"],
+        "properties": ["Sfondo", "Bordo", "Padding"]
+      },
+      "Frame": {
+        "title": "Cornice",
+        "description": "Cornice decorativa per elementi",
+        "use_cases": ["Evidenziare sezioni", "Separazione visiva", "Gerarchie"],
+        "properties": ["Stile bordo", "Spessore", "Colore"]
+      },
+      "Separator": {
+        "title": "Separatore",
+        "description": "Linea di separazione visiva",
+        "use_cases": ["Dividere sezioni", "Organizzare layout", "Chiarezza visiva"],
+        "properties": ["Orientamento", "Spessore", "Colore"]
+      },
+      "NumberInput": {
+        "title": "Input Numerico",
+        "description": "Campo per inserire valori numerici",
+        "use_cases": ["Parametri", "Tolleranze", "Configurazioni"],
+        "properties": ["Min", "Max", "Step", "Valore default"]
+      },
+      "Slider": {
+        "title": "Slider",
+        "description": "Barra di scorrimento per valori",
+        "use_cases": ["Regolazioni", "Volume", "Luminosità", "Range continui"],
+        "properties": ["Min", "Max", "Valore corrente", "Orientamento"]
+      },
+      "Dropdown": {
+        "title": "Menu a Tendina",
+        "description": "Selezione da lista opzioni",
+        "use_cases": ["Scelta modalità", "Selezione puntale", "Opzioni multiple"],
+        "properties": ["Opzioni", "Valore default", "Placeholder"]
+      },
+      "TipologiaWidget": {
+        "title": "Widget Tipologia",
+        "description": "Gestione tipologie finestre/serramenti",
+        "use_cases": ["Finestre predefinite", "Porte", "Configurazioni complesse"],
+        "properties": ["Tipologia", "Parametri", "Template"]
+      },
+      "AstinaSelector": {
+        "title": "Selettore Astine",
+        "description": "Seleziona e configura astine",
+        "use_cases": ["Anta ribalta", "Configurazioni astine", "Posizionamento"],
+        "properties": ["Tipo astina", "Posizione", "Lunghezza"]
+      },
+      "MaterialSelector": {
+        "title": "Selettore Materiali",
+        "description": "Scelta materiale e finiture",
+        "use_cases": ["Tipo vetro", "Profili", "Fermavetri"],
+        "properties": ["Materiale", "Colore", "Finitura"]
+      }
+    },
+    "menus": {
+      "file": {
+        "new": "Crea un nuovo progetto vuoto",
+        "open": "Apri progetto esistente (.mdp)",
+        "save": "Salva progetto corrente",
+        "save_as": "Salva progetto con nuovo nome",
+        "export": "Esporta configurazione come JSON per ESP32"
+      },
+      "edit": {
+        "undo": "Annulla ultima modifica",
+        "redo": "Ripeti ultima modifica annullata",
+        "cut": "Taglia elemento selezionato",
+        "copy": "Copia elemento selezionato",
+        "paste": "Incolla elemento copiato",
+        "delete": "Elimina elemento selezionato"
+      },
+      "view": {
+        "toolbox": "Mostra/nascondi Toolbox elementi",
+        "properties": "Mostra/nascondi pannello Proprietà",
+        "editors": "Mostra/nascondi editor Menu/Formule/Tipologie"
+      },
+      "tools": {
+        "upload": "Carica configurazione su dispositivo ESP32 via seriale",
+        "icon_browser": "Apri browser icone Iconify (200,000+ icone gratuite)",
+        "test_formulas": "Test e debug formule matematiche"
+      }
+    },
+    "editors": {
+      "menu": {
+        "title": "Editor Menu",
+        "description": "Configura struttura menu principale e sottomenu",
+        "features": [
+          "Menu gerarchici multilivello",
+          "Azioni associate a voci menu",
+          "Icone e shortcut",
+          "Navigazione tra schermate"
+        ]
+      },
+      "tipologie": {
+        "title": "Editor Tipologie",
+        "description": "Definisci tipologie finestre/serramenti predefinite",
+        "features": [
+          "Template riutilizzabili",
+          "Configurazioni parametriche",
+          "Calcoli automatici",
+          "Preimpostazioni"
+        ]
+      },
+      "formulas": {
+        "title": "Editor Formule",
+        "description": "Crea formule matematiche personalizzate",
+        "features": [
+          "Parser matematico",
+          "Variabili da misure",
+          "Funzioni matematiche",
+          "Test in tempo reale"
+        ]
+      }
+    },
+    "hardware": {
+      "encoder": {
+        "title": "Configurazione Encoder",
+        "description": "Configura encoder rotativo per misure",
+        "properties": {
+          "risoluzione": "Impulsi per rotazione (tipicamente 400)",
+          "pin_clk": "Pin GPIO per segnale CLK",
+          "pin_dt": "Pin GPIO per segnale DT",
+          "pin_sw": "Pin GPIO per pulsante encoder",
+          "calibrazione": "Fattore di correzione precisione"
+        }
+      },
+      "puntale": {
+        "title": "Configurazione Puntale",
+        "description": "Configura puntali di misura",
+        "types": {
+          "standard": "Puntale standard per misure generiche",
+          "interno": "Puntale per misure interne (cave, fori)",
+          "esterno": "Puntale per misure esterne",
+          "profondita": "Puntale per misure di profondità",
+          "battuta": "Puntale per misure con battuta"
+        },
+        "properties": {
+          "offset": "Compensazione da aggiungere alla misura (mm)",
+          "diametro": "Diametro puntale (mm)",
+          "lunghezza": "Lunghezza puntale (mm)"
+        }
+      },
+      "bluetooth": {
+        "title": "Configurazione Bluetooth",
+        "description": "Configura connessione Bluetooth per invio misure",
+        "properties": {
+          "nome_dispositivo": "Nome visibile del dispositivo Bluetooth",
+          "uuid_servizio": "UUID servizio BLE",
+          "uuid_caratteristica": "UUID caratteristica BLE",
+          "protocollo": "Protocollo Bluetooth (BLE o Classic)",
+          "pin": "PIN per pairing",
+          "auto_reconnect": "Riconnessione automatica"
+        }
+      }
+    },
+    "shortcuts": {
+      "global": {
+        "Ctrl+N": "Nuovo progetto",
+        "Ctrl+O": "Apri progetto",
+        "Ctrl+S": "Salva progetto",
+        "Ctrl+Shift+S": "Salva con nome",
+        "Ctrl+Z": "Annulla",
+        "Ctrl+Y": "Ripeti",
+        "Ctrl+X": "Taglia",
+        "Ctrl+C": "Copia",
+        "Ctrl+V": "Incolla",
+        "Delete": "Elimina selezionato",
+        "F1": "Aiuto/Documentazione"
+      },
+      "canvas": {
+        "Click destro": "Menu contestuale elemento",
+        "Doppio click": "Apri proprietà elemento",
+        "Drag": "Sposta elemento",
+        "Ctrl+Drag": "Duplica elemento",
+        "Shift+Drag": "Sposta vincolato (asse X o Y)"
+      }
+    }
+  },
+  "guides": {
+    "getting_started": {
+      "title": "Guida Introduttiva",
+      "steps": [
+        "1. Crea un nuovo progetto o apri uno esistente",
+        "2. Trascina elementi dalla Toolbox sul Canvas",
+        "3. Configura le proprietà di ogni elemento",
+        "4. Definisci menu e navigazione nell'Editor Menu",
+        "5. Crea formule personalizzate nell'Editor Formule",
+        "6. Configura tipologie nell'Editor Tipologie",
+        "7. Salva il progetto (.mdp)",
+        "8. Esporta JSON per ESP32",
+        "9. Carica su dispositivo con Upload ESP32"
+      ]
+    },
+    "best_practices": {
+      "layout": [
+        "Usa griglia per allineamento preciso",
+        "Raggruppa elementi correlati in Panel",
+        "Mantieni interfaccia semplice e chiara",
+        "Usa icone per azioni comuni",
+        "Rispetta dimensioni display 800x480"
+      ],
+      "performance": [
+        "Limita numero elementi per schermata",
+        "Ottimizza dimensioni icone (max 64x64)",
+        "Evita animazioni pesanti",
+        "Usa colori della palette predefinita"
+      ],
+      "usability": [
+        "Feedback visivo per azioni utente",
+        "Conferma per azioni distruttive",
+        "Messaggi di errore chiari",
+        "Navigazione intuitiva",
+        "Testi leggibili (min 10pt)"
+      ]
+    }
+  }
+}

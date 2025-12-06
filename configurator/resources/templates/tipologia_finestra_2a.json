@@ -1,0 +1,206 @@
+{
+  "name": "Tipologia Finestra 2 Ante",
+  "description": "Template finestra doppia anta",
+  "version": "1.0.0",
+  "elements": [
+    {
+      "type": "Label",
+      "id": "title",
+      "x": 200,
+      "y": 20,
+      "width": 400,
+      "height": 40,
+      "properties": {
+        "text": "Finestra 2 Ante",
+        "fontSize": 20,
+        "fontBold": true,
+        "textColor": "#8800ff",
+        "alignment": "center"
+      }
+    },
+    {
+      "type": "TipologiaWidget",
+      "id": "tipologia_widget",
+      "x": 50,
+      "y": 80,
+      "width": 700,
+      "height": 200,
+      "properties": {
+        "tipo": "finestra_2a",
+        "schema": "visual",
+        "ante": 2,
+        "editable": true
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "misure_panel",
+      "x": 50,
+      "y": 300,
+      "width": 700,
+      "height": 140,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#8800ff",
+        "borderWidth": 2
+      }
+    },
+    {
+      "type": "Label",
+      "id": "misure_title",
+      "x": 70,
+      "y": 310,
+      "width": 660,
+      "height": 25,
+      "properties": {
+        "text": "Misure Finestra",
+        "fontSize": 14,
+        "fontBold": true,
+        "textColor": "#8800ff"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "larghezza_totale",
+      "x": 70,
+      "y": 345,
+      "width": 200,
+      "height": 35,
+      "properties": {
+        "label": "Larghezza Tot:",
+        "min": 600.0,
+        "max": 4000.0,
+        "step": 10.0,
+        "default": 1600.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "altezza_totale",
+      "x": 290,
+      "y": 345,
+      "width": 200,
+      "height": 35,
+      "properties": {
+        "label": "Altezza Tot:",
+        "min": 300.0,
+        "max": 3000.0,
+        "step": 10.0,
+        "default": 1200.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "larghezza_montante",
+      "x": 510,
+      "y": 345,
+      "width": 180,
+      "height": 35,
+      "properties": {
+        "label": "Montante:",
+        "min": 30.0,
+        "max": 150.0,
+        "step": 5.0,
+        "default": 60.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "Dropdown",
+      "id": "materiale_telaio",
+      "x": 70,
+      "y": 390,
+      "width": 200,
+      "height": 35,
+      "properties": {
+        "label": "Telaio:",
+        "options": ["PVC", "Alluminio", "Legno", "Misto"],
+        "default": "PVC"
+      }
+    },
+    {
+      "type": "CheckBox",
+      "id": "simmetrica_check",
+      "x": 290,
+      "y": 395,
+      "width": 250,
+      "height": 25,
+      "properties": {
+        "text": "Ante simmetriche",
+        "checked": true
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_misura_totale",
+      "x": 100,
+      "y": 455,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "📏 Mis. Totale",
+        "fontSize": 12,
+        "background": "#8800ff",
+        "action": "measure_totale"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_calcola",
+      "x": 270,
+      "y": 455,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "🔢 Calcola",
+        "fontSize": 12,
+        "background": "#0088ff",
+        "action": "calculate_ante"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_save",
+      "x": 410,
+      "y": 455,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "💾 Salva",
+        "fontSize": 14,
+        "background": "#00ff88",
+        "action": "save_tipologia"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_print",
+      "x": 550,
+      "y": 455,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "🖨️ Stampa",
+        "fontSize": 14,
+        "background": "#ff8800",
+        "action": "print_tipologia"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_back",
+      "x": 50,
+      "y": 455,
+      "width": 80,
+      "height": 50,
+      "properties": {
+        "text": "← Back",
+        "fontSize": 14,
+        "background": "#333333",
+        "action": "goto:home"
+      }
+    }
+  ]
+}

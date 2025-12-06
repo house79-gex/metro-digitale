@@ -1,0 +1,228 @@
+{
+  "name": "Astine Anta-Ribalta",
+  "description": "Configurazione e misura astine per anta ribalta",
+  "version": "1.0.0",
+  "elements": [
+    {
+      "type": "Label",
+      "id": "title",
+      "x": 200,
+      "y": 20,
+      "width": 400,
+      "height": 40,
+      "properties": {
+        "text": "Astine Anta-Ribalta",
+        "fontSize": 20,
+        "fontBold": true,
+        "textColor": "#ff8800",
+        "alignment": "center"
+      }
+    },
+    {
+      "type": "AstinaSelector",
+      "id": "astina_selector",
+      "x": 50,
+      "y": 80,
+      "width": 700,
+      "height": 120,
+      "properties": {
+        "tipo": "anta_ribalta",
+        "options": ["Asta Standard", "Asta Regolabile", "Asta con Fermo", "Asta Doppia"],
+        "default": "Asta Standard"
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "misure_panel",
+      "x": 50,
+      "y": 220,
+      "width": 350,
+      "height": 180,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#ff8800",
+        "borderWidth": 2
+      }
+    },
+    {
+      "type": "Label",
+      "id": "misure_title",
+      "x": 70,
+      "y": 230,
+      "width": 310,
+      "height": 30,
+      "properties": {
+        "text": "Misure",
+        "fontSize": 16,
+        "fontBold": true,
+        "textColor": "#ff8800"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "lunghezza_asta",
+      "x": 70,
+      "y": 270,
+      "width": 250,
+      "height": 35,
+      "properties": {
+        "label": "Lunghezza:",
+        "min": 100.0,
+        "max": 2000.0,
+        "step": 10.0,
+        "default": 500.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "posizione_foro",
+      "x": 70,
+      "y": 315,
+      "width": 250,
+      "height": 35,
+      "properties": {
+        "label": "Pos. Foro:",
+        "min": 0.0,
+        "max": 2000.0,
+        "step": 5.0,
+        "default": 250.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_misura_lunghezza",
+      "x": 70,
+      "y": 360,
+      "width": 250,
+      "height": 35,
+      "properties": {
+        "text": "📏 Misura Lunghezza",
+        "fontSize": 12,
+        "background": "#ff8800",
+        "action": "measure_lunghezza_asta"
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "config_panel",
+      "x": 420,
+      "y": 220,
+      "width": 330,
+      "height": 180,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#0088ff",
+        "borderWidth": 2
+      }
+    },
+    {
+      "type": "Label",
+      "id": "config_title",
+      "x": 440,
+      "y": 230,
+      "width": 290,
+      "height": 30,
+      "properties": {
+        "text": "Configurazione",
+        "fontSize": 16,
+        "fontBold": true,
+        "textColor": "#0088ff"
+      }
+    },
+    {
+      "type": "CheckBox",
+      "id": "fermo_check",
+      "x": 440,
+      "y": 270,
+      "width": 250,
+      "height": 25,
+      "properties": {
+        "text": "Con fermo",
+        "checked": false
+      }
+    },
+    {
+      "type": "CheckBox",
+      "id": "regolabile_check",
+      "x": 440,
+      "y": 300,
+      "width": 250,
+      "height": 25,
+      "properties": {
+        "text": "Regolabile",
+        "checked": false
+      }
+    },
+    {
+      "type": "Dropdown",
+      "id": "materiale_selector",
+      "x": 440,
+      "y": 335,
+      "width": 250,
+      "height": 35,
+      "properties": {
+        "label": "Materiale:",
+        "options": ["Acciaio", "Alluminio", "Inox"],
+        "default": "Acciaio"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_calcola",
+      "x": 150,
+      "y": 420,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "🔢 Calcola",
+        "fontSize": 14,
+        "background": "#0088ff",
+        "action": "calculate_astina"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_save",
+      "x": 320,
+      "y": 420,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "💾 Salva",
+        "fontSize": 14,
+        "background": "#00ff88",
+        "action": "save_astina"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_print",
+      "x": 490,
+      "y": 420,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "🖨️ Stampa",
+        "fontSize": 14,
+        "background": "#ff8800",
+        "action": "print_astina"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_back",
+      "x": 50,
+      "y": 420,
+      "width": 80,
+      "height": 50,
+      "properties": {
+        "text": "← Back",
+        "fontSize": 14,
+        "background": "#333333",
+        "action": "goto:home"
+      }
+    }
+  ]
+}

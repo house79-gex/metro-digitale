@@ -1,0 +1,218 @@
+{
+  "name": "Vetri con Battute",
+  "description": "Misura vetri con battute e deduzioni automatiche",
+  "version": "1.0.0",
+  "elements": [
+    {
+      "type": "Label",
+      "id": "title",
+      "x": 200,
+      "y": 15,
+      "width": 400,
+      "height": 35,
+      "properties": {
+        "text": "Vetri con Battute",
+        "fontSize": 18,
+        "fontBold": true,
+        "textColor": "#00ff88",
+        "alignment": "center"
+      }
+    },
+    {
+      "type": "MeasureDisplay",
+      "id": "main_display",
+      "x": 100,
+      "y": 60,
+      "width": 600,
+      "height": 80,
+      "properties": {
+        "fontSize": 42,
+        "fontBold": true,
+        "unit": "mm",
+        "precision": 2,
+        "textColor": "#00ff88",
+        "background": "#16213e",
+        "borderColor": "#00ff88",
+        "borderWidth": 3
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "battute_panel",
+      "x": 50,
+      "y": 155,
+      "width": 700,
+      "height": 120,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#333333",
+        "borderWidth": 1
+      }
+    },
+    {
+      "type": "Label",
+      "id": "battute_title",
+      "x": 70,
+      "y": 165,
+      "width": 660,
+      "height": 25,
+      "properties": {
+        "text": "Battute e Deduzioni",
+        "fontSize": 14,
+        "fontBold": true,
+        "textColor": "#ffffff"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "battuta_sx",
+      "x": 70,
+      "y": 195,
+      "width": 140,
+      "height": 35,
+      "properties": {
+        "label": "Batt. SX:",
+        "min": 0.0,
+        "max": 50.0,
+        "step": 0.5,
+        "default": 10.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "battuta_dx",
+      "x": 230,
+      "y": 195,
+      "width": 140,
+      "height": 35,
+      "properties": {
+        "label": "Batt. DX:",
+        "min": 0.0,
+        "max": 50.0,
+        "step": 0.5,
+        "default": 10.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "battuta_top",
+      "x": 390,
+      "y": 195,
+      "width": 140,
+      "height": 35,
+      "properties": {
+        "label": "Batt. Alto:",
+        "min": 0.0,
+        "max": 50.0,
+        "step": 0.5,
+        "default": 10.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "battuta_bottom",
+      "x": 550,
+      "y": 195,
+      "width": 140,
+      "height": 35,
+      "properties": {
+        "label": "Batt. Basso:",
+        "min": 0.0,
+        "max": 50.0,
+        "step": 0.5,
+        "default": 10.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "CheckBox",
+      "id": "auto_deduce",
+      "x": 70,
+      "y": 240,
+      "width": 250,
+      "height": 25,
+      "properties": {
+        "text": "Deduzione automatica",
+        "checked": true
+      }
+    },
+    {
+      "type": "Label",
+      "id": "result_netto",
+      "x": 150,
+      "y": 290,
+      "width": 500,
+      "height": 35,
+      "properties": {
+        "text": "Misura Netta: 0.00 mm",
+        "fontSize": 16,
+        "fontBold": true,
+        "textColor": "#00ff88",
+        "alignment": "center"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_misura",
+      "x": 150,
+      "y": 340,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "📏 Misura",
+        "fontSize": 14,
+        "background": "#00ff88",
+        "textColor": "#000000",
+        "action": "measure_with_battute"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_calcola",
+      "x": 320,
+      "y": 340,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "🔢 Calcola",
+        "fontSize": 14,
+        "background": "#0088ff",
+        "textColor": "#ffffff",
+        "action": "calculate_netto"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_save",
+      "x": 490,
+      "y": 340,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "💾 Salva",
+        "fontSize": 14,
+        "background": "#00ff88",
+        "textColor": "#000000",
+        "action": "save_vetro_netto"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_back",
+      "x": 50,
+      "y": 410,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "← Indietro",
+        "fontSize": 14,
+        "background": "#333333",
+        "textColor": "#ffffff",
+        "action": "goto:home"
+      }
+    }
+  ]
+}

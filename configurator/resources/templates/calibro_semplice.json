@@ -1,0 +1,113 @@
+{
+  "name": "Calibro Semplice",
+  "description": "Interfaccia calibro digitale semplice con misura diretta",
+  "version": "1.0.0",
+  "elements": [
+    {
+      "type": "Label",
+      "id": "title",
+      "x": 250,
+      "y": 20,
+      "width": 300,
+      "height": 40,
+      "properties": {
+        "text": "Calibro Digitale",
+        "fontSize": 20,
+        "fontBold": true,
+        "textColor": "#00ff88",
+        "alignment": "center"
+      }
+    },
+    {
+      "type": "MeasureDisplay",
+      "id": "main_measure",
+      "x": 100,
+      "y": 80,
+      "width": 600,
+      "height": 150,
+      "properties": {
+        "fontSize": 64,
+        "fontBold": true,
+        "unit": "mm",
+        "precision": 2,
+        "textColor": "#00ff88",
+        "background": "#16213e",
+        "borderColor": "#00ff88",
+        "borderWidth": 4
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_zero",
+      "x": 150,
+      "y": 260,
+      "width": 150,
+      "height": 60,
+      "properties": {
+        "text": "Zero",
+        "fontSize": 16,
+        "background": "#ff8800",
+        "textColor": "#ffffff",
+        "action": "zero_measure"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_hold",
+      "x": 325,
+      "y": 260,
+      "width": 150,
+      "height": 60,
+      "properties": {
+        "text": "Hold",
+        "fontSize": 16,
+        "background": "#0088ff",
+        "textColor": "#ffffff",
+        "action": "hold_measure"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_save",
+      "x": 500,
+      "y": 260,
+      "width": 150,
+      "height": 60,
+      "properties": {
+        "text": "Salva",
+        "fontSize": 16,
+        "background": "#00ff88",
+        "textColor": "#000000",
+        "action": "save_measure"
+      }
+    },
+    {
+      "type": "Dropdown",
+      "id": "unit_selector",
+      "x": 300,
+      "y": 350,
+      "width": 200,
+      "height": 40,
+      "properties": {
+        "options": ["mm", "cm", "pollici"],
+        "default": "mm",
+        "label": "Unità:"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_back",
+      "x": 50,
+      "y": 400,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "← Indietro",
+        "fontSize": 14,
+        "background": "#333333",
+        "textColor": "#ffffff",
+        "action": "goto:home"
+      }
+    }
+  ]
+}
