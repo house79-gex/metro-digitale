@@ -109,8 +109,8 @@ class IconBrowserDialog(QDialog):
         self.status_label.setText("Ricerca in corso...")
         self.results_list.clear()
         
-        # Cerca icone
-        results = self.client.search(query, limit=64, prefix=icon_set if icon_set else None)
+        # Cerca icone (aumentato limite a 100 per visualizzare più icone)
+        results = self.client.search(query, limit=100, prefix=icon_set if icon_set else None)
         
         if not results:
             self.status_label.setText("Nessuna icona trovata")

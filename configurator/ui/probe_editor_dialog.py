@@ -155,8 +155,8 @@ class ProbeCanvas(QWidget):
         # Etichette assi
         painter.setPen(QColor("#0088ff"))
         painter.setFont(QFont("Arial", 8))
-        painter.drawText(center_x + 5, 15, "Y")
-        painter.drawText(self.width() - 15, center_y - 5, "X")
+        painter.drawText(int(center_x + 5), 15, "Y")
+        painter.drawText(int(self.width() - 15), int(center_y - 5), "X")
     
     def _draw_shape(self, painter: QPainter):
         """Disegna shape puntale"""
@@ -230,7 +230,7 @@ class ProbeCanvas(QWidget):
         if label:
             painter.setPen(QColor("#ff0000"))
             painter.setFont(QFont("Arial", 10, QFont.Weight.Bold))
-            painter.drawText(end.x() + 10, end.y() - 10, label)
+            painter.drawText(int(end.x() + 10), int(end.y() - 10), label)
     
     def _draw_contact_point(self, painter: QPainter, cp: dict):
         """Disegna punto di contatto"""
@@ -252,13 +252,13 @@ class ProbeCanvas(QWidget):
         # Etichetta
         painter.setPen(QColor("#000000"))
         painter.setFont(QFont("Arial", 8, QFont.Weight.Bold))
-        painter.drawText(pos.x() - 10, pos.y() + 4, label)
+        painter.drawText(int(pos.x() - 10), int(pos.y() + 4), label)
         
         # Descrizione sotto
         painter.setPen(color)
         painter.setFont(QFont("Arial", 9))
         text = "Appoggio Interno" if contact_type == "interno" else "Appoggio Esterno"
-        painter.drawText(pos.x() - 40, pos.y() + 25, text)
+        painter.drawText(int(pos.x() - 40), int(pos.y() + 25), text)
     
     def mousePressEvent(self, event):
         """Inizia disegno"""

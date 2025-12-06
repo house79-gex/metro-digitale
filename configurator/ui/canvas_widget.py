@@ -142,7 +142,7 @@ class CanvasElement(QGraphicsRectItem):
             # Slider track e thumb
             mid_y = rect.height() / 2
             painter.setPen(QPen(QColor("#333333"), 2))
-            painter.drawLine(10, mid_y, rect.width() - 10, mid_y)
+            painter.drawLine(10, int(mid_y), int(rect.width() - 10), int(mid_y))
             
             # Thumb
             thumb_x = rect.width() * 0.6
