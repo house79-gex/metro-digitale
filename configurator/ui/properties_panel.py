@@ -449,14 +449,14 @@ class PropertiesPanel(QWidget):
         """Aggiorna grassetto"""
         if self.current_item and hasattr(self.current_item, 'text_item'):
             font = self.current_item.text_item.font()
-            font.setBold(state == Qt.CheckState.Checked.value)
+            font.setBold(state == Qt.CheckState.Checked)
             self.current_item.text_item.setFont(font)
     
     def _update_text_italic(self, state):
         """Aggiorna corsivo"""
         if self.current_item and hasattr(self.current_item, 'text_item'):
             font = self.current_item.text_item.font()
-            font.setItalic(state == Qt.CheckState.Checked.value)
+            font.setItalic(state == Qt.CheckState.Checked)
             self.current_item.text_item.setFont(font)
     
     def _update_text_alignment(self, alignment):

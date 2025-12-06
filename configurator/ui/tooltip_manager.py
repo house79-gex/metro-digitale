@@ -47,7 +47,9 @@ class TooltipManager:
     def _setup_tooltip_style(self):
         """Configura stile globale tooltip"""
         # Stile CSS per tooltip avanzati
-        tooltip_style = """
+        # Nota: QToolTip styles devono essere applicati a livello di QApplication
+        # o singolarmente su ogni widget. Questo metodo prepara lo stile per uso futuro.
+        self.tooltip_style = """
             QToolTip {
                 background-color: #16213e;
                 color: #ffffff;
@@ -58,8 +60,6 @@ class TooltipManager:
                 font-family: Arial, sans-serif;
             }
         """
-        # Applica stile globalmente (sarà usato da tutti i tooltip)
-        # Nota: lo stile viene applicato quando si chiama set_tooltip
     
     def get_tooltip(self, category: str, key: str) -> Optional[str]:
         """
