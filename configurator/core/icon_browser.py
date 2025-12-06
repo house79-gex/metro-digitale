@@ -137,6 +137,10 @@ class IconifyClient:
             print(f"Errore download SVG: {e}")
             return None
     
+    def get_icon_svg(self, icon_name: str, color: str = "#ffffff", size: int = 48) -> Optional[str]:
+        """Alias per get_svg con dimensione default più grande per preview"""
+        return self.get_svg(icon_name, color, size)
+    
     def get_icon_sets(self) -> List[Tuple[str, str]]:
         return self.RECOMMENDED_SETS.copy()
     

@@ -128,9 +128,22 @@ class MainWindow(QMainWindow):
         self.action_test_formulas = QAction("&Test Formule", self)
         self.action_test_formulas.triggered.connect(self._on_test_formulas)
         
+        self.action_template_browser = QAction("Browser &Template", self)
+        self.action_template_browser.setStatusTip("Carica template preimpostati")
+        self.action_template_browser.triggered.connect(self._on_template_browser)
+        
+        self.action_simulation = QAction("🎮 Modalità &Simulazione", self)
+        self.action_simulation.setStatusTip("Simula funzionamento dispositivo")
+        self.action_simulation.triggered.connect(self._on_simulation_mode)
+        
+        self.action_probe_editor = QAction("✏️ Editor &Puntali", self)
+        self.action_probe_editor.setStatusTip("Editor grafico forma puntali")
+        self.action_probe_editor.triggered.connect(self._on_probe_editor)
+        
         # Help
         self.action_documentation = QAction("&Documentazione", self)
         self.action_documentation.setShortcut(QKeySequence.StandardKey.HelpContents)
+        self.action_documentation.triggered.connect(self._on_documentation)
         
         self.action_about = QAction("&Info", self)
         self.action_about.triggered.connect(self._on_about)
@@ -170,6 +183,11 @@ class MainWindow(QMainWindow):
         tools_menu = menubar.addMenu("&Strumenti")
         tools_menu.addAction(self.action_upload)
         tools_menu.addAction(self.action_icon_browser)
+        tools_menu.addAction(self.action_template_browser)
+        tools_menu.addSeparator()
+        tools_menu.addAction(self.action_simulation)
+        tools_menu.addAction(self.action_probe_editor)
+        tools_menu.addSeparator()
         tools_menu.addAction(self.action_test_formulas)
         
         # Help Menu
@@ -366,6 +384,40 @@ class MainWindow(QMainWindow):
         self.editor_tabs.setCurrentWidget(self.formula_editor)
         self.dock_editors.show()
     
+    def _on_template_browser(self):
+        """Apri browser template"""
+        from .template_browser_dialog import TemplateBrowserDialog
+        dialog = TemplateBrowserDialog(self)
+        if dialog.exec():
+            template = dialog.get_selected_template()
+            if template:
+                self._load_template(template)
+                self.statusbar.showMessage(f"Template caricato: {template.name}", 3000)
+    
+    def _on_simulation_mode(self):
+        """Apri modalità simulazione"""
+        from .simulation_dialog import SimulationDialog
+        dialog = SimulationDialog(self)
+        dialog.exec()
+    
+    def _on_probe_editor(self):
+        """Apri editor grafico puntali"""
+        from .probe_editor_dialog import ProbeEditorDialog
+        dialog = ProbeEditorDialog(self)
+        dialog.exec()
+    
+    def _on_documentation(self):
+        """Mostra documentazione"""
+        from .tooltip_manager import get_tooltip_manager
+        manager = get_tooltip_manager()
+        guide_html = manager.format_guide_html('getting_started')
+        
+        QMessageBox.information(
+            self,
+            "Guida Rapida",
+            guide_html
+        )
+    
     def _on_about(self):
         """Mostra info applicazione"""
         QMessageBox.about(
@@ -396,6 +448,25 @@ class MainWindow(QMainWindow):
         self.current_project.tipologie = self.tipologia_editor.get_tipologie()
         
         # TODO: Salva elementi canvas
+    
+    def _load_template(self, template_info):
+        """Carica template nel canvas"""
+        from .canvas_widget import CanvasElement
+        
+        # Pulisci canvas
+        self.canvas.scene.clear()
+        
+        # Carica elementi dal template
+        for elem_data in template_info.data.get("elements", []):
+            elem_type = elem_data.get("type", "Button")
+            x = elem_data.get("x", 0)
+            y = elem_data.get("y", 0)
+            
+            # Crea elemento sul canvas
+            element = CanvasElement(elem_type, x, y, self.canvas)
+            self.canvas.scene.addItem(element)
+        
+        self.statusbar.showMessage(f"Caricati {len(template_info.data.get('elements', []))} elementi dal template", 3000)
     
     def _update_ui(self):
         """Aggiorna UI con stato progetto"""

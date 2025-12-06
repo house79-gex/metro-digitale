@@ -5,10 +5,17 @@ Dialog browser icone Iconify
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLineEdit,
     QPushButton, QListWidget, QLabel, QComboBox,
-    QListWidgetItem
+    QListWidgetItem, QProgressBar
 )
-from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt, QSize, QByteArray, QThread, pyqtSignal
+from PyQt6.QtGui import QIcon, QPixmap, QPainter, QColor
+import io
+
+try:
+    from PyQt6.QtSvg import QSvgRenderer
+    HAS_SVG = True
+except ImportError:
+    HAS_SVG = False
 
 from core.icon_browser import IconifyClient
 
@@ -109,11 +116,22 @@ class IconBrowserDialog(QDialog):
             self.status_label.setText("Nessuna icona trovata")
             return
         
-        # Mostra risultati
+        # Mostra risultati con anteprima icone
         for icon_info in results:
             item = QListWidgetItem(icon_info.name)
             item.setData(Qt.ItemDataRole.UserRole, icon_info)
-            # TODO: Carica icona come QIcon
+            
+            # Carica e mostra icona SVG
+            try:
+                svg_data = self.client.get_icon_svg(icon_info.full_name)
+                if svg_data:
+                    pixmap = self._svg_to_pixmap(svg_data, 48, 48)
+                    item.setIcon(QIcon(pixmap))
+            except Exception as e:
+                # Fallback: crea un'icona segnaposto colorata
+                pixmap = self._create_placeholder_icon(icon_info.name[0].upper())
+                item.setIcon(QIcon(pixmap))
+            
             self.results_list.addItem(item)
         
         self.status_label.setText(f"Trovate {len(results)} icone")
@@ -138,3 +156,39 @@ class IconBrowserDialog(QDialog):
     def get_selected_icon(self):
         """Ottiene icona selezionata"""
         return self.selected_icon
+    
+    def _svg_to_pixmap(self, svg_data: str, width: int, height: int) -> QPixmap:
+        """Converte SVG in QPixmap"""
+        if not HAS_SVG:
+            # Fallback se SVG non disponibile
+            return self._create_placeholder_icon("?")
+        
+        try:
+            svg_bytes = QByteArray(svg_data.encode('utf-8'))
+            renderer = QSvgRenderer(svg_bytes)
+            
+            pixmap = QPixmap(width, height)
+            pixmap.fill(Qt.GlobalColor.transparent)
+            
+            painter = QPainter(pixmap)
+            renderer.render(painter)
+            painter.end()
+            
+            return pixmap
+        except Exception:
+            return self._create_placeholder_icon("?")
+    
+    def _create_placeholder_icon(self, letter: str) -> QPixmap:
+        """Crea icona segnaposto con lettera"""
+        pixmap = QPixmap(48, 48)
+        pixmap.fill(QColor("#00ff88"))
+        
+        painter = QPainter(pixmap)
+        painter.setPen(QColor("#000000"))
+        painter.setFont(painter.font())
+        painter.font().setPointSize(24)
+        painter.font().setBold(True)
+        painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, letter)
+        painter.end()
+        
+        return pixmap
