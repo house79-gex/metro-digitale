@@ -293,9 +293,12 @@ class ProbeCanvas(QWidget):
             pos = event.position().toPoint()
             self.current_point = QPointF(pos)
             
+            # Costante per lunghezza minima linea
+            MIN_LINE_LENGTH = 5
+            
             if self.start_point and self.current_point:
                 # Aggiungi linea solo se non è troppo corta
-                if (self.start_point - self.current_point).manhattanLength() > 5:
+                if (self.start_point - self.current_point).manhattanLength() > MIN_LINE_LENGTH:
                     self.shape.add_line(self.start_point, self.current_point)
                     self.shape_changed.emit()
             

@@ -26,8 +26,8 @@ class TemplateInfo:
         try:
             with open(self.filepath, 'r', encoding='utf-8') as f:
                 self.data = json.load(f)
-        except Exception as e:
-            print(f"Errore caricamento template {self.filepath}: {e}")
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Errore caricamento template {self.filepath} ({type(e).__name__}): {e}")
             self.data = {
                 "name": self.filepath.stem,
                 "description": "Template non valido",

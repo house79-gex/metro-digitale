@@ -185,9 +185,13 @@ class IconBrowserDialog(QDialog):
         
         painter = QPainter(pixmap)
         painter.setPen(QColor("#000000"))
-        painter.setFont(painter.font())
-        painter.font().setPointSize(24)
-        painter.font().setBold(True)
+        
+        # Fix: Ottieni font, modifica e imposta
+        font = painter.font()
+        font.setPointSize(24)
+        font.setBold(True)
+        painter.setFont(font)
+        
         painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, letter)
         painter.end()
         

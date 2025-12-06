@@ -266,8 +266,7 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.dock_editors)
         
         # Nascondi editor all'avvio per dare più spazio al canvas
-        self.dock_editors.hide()
-        self.action_toggle_editors.setChecked(False)
+        self._set_dock_visibility(self.dock_editors, self.action_toggle_editors, False)
         
         self.action_toggle_editors.triggered.connect(
             lambda checked: self.dock_editors.setVisible(checked)
@@ -510,6 +509,11 @@ class MainWindow(QMainWindow):
         self.project_label.setText(project_name)
         
         self.project_changed.emit()
+    
+    def _set_dock_visibility(self, dock: QDockWidget, action: QAction, visible: bool):
+        """Imposta visibilità dock e aggiorna azione toggle"""
+        dock.setVisible(visible)
+        action.setChecked(visible)
     
     def _apply_tooltips(self):
         """Applica tooltip a tutti gli elementi UI"""
