@@ -1,0 +1,346 @@
+{
+  "name": "Impostazioni",
+  "description": "Schermata configurazione impostazioni hardware e software",
+  "version": "1.0.0",
+  "elements": [
+    {
+      "type": "Label",
+      "id": "title",
+      "x": 250,
+      "y": 20,
+      "width": 300,
+      "height": 40,
+      "properties": {
+        "text": "Impostazioni",
+        "fontSize": 20,
+        "fontBold": true,
+        "textColor": "#ffffff",
+        "alignment": "center"
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "encoder_panel",
+      "x": 50,
+      "y": 80,
+      "width": 350,
+      "height": 160,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#00ff88",
+        "borderWidth": 2
+      }
+    },
+    {
+      "type": "Label",
+      "id": "encoder_title",
+      "x": 70,
+      "y": 90,
+      "width": 310,
+      "height": 25,
+      "properties": {
+        "text": "⚙️ Encoder",
+        "fontSize": 14,
+        "fontBold": true,
+        "textColor": "#00ff88"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "encoder_resolution",
+      "x": 70,
+      "y": 125,
+      "width": 250,
+      "height": 35,
+      "properties": {
+        "label": "Risoluzione:",
+        "min": 100,
+        "max": 1000,
+        "step": 100,
+        "default": 400,
+        "unit": "ppr"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "encoder_calibration",
+      "x": 70,
+      "y": 170,
+      "width": 250,
+      "height": 35,
+      "properties": {
+        "label": "Calibrazione:",
+        "min": 0.5,
+        "max": 2.0,
+        "step": 0.01,
+        "default": 1.0
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_calibrate",
+      "x": 70,
+      "y": 210,
+      "width": 250,
+      "height": 25,
+      "properties": {
+        "text": "🔧 Calibra Encoder",
+        "fontSize": 11,
+        "background": "#00ff88",
+        "textColor": "#000000",
+        "action": "calibrate_encoder"
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "puntale_panel",
+      "x": 420,
+      "y": 80,
+      "width": 330,
+      "height": 160,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#0088ff",
+        "borderWidth": 2
+      }
+    },
+    {
+      "type": "Label",
+      "id": "puntale_title",
+      "x": 440,
+      "y": 90,
+      "width": 290,
+      "height": 25,
+      "properties": {
+        "text": "📏 Puntale",
+        "fontSize": 14,
+        "fontBold": true,
+        "textColor": "#0088ff"
+      }
+    },
+    {
+      "type": "Dropdown",
+      "id": "puntale_selector",
+      "x": 440,
+      "y": 125,
+      "width": 250,
+      "height": 35,
+      "properties": {
+        "options": ["Standard", "Interno", "Esterno", "Profondità", "Battuta"],
+        "default": "Standard"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "puntale_offset",
+      "x": 440,
+      "y": 170,
+      "width": 250,
+      "height": 35,
+      "properties": {
+        "label": "Offset:",
+        "min": -50.0,
+        "max": 50.0,
+        "step": 0.5,
+        "default": 0.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_config_puntale",
+      "x": 440,
+      "y": 210,
+      "width": 250,
+      "height": 25,
+      "properties": {
+        "text": "⚙️ Configura Puntale",
+        "fontSize": 11,
+        "background": "#0088ff",
+        "textColor": "#ffffff",
+        "action": "config_puntale"
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "bluetooth_panel",
+      "x": 50,
+      "y": 260,
+      "width": 350,
+      "height": 140,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#ff8800",
+        "borderWidth": 2
+      }
+    },
+    {
+      "type": "Label",
+      "id": "bluetooth_title",
+      "x": 70,
+      "y": 270,
+      "width": 310,
+      "height": 25,
+      "properties": {
+        "text": "📱 Bluetooth",
+        "fontSize": 14,
+        "fontBold": true,
+        "textColor": "#ff8800"
+      }
+    },
+    {
+      "type": "CheckBox",
+      "id": "bluetooth_enable",
+      "x": 70,
+      "y": 305,
+      "width": 250,
+      "height": 25,
+      "properties": {
+        "text": "Abilita Bluetooth",
+        "checked": true
+      }
+    },
+    {
+      "type": "LineEdit",
+      "id": "bluetooth_name",
+      "x": 70,
+      "y": 335,
+      "width": 250,
+      "height": 35,
+      "properties": {
+        "label": "Nome dispositivo:",
+        "placeholder": "MetroDigitale",
+        "default": "MetroDigitale"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_bluetooth_config",
+      "x": 70,
+      "y": 375,
+      "width": 250,
+      "height": 25,
+      "properties": {
+        "text": "⚙️ Configura Bluetooth",
+        "fontSize": 11,
+        "background": "#ff8800",
+        "textColor": "#ffffff",
+        "action": "config_bluetooth"
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "display_panel",
+      "x": 420,
+      "y": 260,
+      "width": 330,
+      "height": 140,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#8800ff",
+        "borderWidth": 2
+      }
+    },
+    {
+      "type": "Label",
+      "id": "display_title",
+      "x": 440,
+      "y": 270,
+      "width": 290,
+      "height": 25,
+      "properties": {
+        "text": "🖥️ Display",
+        "fontSize": 14,
+        "fontBold": true,
+        "textColor": "#8800ff"
+      }
+    },
+    {
+      "type": "Slider",
+      "id": "brightness_slider",
+      "x": 440,
+      "y": 305,
+      "width": 250,
+      "height": 30,
+      "properties": {
+        "label": "Luminosità:",
+        "min": 0,
+        "max": 100,
+        "default": 80
+      }
+    },
+    {
+      "type": "CheckBox",
+      "id": "auto_off_check",
+      "x": 440,
+      "y": 345,
+      "width": 250,
+      "height": 25,
+      "properties": {
+        "text": "Spegnimento automatico",
+        "checked": true
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "auto_off_time",
+      "x": 440,
+      "y": 370,
+      "width": 250,
+      "height": 30,
+      "properties": {
+        "label": "Timeout:",
+        "min": 10,
+        "max": 300,
+        "step": 10,
+        "default": 60,
+        "unit": "sec"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_save_settings",
+      "x": 250,
+      "y": 420,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "💾 Salva",
+        "fontSize": 14,
+        "background": "#00ff88",
+        "textColor": "#000000",
+        "action": "save_settings"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_reset_settings",
+      "x": 420,
+      "y": 420,
+      "width": 150,
+      "height": 50,
+      "properties": {
+        "text": "♻️ Ripristina",
+        "fontSize": 14,
+        "background": "#ff0088",
+        "textColor": "#ffffff",
+        "action": "reset_settings"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_back",
+      "x": 50,
+      "y": 420,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "← Indietro",
+        "fontSize": 14,
+        "background": "#333333",
+        "textColor": "#ffffff",
+        "action": "goto:home"
+      }
+    }
+  ]
+}

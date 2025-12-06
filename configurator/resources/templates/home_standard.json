@@ -1,0 +1,117 @@
+{
+  "name": "Home Standard",
+  "description": "Schermata home standard con pulsanti principali",
+  "version": "1.0.0",
+  "elements": [
+    {
+      "type": "Label",
+      "id": "title",
+      "x": 200,
+      "y": 20,
+      "width": 400,
+      "height": 50,
+      "properties": {
+        "text": "Metro Digitale",
+        "font": "Arial",
+        "fontSize": 24,
+        "fontBold": true,
+        "textColor": "#00ff88",
+        "alignment": "center",
+        "background": "transparent"
+      }
+    },
+    {
+      "type": "MeasureDisplay",
+      "id": "main_display",
+      "x": 150,
+      "y": 90,
+      "width": 500,
+      "height": 120,
+      "properties": {
+        "fontSize": 48,
+        "fontBold": true,
+        "unit": "mm",
+        "precision": 2,
+        "textColor": "#00ff88",
+        "background": "#16213e",
+        "borderColor": "#00ff88",
+        "borderWidth": 3
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_calibro",
+      "x": 50,
+      "y": 240,
+      "width": 180,
+      "height": 80,
+      "properties": {
+        "text": "Calibro",
+        "fontSize": 16,
+        "background": "#00ff88",
+        "textColor": "#000000",
+        "action": "goto:calibro_semplice"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_vetri",
+      "x": 250,
+      "y": 240,
+      "width": 180,
+      "height": 80,
+      "properties": {
+        "text": "Vetri",
+        "fontSize": 16,
+        "background": "#0088ff",
+        "textColor": "#ffffff",
+        "action": "goto:vetri_lxa"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_astine",
+      "x": 450,
+      "y": 240,
+      "width": 180,
+      "height": 80,
+      "properties": {
+        "text": "Astine",
+        "fontSize": 16,
+        "background": "#ff8800",
+        "textColor": "#ffffff",
+        "action": "goto:astine_anta_ribalta"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_tipologie",
+      "x": 150,
+      "y": 340,
+      "width": 180,
+      "height": 80,
+      "properties": {
+        "text": "Tipologie",
+        "fontSize": 16,
+        "background": "#8800ff",
+        "textColor": "#ffffff",
+        "action": "goto:tipologie"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_impostazioni",
+      "x": 350,
+      "y": 340,
+      "width": 180,
+      "height": 80,
+      "properties": {
+        "text": "Impostazioni",
+        "fontSize": 16,
+        "background": "#333333",
+        "textColor": "#ffffff",
+        "action": "goto:impostazioni"
+      }
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "name": "Fermavetri Standard",
+  "description": "Misura e configurazione fermavetri standard",
+  "version": "1.0.0",
+  "elements": [
+    {
+      "type": "Label",
+      "id": "title",
+      "x": 250,
+      "y": 20,
+      "width": 300,
+      "height": 40,
+      "properties": {
+        "text": "Fermavetri",
+        "fontSize": 20,
+        "fontBold": true,
+        "textColor": "#00ff88",
+        "alignment": "center"
+      }
+    },
+    {
+      "type": "MeasureDisplay",
+      "id": "main_display",
+      "x": 150,
+      "y": 80,
+      "width": 500,
+      "height": 100,
+      "properties": {
+        "fontSize": 48,
+        "fontBold": true,
+        "unit": "mm",
+        "precision": 2,
+        "textColor": "#00ff88",
+        "background": "#16213e",
+        "borderColor": "#00ff88",
+        "borderWidth": 3
+      }
+    },
+    {
+      "type": "Panel",
+      "id": "tipo_panel",
+      "x": 50,
+      "y": 200,
+      "width": 700,
+      "height": 100,
+      "properties": {
+        "background": "#1a1a2e",
+        "borderColor": "#333333",
+        "borderWidth": 1
+      }
+    },
+    {
+      "type": "Label",
+      "id": "tipo_label",
+      "x": 70,
+      "y": 210,
+      "width": 660,
+      "height": 25,
+      "properties": {
+        "text": "Tipo Fermavetro",
+        "fontSize": 14,
+        "fontBold": true,
+        "textColor": "#ffffff"
+      }
+    },
+    {
+      "type": "Dropdown",
+      "id": "tipo_selector",
+      "x": 70,
+      "y": 245,
+      "width": 300,
+      "height": 40,
+      "properties": {
+        "options": ["Standard", "A pressione", "Con guarnizione", "Magnetico", "Incastro"],
+        "default": "Standard"
+      }
+    },
+    {
+      "type": "NumberInput",
+      "id": "spessore_vetro",
+      "x": 390,
+      "y": 245,
+      "width": 250,
+      "height": 40,
+      "properties": {
+        "label": "Spessore vetro:",
+        "min": 3.0,
+        "max": 20.0,
+        "step": 0.5,
+        "default": 4.0,
+        "unit": "mm"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_misura",
+      "x": 150,
+      "y": 320,
+      "width": 150,
+      "height": 60,
+      "properties": {
+        "text": "📏 Misura",
+        "fontSize": 14,
+        "background": "#00ff88",
+        "textColor": "#000000",
+        "action": "measure_fermavetro"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_save",
+      "x": 325,
+      "y": 320,
+      "width": 150,
+      "height": 60,
+      "properties": {
+        "text": "💾 Salva",
+        "fontSize": 14,
+        "background": "#0088ff",
+        "textColor": "#ffffff",
+        "action": "save_fermavetro"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_send",
+      "x": 500,
+      "y": 320,
+      "width": 150,
+      "height": 60,
+      "properties": {
+        "text": "📤 Invia",
+        "fontSize": 14,
+        "background": "#ff8800",
+        "textColor": "#ffffff",
+        "action": "send_fermavetro"
+      }
+    },
+    {
+      "type": "Button",
+      "id": "btn_back",
+      "x": 50,
+      "y": 400,
+      "width": 120,
+      "height": 50,
+      "properties": {
+        "text": "← Indietro",
+        "fontSize": 14,
+        "background": "#333333",
+        "textColor": "#ffffff",
+        "action": "goto:home"
+      }
+    }
+  ]
+}
