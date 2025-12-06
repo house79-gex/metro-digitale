@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         self._create_toolbars()
         self._create_docks()
         self._create_statusbar()
+        self._apply_tooltips()
         
         self.setWindowTitle("Metro Digitale Configurator")
         self.resize(1400, 900)
@@ -128,9 +129,22 @@ class MainWindow(QMainWindow):
         self.action_test_formulas = QAction("&Test Formule", self)
         self.action_test_formulas.triggered.connect(self._on_test_formulas)
         
+        self.action_template_browser = QAction("Browser &Template", self)
+        self.action_template_browser.setStatusTip("Carica template preimpostati")
+        self.action_template_browser.triggered.connect(self._on_template_browser)
+        
+        self.action_simulation = QAction("🎮 Modalità &Simulazione", self)
+        self.action_simulation.setStatusTip("Simula funzionamento dispositivo")
+        self.action_simulation.triggered.connect(self._on_simulation_mode)
+        
+        self.action_probe_editor = QAction("✏️ Editor &Puntali", self)
+        self.action_probe_editor.setStatusTip("Editor grafico forma puntali")
+        self.action_probe_editor.triggered.connect(self._on_probe_editor)
+        
         # Help
         self.action_documentation = QAction("&Documentazione", self)
         self.action_documentation.setShortcut(QKeySequence.StandardKey.HelpContents)
+        self.action_documentation.triggered.connect(self._on_documentation)
         
         self.action_about = QAction("&Info", self)
         self.action_about.triggered.connect(self._on_about)
@@ -170,6 +184,11 @@ class MainWindow(QMainWindow):
         tools_menu = menubar.addMenu("&Strumenti")
         tools_menu.addAction(self.action_upload)
         tools_menu.addAction(self.action_icon_browser)
+        tools_menu.addAction(self.action_template_browser)
+        tools_menu.addSeparator()
+        tools_menu.addAction(self.action_simulation)
+        tools_menu.addAction(self.action_probe_editor)
+        tools_menu.addSeparator()
         tools_menu.addAction(self.action_test_formulas)
         
         # Help Menu
@@ -196,7 +215,13 @@ class MainWindow(QMainWindow):
     def _create_docks(self):
         """Crea dock widgets"""
         # Dock Toolbox (sinistra)
-        self.dock_toolbox = QDockWidget("Toolbox", self)
+        self.dock_toolbox = QDockWidget("📦 Toolbox", self)
+        self.dock_toolbox.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
+        self.dock_toolbox.setFeatures(
+            QDockWidget.DockWidgetFeature.DockWidgetClosable |
+            QDockWidget.DockWidgetFeature.DockWidgetMovable |
+            QDockWidget.DockWidgetFeature.DockWidgetFloatable
+        )
         self.toolbox = ToolboxWidget()
         self.dock_toolbox.setWidget(self.toolbox)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dock_toolbox)
@@ -205,7 +230,13 @@ class MainWindow(QMainWindow):
         )
         
         # Dock Properties (destra)
-        self.dock_properties = QDockWidget("Proprietà", self)
+        self.dock_properties = QDockWidget("⚙️ Proprietà", self)
+        self.dock_properties.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
+        self.dock_properties.setFeatures(
+            QDockWidget.DockWidgetFeature.DockWidgetClosable |
+            QDockWidget.DockWidgetFeature.DockWidgetMovable |
+            QDockWidget.DockWidgetFeature.DockWidgetFloatable
+        )
         self.properties_panel = PropertiesPanel()
         self.dock_properties.setWidget(self.properties_panel)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock_properties)
@@ -214,7 +245,13 @@ class MainWindow(QMainWindow):
         )
         
         # Dock Editors (basso)
-        self.dock_editors = QDockWidget("Editor", self)
+        self.dock_editors = QDockWidget("📝 Editor", self)
+        self.dock_editors.setAllowedAreas(Qt.DockWidgetArea.BottomDockWidgetArea | Qt.DockWidgetArea.TopDockWidgetArea)
+        self.dock_editors.setFeatures(
+            QDockWidget.DockWidgetFeature.DockWidgetClosable |
+            QDockWidget.DockWidgetFeature.DockWidgetMovable |
+            QDockWidget.DockWidgetFeature.DockWidgetFloatable
+        )
         self.editor_tabs = QTabWidget()
         
         self.menu_editor = MenuEditor()
@@ -227,6 +264,10 @@ class MainWindow(QMainWindow):
         
         self.dock_editors.setWidget(self.editor_tabs)
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.dock_editors)
+        
+        # Nascondi editor all'avvio per dare più spazio al canvas
+        self._set_dock_visibility(self.dock_editors, self.action_toggle_editors, False)
+        
         self.action_toggle_editors.triggered.connect(
             lambda checked: self.dock_editors.setVisible(checked)
         )
@@ -366,6 +407,40 @@ class MainWindow(QMainWindow):
         self.editor_tabs.setCurrentWidget(self.formula_editor)
         self.dock_editors.show()
     
+    def _on_template_browser(self):
+        """Apri browser template"""
+        from .template_browser_dialog import TemplateBrowserDialog
+        dialog = TemplateBrowserDialog(self)
+        if dialog.exec():
+            template = dialog.get_selected_template()
+            if template:
+                self._load_template(template)
+                self.statusbar.showMessage(f"Template caricato: {template.name}", 3000)
+    
+    def _on_simulation_mode(self):
+        """Apri modalità simulazione"""
+        from .simulation_dialog import SimulationDialog
+        dialog = SimulationDialog(self)
+        dialog.exec()
+    
+    def _on_probe_editor(self):
+        """Apri editor grafico puntali"""
+        from .probe_editor_dialog import ProbeEditorDialog
+        dialog = ProbeEditorDialog(self)
+        dialog.exec()
+    
+    def _on_documentation(self):
+        """Mostra documentazione"""
+        from .tooltip_manager import get_tooltip_manager
+        manager = get_tooltip_manager()
+        guide_html = manager.format_guide_html('getting_started')
+        
+        QMessageBox.information(
+            self,
+            "Guida Rapida",
+            guide_html
+        )
+    
     def _on_about(self):
         """Mostra info applicazione"""
         QMessageBox.about(
@@ -397,6 +472,25 @@ class MainWindow(QMainWindow):
         
         # TODO: Salva elementi canvas
     
+    def _load_template(self, template_info):
+        """Carica template nel canvas"""
+        from .canvas_widget import CanvasElement
+        
+        # Pulisci canvas
+        self.canvas.scene.clear()
+        
+        # Carica elementi dal template
+        for elem_data in template_info.data.get("elements", []):
+            elem_type = elem_data.get("type", "Button")
+            x = elem_data.get("x", 0)
+            y = elem_data.get("y", 0)
+            
+            # Crea elemento sul canvas
+            element = CanvasElement(elem_type, x, y, self.canvas)
+            self.canvas.scene.addItem(element)
+        
+        self.statusbar.showMessage(f"Caricati {len(template_info.data.get('elements', []))} elementi dal template", 3000)
+    
     def _update_ui(self):
         """Aggiorna UI con stato progetto"""
         project_name = self.project_manager.get_project_name()
@@ -415,6 +509,48 @@ class MainWindow(QMainWindow):
         self.project_label.setText(project_name)
         
         self.project_changed.emit()
+    
+    def _set_dock_visibility(self, dock: QDockWidget, action: QAction, visible: bool):
+        """Imposta visibilità dock e aggiorna azione toggle"""
+        dock.setVisible(visible)
+        action.setChecked(visible)
+    
+    def _apply_tooltips(self):
+        """Applica tooltip a tutti gli elementi UI"""
+        try:
+            from .tooltip_manager import get_tooltip_manager
+            manager = get_tooltip_manager()
+            
+            # Tooltips azioni menu File
+            manager.set_menu_tooltip(self.action_new, 'file', 'new')
+            manager.set_menu_tooltip(self.action_open, 'file', 'open')
+            manager.set_menu_tooltip(self.action_save, 'file', 'save')
+            manager.set_menu_tooltip(self.action_save_as, 'file', 'save_as')
+            manager.set_menu_tooltip(self.action_export, 'file', 'export')
+            
+            # Tooltips azioni menu Edit
+            manager.set_menu_tooltip(self.action_undo, 'edit', 'undo')
+            manager.set_menu_tooltip(self.action_redo, 'edit', 'redo')
+            manager.set_menu_tooltip(self.action_cut, 'edit', 'cut')
+            manager.set_menu_tooltip(self.action_copy, 'edit', 'copy')
+            manager.set_menu_tooltip(self.action_paste, 'edit', 'paste')
+            manager.set_menu_tooltip(self.action_delete, 'edit', 'delete')
+            
+            # Tooltips azioni menu View
+            manager.set_menu_tooltip(self.action_toggle_toolbox, 'view', 'toolbox')
+            manager.set_menu_tooltip(self.action_toggle_properties, 'view', 'properties')
+            
+            # Tooltips azioni menu Tools
+            manager.set_menu_tooltip(self.action_icon_browser, 'tools', 'icon_browser')
+            manager.set_menu_tooltip(self.action_upload, 'tools', 'upload')
+            
+            # Tooltips dock widgets
+            manager.set_tooltip(self.dock_toolbox, 'tooltips', 'toolbox')
+            manager.set_tooltip(self.dock_properties, 'tooltips', 'properties')
+            manager.set_tooltip(self.canvas, 'tooltips', 'canvas')
+            
+        except Exception as e:
+            print(f"Errore applicazione tooltip: {e}")
     
     def closeEvent(self, event):
         """Gestisce chiusura finestra"""

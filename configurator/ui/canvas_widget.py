@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal, QRectF, QPointF
 from PyQt6.QtGui import (
     QPainter, QPen, QColor, QBrush, QLinearGradient,
-    QFont, QDragEnterEvent, QDragMoveEvent, QDropEvent
+    QFont, QDragEnterEvent, QDragMoveEvent, QDropEvent, QPolygonF
 )
 import json
 
@@ -22,6 +22,20 @@ class CanvasElement(QGraphicsRectItem):
     # Duplicate element offset constants
     DUPLICATE_OFFSET_X = 20
     DUPLICATE_OFFSET_Y = 20
+    
+    # Font cache per migliorare performance rendering
+    _FONT_CACHE = {}
+    
+    @classmethod
+    def _get_cached_font(cls, family: str, size: int, bold: bool = False) -> QFont:
+        """Ottieni font dalla cache o crealo"""
+        key = (family, size, bold)
+        if key not in cls._FONT_CACHE:
+            font = QFont(family, size)
+            if bold:
+                font.setWeight(QFont.Weight.Bold)
+            cls._FONT_CACHE[key] = font
+        return cls._FONT_CACHE[key]
     
     ELEMENT_STYLES = {
         "Button": {"color": "#00ff88", "text_color": "#000", "default_size": (100, 40)},
@@ -83,6 +97,69 @@ class CanvasElement(QGraphicsRectItem):
             self.setPen(QPen(QColor("#ff8800"), 3))
         else:
             self.setPen(QPen(QColor("#333333"), 2))
+    
+    def paint(self, painter, option, widget):
+        """Custom paint per rendering realistico WYSIWYG"""
+        # Disegna sfondo base
+        super().paint(painter, option, widget)
+        
+        # Rendering specifico per tipo
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        rect = self.rect()
+        
+        if "Display" in self.element_type or "Measure" in self.element_type:
+            # Display misura con valore simulato
+            painter.setFont(self._get_cached_font("Arial", 18, True))
+            painter.setPen(QColor("#000000"))
+            painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, "1234.56")
+            
+            # Unità di misura
+            painter.setFont(self._get_cached_font("Arial", 10))
+            painter.drawText(rect.adjusted(0, rect.height() * 0.4, 0, 0), 
+                           Qt.AlignmentFlag.AlignCenter, "mm")
+        
+        elif "Button" in self.element_type:
+            # Effetto 3D per pulsante
+            painter.setPen(QPen(QColor("#ffffff"), 1))
+            painter.drawLine(rect.left() + 2, rect.top() + 2, 
+                           rect.right() - 2, rect.top() + 2)
+            painter.drawLine(rect.left() + 2, rect.top() + 2, 
+                           rect.left() + 2, rect.bottom() - 2)
+        
+        elif "IconButton" in self.element_type:
+            # Icona placeholder (emoji o simbolo)
+            painter.setFont(self._get_cached_font("Arial", 24))
+            painter.setPen(QColor(self.ELEMENT_STYLES[self.element_type]["text_color"]))
+            painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, "⚙️")
+        
+        elif "Panel" in self.element_type or "Frame" in self.element_type:
+            # Bordo interno per panel
+            inner_rect = rect.adjusted(5, 5, -5, -5)
+            painter.setPen(QPen(QColor("#00ff88"), 1, Qt.PenStyle.DashLine))
+            painter.drawRect(inner_rect)
+        
+        elif "Slider" in self.element_type:
+            # Slider track e thumb
+            mid_y = rect.height() / 2
+            painter.setPen(QPen(QColor("#333333"), 2))
+            painter.drawLine(10, mid_y, rect.width() - 10, mid_y)
+            
+            # Thumb
+            thumb_x = rect.width() * 0.6
+            painter.setBrush(QColor("#ffffff"))
+            painter.setPen(QPen(QColor("#000000"), 1))
+            painter.drawEllipse(QPointF(thumb_x, mid_y), 6, 6)
+        
+        elif "Dropdown" in self.element_type:
+            # Freccia dropdown
+            arrow_x = rect.width() - 20
+            arrow_y = rect.height() / 2
+            painter.setBrush(QColor("#000000"))
+            arrow = QPolygonF()
+            arrow << QPointF(arrow_x, arrow_y - 3)
+            arrow << QPointF(arrow_x + 6, arrow_y - 3)
+            arrow << QPointF(arrow_x + 3, arrow_y + 3)
+            painter.drawPolygon(arrow)
     
     def contextMenuEvent(self, event):
         """Menu contestuale"""
