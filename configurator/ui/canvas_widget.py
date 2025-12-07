@@ -121,10 +121,10 @@ class CanvasElement(QGraphicsRectItem):
         elif "Button" in self.element_type:
             # Effetto 3D per pulsante
             painter.setPen(QPen(QColor("#ffffff"), 1))
-            painter.drawLine(rect.left() + 2, rect.top() + 2, 
-                           rect.right() - 2, rect.top() + 2)
-            painter.drawLine(rect.left() + 2, rect.top() + 2, 
-                           rect.left() + 2, rect.bottom() - 2)
+            painter.drawLine(int(rect.left() + 2), int(rect.top() + 2), 
+                           int(rect.right() - 2), int(rect.top() + 2))
+            painter.drawLine(int(rect.left() + 2), int(rect.top() + 2), 
+                           int(rect.left() + 2), int(rect.bottom() - 2))
         
         elif "IconButton" in self.element_type:
             # Icona placeholder (emoji o simbolo)
