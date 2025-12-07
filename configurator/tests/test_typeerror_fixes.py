@@ -26,7 +26,7 @@ def test_canvas_widget_drawline_int_coords():
     
     # Verifica che la linea per Slider sia corretta
     slider_section = re.search(
-        r'painter\.drawLine\(10, int\(mid_y\), int\(rect\.width\(\)\) - 10, int\(mid_y\)\)',
+        r'painter\.drawLine\(10, int\(mid_y\), int\(rect\.width\(\) - 10\), int\(mid_y\)\)',
         content
     )
     assert slider_section is not None, "Slider drawLine non usa int() correttamente"
