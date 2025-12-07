@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
     QListWidget, QLabel, QListWidgetItem, QTextEdit
 )
 from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont
+from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont, QIcon
 import json
 from pathlib import Path
 from typing import Optional, Dict, Any
@@ -150,7 +150,7 @@ class TemplateBrowserDialog(QDialog):
             
             # Genera anteprima miniatura
             thumbnail = self._generate_thumbnail(template_info)
-            item.setIcon(thumbnail)
+            item.setIcon(QIcon(thumbnail))
             
             self.template_list.addItem(item)
     
