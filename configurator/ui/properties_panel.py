@@ -304,26 +304,47 @@ class PropertiesPanel(QWidget):
         return group
     
     def _create_icon_group(self):
-        """Crea gruppo selettore icona"""
+        """Crea gruppo selettore icona con supporto Iconify e locale"""
         group = QGroupBox("🎭 Icona")
         layout = QVBoxLayout()
         
         # Anteprima icona
-        icon_preview = QLabel()
-        icon_preview.setFixedSize(64, 64)
-        icon_preview.setStyleSheet("""
+        self.icon_preview = QLabel()
+        self.icon_preview.setFixedSize(64, 64)
+        self.icon_preview.setStyleSheet("""
             background: #1a1a2e;
             border: 2px solid #333;
             border-radius: 4px;
         """)
-        icon_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        icon_preview.setText("N/A")
-        layout.addWidget(icon_preview, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.icon_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.icon_preview.setText("N/A")
+        layout.addWidget(self.icon_preview, alignment=Qt.AlignmentFlag.AlignCenter)
         
-        # Pulsante seleziona icona
-        select_icon_btn = QPushButton("📂 Seleziona icona...")
+        # Info icona corrente
+        info_layout = QFormLayout()
+        
+        self.icon_source_label = QLabel("Nessuna")
+        info_layout.addRow("Sorgente:", self.icon_source_label)
+        
+        self.icon_name_label = QLabel("-")
+        info_layout.addRow("Nome:", self.icon_name_label)
+        
+        layout.addLayout(info_layout)
+        
+        # Pulsanti
+        buttons_layout = QHBoxLayout()
+        
+        select_icon_btn = QPushButton("📂 Sfoglia...")
         select_icon_btn.clicked.connect(self._select_icon)
-        layout.addWidget(select_icon_btn)
+        buttons_layout.addWidget(select_icon_btn)
+        
+        clear_icon_btn = QPushButton("🗑️")
+        clear_icon_btn.setToolTip("Rimuovi icona")
+        clear_icon_btn.clicked.connect(self._clear_icon)
+        clear_icon_btn.setFixedWidth(40)
+        buttons_layout.addWidget(clear_icon_btn)
+        
+        layout.addLayout(buttons_layout)
         
         group.setLayout(layout)
         return group
@@ -465,10 +486,85 @@ class PropertiesPanel(QWidget):
         pass
     
     def _select_icon(self):
-        """Apri browser icone"""
+        """Apri browser icone con supporto Iconify e locale"""
         from .icon_browser_dialog import IconBrowserDialog
+        from core.icon_manager import IconManager
+        from PyQt6.QtCore import QSize
+        
         dialog = IconBrowserDialog(self)
         if dialog.exec():
             selected_icon = dialog.get_selected_icon()
-            # TODO: Applicare icona all'elemento
-            pass
+            icon_source = dialog.get_selected_icon_source()
+            
+            if not selected_icon:
+                return
+            
+            # Aggiorna preview e info
+            if icon_source == 'iconify':
+                # Icona Iconify
+                self.icon_source_label.setText("Iconify")
+                self.icon_name_label.setText(selected_icon.full_name if hasattr(selected_icon, 'full_name') else str(selected_icon))
+                
+                # Prova a caricare preview (se disponibile)
+                try:
+                    from core.icon_browser import IconifyClient
+                    client = IconifyClient()
+                    svg_data = client.get_icon_svg(selected_icon.full_name)
+                    if svg_data:
+                        # Converti SVG in pixmap
+                        from PyQt6.QtSvg import QSvgRenderer
+                        from PyQt6.QtGui import QPixmap, QPainter
+                        from PyQt6.QtCore import QByteArray
+                        
+                        svg_bytes = QByteArray(svg_data.encode('utf-8'))
+                        renderer = QSvgRenderer(svg_bytes)
+                        
+                        pixmap = QPixmap(64, 64)
+                        pixmap.fill(0x00000000)
+                        
+                        painter = QPainter(pixmap)
+                        renderer.render(painter)
+                        painter.end()
+                        
+                        self.icon_preview.setPixmap(pixmap)
+                    else:
+                        self.icon_preview.setText("✓")
+                except Exception as e:
+                    print(f"Errore caricamento preview Iconify: {e}")
+                    self.icon_preview.setText("✓")
+            
+            elif icon_source == 'local':
+                # Icona locale
+                self.icon_source_label.setText("Locale")
+                self.icon_name_label.setText(selected_icon)
+                
+                # Carica preview da IconManager
+                try:
+                    manager = IconManager()
+                    pixmap = manager.get_pixmap(selected_icon, QSize(64, 64))
+                    
+                    if pixmap:
+                        self.icon_preview.setPixmap(pixmap)
+                    else:
+                        self.icon_preview.setText("?")
+                except Exception as e:
+                    print(f"Errore caricamento preview locale: {e}")
+                    self.icon_preview.setText("?")
+            
+            # Salva riferimento icona sull'elemento (se applicabile)
+            if self.current_item and hasattr(self.current_item, 'icon_data'):
+                self.current_item.icon_data = {
+                    'source': icon_source,
+                    'icon': selected_icon
+                }
+    
+    def _clear_icon(self):
+        """Rimuovi icona corrente"""
+        self.icon_preview.clear()
+        self.icon_preview.setText("N/A")
+        self.icon_source_label.setText("Nessuna")
+        self.icon_name_label.setText("-")
+        
+        # Rimuovi da elemento
+        if self.current_item and hasattr(self.current_item, 'icon_data'):
+            self.current_item.icon_data = None
