@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Optional, List, Dict, Tuple
 from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtSvg import QSvgRenderer
-from PyQt6.QtCore import QByteArray, QSize
+from PyQt6.QtCore import QByteArray, QSize, Qt
 
 
 class IconManager:
@@ -201,8 +201,8 @@ class IconManager:
             if size and not pixmap.isNull():
                 pixmap = pixmap.scaled(
                     size[0], size[1],
-                    aspectRatioMode=1,  # KeepAspectRatio
-                    transformMode=1     # SmoothTransformation
+                    aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+                    transformMode=Qt.TransformationMode.SmoothTransformation
                 )
         
         # Cache e ritorna

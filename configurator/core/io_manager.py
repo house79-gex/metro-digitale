@@ -19,6 +19,9 @@ class IOManager:
     SD_MOUNT_PATH = "/sd"  # Path standard per microSD su ESP32
     USB_MOUNT_PATH = "/usb"  # Path standard per USB OTG
     
+    # Formato timestamp per backup
+    BACKUP_TIMESTAMP_FORMAT = "%Y%m%d_%H%M%S"
+    
     def __init__(self):
         """Inizializza gestore I/O"""
         self.last_export_path = None
@@ -216,7 +219,8 @@ class IOManager:
         try:
             # Backup file esistente
             if create_backup and output_path.exists():
-                backup_path = output_path.with_suffix(f'.backup_{datetime.now():%Y%m%d_%H%M%S}.json')
+                timestamp = datetime.now().strftime(self.BACKUP_TIMESTAMP_FORMAT)
+                backup_path = output_path.with_suffix(f'.backup_{timestamp}.json')
                 shutil.copy2(output_path, backup_path)
                 print(f"Backup creato: {backup_path}")
             
