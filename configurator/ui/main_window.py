@@ -13,12 +13,15 @@ from PyQt6.QtGui import QAction, QIcon, QKeySequence
 
 from core.project_manager import ProjectManager
 from core.config_model import ProgettoConfigurazione
+from core.io_manager import IOManager
 from .canvas_widget import DisplayPreviewWidget
 from .toolbox_widget import ToolboxWidget
 from .properties_panel import PropertiesPanel
 from .menu_editor import MenuEditor
 from .formula_editor import FormulaEditor
 from .tipologia_editor import TipologiaEditor
+from .mode_editor_dialog import ModeEditorDialog
+from pathlib import Path
 
 
 class MainWindow(QMainWindow):
@@ -31,6 +34,7 @@ class MainWindow(QMainWindow):
         
         self.project_manager = ProjectManager()
         self.current_project = self.project_manager.new_project()
+        self.io_manager = IOManager()
         
         self._init_ui()
         self._create_actions()
@@ -79,6 +83,23 @@ class MainWindow(QMainWindow):
         
         self.action_export = QAction("&Esporta JSON", self)
         self.action_export.triggered.connect(self._on_export_json)
+        
+        # Import/Export azioni aggiuntive
+        self.action_import_measures = QAction("Importa &Misure...", self)
+        self.action_import_measures.setStatusTip("Importa misure da JSONL/CSV")
+        self.action_import_measures.triggered.connect(self._on_import_measures)
+        
+        self.action_export_measures = QAction("Esporta M&isure...", self)
+        self.action_export_measures.setStatusTip("Esporta misure su JSONL/CSV")
+        self.action_export_measures.triggered.connect(self._on_export_measures)
+        
+        self.action_import_config = QAction("Importa &Configurazione...", self)
+        self.action_import_config.setStatusTip("Importa configurazione completa")
+        self.action_import_config.triggered.connect(self._on_import_config)
+        
+        self.action_export_config = QAction("Esporta C&onfigurazione...", self)
+        self.action_export_config.setStatusTip("Esporta configurazione completa")
+        self.action_export_config.triggered.connect(self._on_export_config)
         
         self.action_exit = QAction("E&sci", self)
         self.action_exit.setShortcut(QKeySequence.StandardKey.Quit)
@@ -141,6 +162,10 @@ class MainWindow(QMainWindow):
         self.action_probe_editor.setStatusTip("Editor grafico forma puntali")
         self.action_probe_editor.triggered.connect(self._on_probe_editor)
         
+        self.action_mode_editor = QAction("🔧 Editor &Modalità", self)
+        self.action_mode_editor.setStatusTip("Editor modalità di misura con workflow")
+        self.action_mode_editor.triggered.connect(self._on_mode_editor)
+        
         # Help
         self.action_documentation = QAction("&Documentazione", self)
         self.action_documentation.setShortcut(QKeySequence.StandardKey.HelpContents)
@@ -161,6 +186,16 @@ class MainWindow(QMainWindow):
         file_menu.addAction(self.action_save_as)
         file_menu.addSeparator()
         file_menu.addAction(self.action_export)
+        file_menu.addSeparator()
+        
+        # Sottomenu Import/Export
+        import_export_menu = file_menu.addMenu("📥📤 Import/Export")
+        import_export_menu.addAction(self.action_import_measures)
+        import_export_menu.addAction(self.action_export_measures)
+        import_export_menu.addSeparator()
+        import_export_menu.addAction(self.action_import_config)
+        import_export_menu.addAction(self.action_export_config)
+        
         file_menu.addSeparator()
         file_menu.addAction(self.action_exit)
         
@@ -188,6 +223,7 @@ class MainWindow(QMainWindow):
         tools_menu.addSeparator()
         tools_menu.addAction(self.action_simulation)
         tools_menu.addAction(self.action_probe_editor)
+        tools_menu.addAction(self.action_mode_editor)
         tools_menu.addSeparator()
         tools_menu.addAction(self.action_test_formulas)
         
@@ -428,6 +464,196 @@ class MainWindow(QMainWindow):
         from .probe_editor_dialog import ProbeEditorDialog
         dialog = ProbeEditorDialog(self)
         dialog.exec()
+    
+    def _on_mode_editor(self):
+        """Apri editor modalità di misura"""
+        dialog = ModeEditorDialog(self)
+        if dialog.exec():
+            mode_data = dialog.get_mode_data()
+            # Aggiungi modalità al progetto
+            from core.config_model import ModeConfig
+            mode = ModeConfig.from_dict(mode_data)
+            self.current_project.modes.append(mode)
+            QMessageBox.information(
+                self,
+                "Modalità Creata",
+                f"Modalità '{mode.name}' creata con successo"
+            )
+    
+    def _on_import_measures(self):
+        """Importa misure da file"""
+        filepath, selected_filter = QFileDialog.getOpenFileName(
+            self,
+            "Importa Misure",
+            "",
+            "JSONL Files (*.jsonl);;CSV Files (*.csv);;All Files (*)"
+        )
+        
+        if not filepath:
+            return
+        
+        filepath = Path(filepath)
+        
+        # Determina formato
+        if filepath.suffix.lower() == '.jsonl':
+            measures = self.io_manager.import_measures_jsonl(filepath)
+        elif filepath.suffix.lower() == '.csv':
+            measures = self.io_manager.import_measures_csv(filepath)
+        else:
+            QMessageBox.warning(
+                self,
+                "Formato Non Supportato",
+                "Usa file JSONL o CSV"
+            )
+            return
+        
+        if measures:
+            QMessageBox.information(
+                self,
+                "Import Completato",
+                f"Importate {len(measures)} misure"
+            )
+        else:
+            QMessageBox.warning(
+                self,
+                "Errore Import",
+                "Impossibile importare misure"
+            )
+    
+    def _on_export_measures(self):
+        """Esporta misure su file"""
+        filepath, selected_filter = QFileDialog.getSaveFileName(
+            self,
+            "Esporta Misure",
+            "measures.jsonl",
+            "JSONL Files (*.jsonl);;CSV Files (*.csv);;All Files (*)"
+        )
+        
+        if not filepath:
+            return
+        
+        filepath = Path(filepath)
+        
+        # Crea misure esempio per demo
+        measures = self.io_manager.create_example_measures(10)
+        
+        # Determina formato
+        success = False
+        if filepath.suffix.lower() == '.jsonl':
+            success = self.io_manager.export_measures_jsonl(measures, filepath)
+        elif filepath.suffix.lower() == '.csv':
+            success = self.io_manager.export_measures_csv(measures, filepath)
+        else:
+            QMessageBox.warning(
+                self,
+                "Formato Non Supportato",
+                "Usa estensione .jsonl o .csv"
+            )
+            return
+        
+        if success:
+            QMessageBox.information(
+                self,
+                "Export Completato",
+                f"Esportate {len(measures)} misure"
+            )
+        else:
+            QMessageBox.warning(
+                self,
+                "Errore Export",
+                "Impossibile esportare misure"
+            )
+    
+    def _on_import_config(self):
+        """Importa configurazione completa"""
+        filepath, _ = QFileDialog.getOpenFileName(
+            self,
+            "Importa Configurazione",
+            "",
+            "JSON Files (*.json);;All Files (*)"
+        )
+        
+        if not filepath:
+            return
+        
+        filepath = Path(filepath)
+        
+        config = self.io_manager.import_config(filepath, migrate=True)
+        
+        if config:
+            # Valida configurazione
+            is_valid, errors = self.io_manager.validate_config(config)
+            
+            if is_valid:
+                # Carica configurazione nel progetto
+                self.current_project = ProgettoConfigurazione.from_dict(config)
+                self._load_project_to_ui()
+                
+                QMessageBox.information(
+                    self,
+                    "Import Completato",
+                    "Configurazione importata con successo"
+                )
+            else:
+                QMessageBox.warning(
+                    self,
+                    "Configurazione Invalida",
+                    f"Errori trovati:\n" + "\n".join(errors)
+                )
+        else:
+            QMessageBox.warning(
+                self,
+                "Errore Import",
+                "Impossibile importare configurazione"
+            )
+    
+    def _on_export_config(self):
+        """Esporta configurazione completa"""
+        filepath, _ = QFileDialog.getSaveFileName(
+            self,
+            "Esporta Configurazione",
+            "config.json",
+            "JSON Files (*.json);;All Files (*)"
+        )
+        
+        if not filepath:
+            return
+        
+        filepath = Path(filepath)
+        
+        # Converte progetto in dizionario
+        config = self.current_project.to_dict()
+        
+        # Valida prima dell'export
+        is_valid, errors = self.io_manager.validate_config(config)
+        
+        if not is_valid:
+            reply = QMessageBox.question(
+                self,
+                "Configurazione Invalida",
+                f"La configurazione ha errori:\n" + "\n".join(errors) + 
+                "\n\nVuoi esportare comunque?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            
+            if reply != QMessageBox.StandardButton.Yes:
+                return
+        
+        # Export
+        success = self.io_manager.export_config(config, filepath, create_backup=True)
+        
+        if success:
+            QMessageBox.information(
+                self,
+                "Export Completato",
+                f"Configurazione esportata su:\n{filepath}"
+            )
+        else:
+            QMessageBox.warning(
+                self,
+                "Errore Export",
+                "Impossibile esportare configurazione"
+            )
     
     def _on_documentation(self):
         """Mostra documentazione"""
