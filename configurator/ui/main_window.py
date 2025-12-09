@@ -686,6 +686,11 @@ class MainWindow(QMainWindow):
         # Carica tipologie
         self.tipologia_editor.load_tipologie(self.current_project.tipologie)
         
+        # TODO: Carica hardware, modes, ui_layout, icons
+        # Questi campi sono disponibili nel progetto ma non ancora
+        # integrati negli editor esistenti. Per ora vengono solo
+        # preservati durante import/export configurazione.
+        
         # TODO: Carica altri elementi nel canvas
     
     def _save_ui_to_project(self):

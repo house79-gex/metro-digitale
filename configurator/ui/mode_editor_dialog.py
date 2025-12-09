@@ -397,7 +397,7 @@ class ModeEditorDialog(QDialog):
                 step.step_number = i
     
     def _calculate_formula_preview(self):
-        """Calcola anteprima formula"""
+        """Calcola anteprima formula con parser sicuro"""
         formula = self.formula_input.toPlainText().strip()
         
         if not formula:
@@ -410,9 +410,15 @@ class ModeEditorDialog(QDialog):
             test_formula = test_formula.replace(var, str(spin.value()))
         
         try:
-            # Valuta formula (ATTENZIONE: eval è pericoloso, usare parser dedicato in produzione)
-            import math
-            result = eval(test_formula, {"__builtins__": {}, "sqrt": math.sqrt, "abs": abs})
+            # Usa parser sicuro formula invece di eval
+            from core.formula_parser import FormulaParser
+            parser = FormulaParser()
+            
+            # Crea contesto con variabili
+            context = {var: spin.value() for var, spin in self.test_values.items()}
+            
+            # Valuta formula in modo sicuro
+            result = parser.evaluate(formula, context)
             
             # Formatta risultato
             decimals = self.decimals_spin.value()

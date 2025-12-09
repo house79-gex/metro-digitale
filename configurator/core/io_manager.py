@@ -19,6 +19,33 @@ class IOManager:
         self.default_sd_path = Path("/sd")  # Path microSD su ESP32
         self.default_usb_path = Path("/usb")  # Path USB MSC su ESP32
     
+    @staticmethod
+    def _sanitize_path(filepath: Path, base_path: Path) -> Path:
+        """
+        Sanitizza path per prevenire directory traversal
+        
+        Args:
+            filepath: Path da sanitizzare
+            base_path: Path base consentito
+            
+        Returns:
+            Path sanitizzato
+            
+        Raises:
+            ValueError: Se path tenta directory traversal
+        """
+        # Risolvi path assoluto
+        resolved = filepath.resolve()
+        base_resolved = base_path.resolve()
+        
+        # Verifica che sia sotto base_path
+        try:
+            resolved.relative_to(base_resolved)
+        except ValueError:
+            raise ValueError(f"Path non consentito: {filepath} non è sotto {base_path}")
+        
+        return resolved
+    
     # ==================== MISURE ====================
     
     def export_measures_jsonl(self, measures: List[Dict[str, Any]], filepath: Path, 

@@ -61,7 +61,13 @@ class PropertiesPanel(QWidget):
                 item.widget().deleteLater()
     
     def set_item(self, item):
-        """Imposta elemento da mostrare"""
+        """
+        Imposta elemento da mostrare
+        
+        Note: Gli elementi che supportano icone dovrebbero avere un attributo
+        'icon_data' dict con 'source' e 'icon'. Questo è verificato con hasattr()
+        per mantenere compatibilità con elementi esistenti.
+        """
         self.current_item = item
         self._update_properties()
     
