@@ -12,193 +12,186 @@ import json
 from core.io_manager import IOManager
 
 
-def test_io_manager_export_import_jsonl():
+def test_io_manager_init():
+    """Test inizializzazione IOManager"""
+    manager = IOManager()
+    
+    assert manager.last_export_path is None
+    assert manager.last_import_path is None
+
+
+def test_export_import_measures_jsonl():
     """Test export/import misure JSONL"""
     manager = IOManager()
     
-    with tempfile.TemporaryDirectory() as tmpdir:
-        filepath = Path(tmpdir) / "measures.jsonl"
-        
-        # Crea misure test
-        measures = manager.create_example_measures(5)
-        
-        # Export
-        success = manager.export_measures_jsonl(measures, filepath)
-        assert success
-        assert filepath.exists()
-        
-        # Import
-        imported = manager.import_measures_jsonl(filepath)
-        assert imported is not None
-        assert len(imported) == 5
-        
-        # Verifica contenuto
-        for i, measure in enumerate(imported):
-            assert measure['id'] == i + 1
-
-
-def test_io_manager_append_jsonl():
-    """Test append JSONL"""
-    manager = IOManager()
+    # Dati test
+    measures = [
+        {"value": 123.45, "unit": "mm", "probe": "internal"},
+        {"value": 678.90, "unit": "mm", "probe": "external"}
+    ]
     
     with tempfile.TemporaryDirectory() as tmpdir:
-        filepath = Path(tmpdir) / "measures.jsonl"
+        output_path = Path(tmpdir) / "measures.jsonl"
         
-        # Prima scrittura
-        measures1 = manager.create_example_measures(3)
-        manager.export_measures_jsonl(measures1, filepath)
-        
-        # Append
-        measures2 = manager.create_example_measures(2)
-        manager.export_measures_jsonl(measures2, filepath, append=True)
+        # Export
+        result = manager.export_measures_jsonl(measures, output_path, append=False)
+        assert result is True
+        assert output_path.exists()
         
         # Import
-        imported = manager.import_measures_jsonl(filepath)
-        assert len(imported) == 5
+        imported = manager.import_measures_jsonl(output_path)
+        assert imported is not None
+        assert len(imported) == 2
+        assert imported[0]["value"] == 123.45
+        
+        # Test append
+        more_measures = [{"value": 111.22, "unit": "mm", "probe": "depth"}]
+        result = manager.export_measures_jsonl(more_measures, output_path, append=True)
+        assert result is True
+        
+        imported_all = manager.import_measures_jsonl(output_path)
+        assert len(imported_all) == 3
 
 
-def test_io_manager_export_import_csv():
+def test_export_import_measures_csv():
     """Test export/import misure CSV"""
     manager = IOManager()
     
+    measures = [
+        {"value": 123.45, "unit": "mm", "probe": "internal"},
+        {"value": 678.90, "unit": "mm", "probe": "external"}
+    ]
+    
     with tempfile.TemporaryDirectory() as tmpdir:
-        filepath = Path(tmpdir) / "measures.csv"
-        
-        # Crea misure test
-        measures = manager.create_example_measures(3)
+        output_path = Path(tmpdir) / "measures.csv"
         
         # Export
-        success = manager.export_measures_csv(measures, filepath)
-        assert success
-        assert filepath.exists()
+        result = manager.export_measures_csv(measures, output_path)
+        assert result is True
+        assert output_path.exists()
         
         # Import
-        imported = manager.import_measures_csv(filepath)
+        imported = manager.import_measures_csv(output_path)
         assert imported is not None
-        assert len(imported) == 3
+        assert len(imported) == 2
+        assert float(imported[0]["value"]) == 123.45
 
 
-def test_io_manager_export_import_config():
+def test_export_import_config():
     """Test export/import configurazione"""
     manager = IOManager()
     
+    config = {
+        "schema_version": "2.0.0",
+        "hardware": {
+            "encoder": {"resolution": 0.01}
+        },
+        "modes": [],
+        "ui_layout": {"theme": "dark"}
+    }
+    
     with tempfile.TemporaryDirectory() as tmpdir:
-        filepath = Path(tmpdir) / "config.json"
-        
-        # Crea config test
-        config = {
-            'schema_version': '1.0.0',
-            'hardware': {'encoder': {}},
-            'modes': [],
-            'ui_layout': {'theme': 'dark'}
-        }
+        output_path = Path(tmpdir) / "config.json"
         
         # Export
-        success = manager.export_config(config, filepath)
-        assert success
-        assert filepath.exists()
+        result = manager.export_config(config, output_path, create_backup=False)
+        assert result is True
+        assert output_path.exists()
         
         # Import
-        imported = manager.import_config(filepath)
+        imported = manager.import_config(output_path, migrate=False)
         assert imported is not None
-        assert imported['schema_version'] == '1.0.0'
-        assert 'hardware' in imported
+        assert imported["schema_version"] == "2.0.0"
 
 
-def test_io_manager_config_migration():
-    """Test migrazione schema configurazione"""
+def test_config_migration():
+    """Test migrazione configurazione"""
     manager = IOManager()
     
-    with tempfile.TemporaryDirectory() as tmpdir:
-        filepath = Path(tmpdir) / "config.json"
-        
-        # Crea config vecchia versione
-        old_config = {
-            'version': '1.0.0',
-            'nome': 'Test'
-        }
-        
-        with open(filepath, 'w') as f:
-            json.dump(old_config, f)
-        
-        # Import con migrazione
-        imported = manager.import_config(filepath, migrate=True)
-        
-        # Verifica campi aggiunti
-        assert 'schema_version' in imported
-        assert 'hardware' in imported
-        assert 'modes' in imported
-        assert 'ui_layout' in imported
-
-
-def test_io_manager_validate_config():
-    """Test validazione configurazione"""
-    manager = IOManager()
-    
-    # Config valida
-    valid_config = {
-        'schema_version': '1.0.0',
-        'hardware': {},
-        'modes': [],
-        'ui_layout': {}
+    # Config vecchio senza schema_version
+    old_config = {
+        "version": "1.0.0",
+        "nome": "Test"
     }
     
-    is_valid, errors = manager.validate_config(valid_config)
-    assert is_valid
-    assert len(errors) == 0
+    migrated = manager._migrate_config(old_config.copy())
     
-    # Config invalida
-    invalid_config = {
-        'schema_version': '1.0.0'
-    }
-    
-    is_valid, errors = manager.validate_config(invalid_config)
-    assert not is_valid
-    assert len(errors) > 0
+    # Verifica campi aggiunti
+    assert "schema_version" in migrated
+    assert "hardware" in migrated
+    assert "modes" in migrated
+    assert "ui_layout" in migrated
+    assert "icons" in migrated
 
 
-def test_io_manager_backup_config():
-    """Test backup configurazione"""
+def test_list_export_destinations():
+    """Test elenco destinazioni export"""
     manager = IOManager()
     
-    with tempfile.TemporaryDirectory() as tmpdir:
-        filepath = Path(tmpdir) / "config.json"
-        
-        # Crea config iniziale
-        config1 = {'schema_version': '1.0.0', 'hardware': {}, 'modes': [], 'ui_layout': {}}
-        manager.export_config(config1, filepath)
-        
-        # Export con backup
-        config2 = {'schema_version': '1.0.0', 'hardware': {'test': True}, 'modes': [], 'ui_layout': {}}
-        manager.export_config(config2, filepath, create_backup=True)
-        
-        # Verifica backup
-        backup_file = filepath.with_suffix('.json.bak')
-        assert backup_file.exists()
+    destinations = manager.list_export_destinations()
+    
+    assert isinstance(destinations, list)
+    assert len(destinations) >= 3  # local, sd, usb
+    
+    # Verifica locale sempre disponibile
+    local_dest = [d for d in destinations if d["type"] == "local"]
+    assert len(local_dest) == 1
+    assert local_dest[0]["available"] is True
+
+
+def test_path_helpers():
+    """Test helper percorsi"""
+    manager = IOManager()
+    
+    sd_path = manager.get_sd_path("test.json")
+    assert "test.json" in str(sd_path)
+    
+    usb_path = manager.get_usb_path("test.json")
+    assert "test.json" in str(usb_path)
+    
+    # Questi possono essere False su Windows
+    is_sd = manager.is_sd_available()
+    is_usb = manager.is_usb_available()
+    assert isinstance(is_sd, bool)
+    assert isinstance(is_usb, bool)
+
+
+def test_singleton_pattern():
+    """Test pattern singleton"""
+    from core.io_manager import get_io_manager
+    
+    manager1 = get_io_manager()
+    manager2 = get_io_manager()
+    
+    # Dovrebbero essere la stessa istanza
+    assert manager1 is manager2
 
 
 if __name__ == "__main__":
     print("Running IOManager tests...")
     
-    test_io_manager_export_import_jsonl()
-    print("✓ test_io_manager_export_import_jsonl")
+    test_io_manager_init()
+    print("✓ test_io_manager_init")
     
-    test_io_manager_append_jsonl()
-    print("✓ test_io_manager_append_jsonl")
+    test_export_import_measures_jsonl()
+    print("✓ test_export_import_measures_jsonl")
     
-    test_io_manager_export_import_csv()
-    print("✓ test_io_manager_export_import_csv")
+    test_export_import_measures_csv()
+    print("✓ test_export_import_measures_csv")
     
-    test_io_manager_export_import_config()
-    print("✓ test_io_manager_export_import_config")
+    test_export_import_config()
+    print("✓ test_export_import_config")
     
-    test_io_manager_config_migration()
-    print("✓ test_io_manager_config_migration")
+    test_config_migration()
+    print("✓ test_config_migration")
     
-    test_io_manager_validate_config()
-    print("✓ test_io_manager_validate_config")
+    test_list_export_destinations()
+    print("✓ test_list_export_destinations")
     
-    test_io_manager_backup_config()
-    print("✓ test_io_manager_backup_config")
+    test_path_helpers()
+    print("✓ test_path_helpers")
     
-    print("\nAll tests passed!")
+    test_singleton_pattern()
+    print("✓ test_singleton_pattern")
+    
+    print("\n✓ All IOManager tests passed!")

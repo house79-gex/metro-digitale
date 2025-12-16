@@ -1,12 +1,13 @@
 """
 Gestore Import/Export per Metro Digitale
-Gestisce import/export misure (JSONL/CSV) e configurazioni (JSON) su microSD/USB-C OTG
+Supporta export/import di misure (JSONL, CSV) e configurazioni (JSON)
+con supporto per microSD e USB-C OTG
 """
 
 import json
 import csv
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 import shutil
 
@@ -14,127 +15,137 @@ import shutil
 class IOManager:
     """Gestisce import/export di misure e configurazioni"""
     
+    # Percorsi standard per dispositivi
+    SD_MOUNT_PATH = "/sd"  # Path standard per microSD su ESP32
+    USB_MOUNT_PATH = "/usb"  # Path standard per USB OTG
+    
+    # Formato timestamp per backup
+    BACKUP_TIMESTAMP_FORMAT = "%Y%m%d_%H%M%S"
+    
     def __init__(self):
         """Inizializza gestore I/O"""
-        self.default_sd_path = Path("/sd")  # Path microSD su ESP32
-        self.default_usb_path = Path("/usb")  # Path USB MSC su ESP32
+        self.last_export_path = None
+        self.last_import_path = None
     
-    @staticmethod
-    def _sanitize_path(filepath: Path, base_path: Path) -> Path:
+    # =====================================================================
+    # EXPORT/IMPORT MISURE
+    # =====================================================================
+    
+    def export_measures_jsonl(self, measures: List[Dict], output_path: Path,
+                              append: bool = True) -> bool:
         """
-        Sanitizza path per prevenire directory traversal
+        Esporta misure in formato JSONL (JSON Lines)
+        Append-safe per registrazione continua
         
         Args:
-            filepath: Path da sanitizzare
-            base_path: Path base consentito
-            
+            measures: Lista di dict misure
+            output_path: Path file output
+            append: Se True, appende al file esistente
+        
         Returns:
-            Path sanitizzato
-            
-        Raises:
-            ValueError: Se path tenta directory traversal
+            True se successo, False altrimenti
         """
-        # Risolvi path assoluto
-        resolved = filepath.resolve()
-        base_resolved = base_path.resolve()
+        output_path = Path(output_path)
         
-        # Verifica che sia sotto base_path
         try:
-            resolved.relative_to(base_resolved)
-        except ValueError:
-            raise ValueError(f"Path non consentito: {filepath} non è sotto {base_path}")
-        
-        return resolved
-    
-    # ==================== MISURE ====================
-    
-    def export_measures_jsonl(self, measures: List[Dict[str, Any]], filepath: Path, 
-                              append: bool = False) -> bool:
-        """
-        Esporta misure in formato JSONL (una riga per misura)
-        
-        Args:
-            measures: Lista di misure da esportare
-            filepath: Percorso file di destinazione
-            append: Se True, appende a file esistente (append-safe)
+            # Crea directory se non esiste
+            output_path.parent.mkdir(parents=True, exist_ok=True)
             
-        Returns:
-            True se esportate con successo
-        """
-        try:
-            mode = 'a' if append else 'w'
-            with open(filepath, mode, encoding='utf-8') as f:
+            # Modalità append o write
+            mode = 'a' if append and output_path.exists() else 'w'
+            
+            with open(output_path, mode, encoding='utf-8') as f:
                 for measure in measures:
                     # Aggiungi timestamp se non presente
                     if 'timestamp' not in measure:
                         measure['timestamp'] = datetime.now().isoformat()
                     
+                    # Scrivi una linea JSON per misura
                     json_line = json.dumps(measure, ensure_ascii=False)
                     f.write(json_line + '\n')
             
+            self.last_export_path = str(output_path)
+            print(f"Esportate {len(measures)} misure in {output_path}")
             return True
-        except IOError as e:
-            print(f"Errore export JSONL: {e}")
+            
+        except (IOError, OSError) as e:
+            print(f"Errore export misure JSONL: {e}")
             return False
     
-    def import_measures_jsonl(self, filepath: Path) -> Optional[List[Dict[str, Any]]]:
+    def import_measures_jsonl(self, input_path: Path,
+                             max_lines: Optional[int] = None) -> Optional[List[Dict]]:
         """
         Importa misure da formato JSONL
         
         Args:
-            filepath: Percorso file sorgente
-            
+            input_path: Path file input
+            max_lines: Numero massimo linee da leggere. None = tutte.
+        
         Returns:
-            Lista di misure o None se errore
+            Lista misure o None se errore
         """
-        if not filepath.exists():
-            print(f"File non trovato: {filepath}")
+        input_path = Path(input_path)
+        
+        if not input_path.exists():
+            print(f"File non trovato: {input_path}")
             return None
         
-        measures = []
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                for line_num, line in enumerate(f, 1):
+            measures = []
+            
+            with open(input_path, 'r', encoding='utf-8') as f:
+                for i, line in enumerate(f):
+                    if max_lines and i >= max_lines:
+                        break
+                    
                     line = line.strip()
-                    if not line:  # Salta linee vuote
+                    if not line:
                         continue
                     
                     try:
                         measure = json.loads(line)
                         measures.append(measure)
                     except json.JSONDecodeError as e:
-                        print(f"Errore parsing linea {line_num}: {e}")
-                        # Continua con le altre linee
+                        print(f"Errore parse linea {i+1}: {e}")
+                        continue
             
+            self.last_import_path = str(input_path)
+            print(f"Importate {len(measures)} misure da {input_path}")
             return measures
-        except IOError as e:
-            print(f"Errore import JSONL: {e}")
+            
+        except (IOError, OSError) as e:
+            print(f"Errore import misure JSONL: {e}")
             return None
     
-    def export_measures_csv(self, measures: List[Dict[str, Any]], filepath: Path, 
+    def export_measures_csv(self, measures: List[Dict], output_path: Path,
                            fields: Optional[List[str]] = None) -> bool:
         """
         Esporta misure in formato CSV
         
         Args:
-            measures: Lista di misure da esportare
-            filepath: Percorso file di destinazione
-            fields: Lista campi da includere (default: tutti)
-            
+            measures: Lista dict misure
+            output_path: Path file output
+            fields: Lista campi da esportare. Se None, usa tutti i campi.
+        
         Returns:
-            True se esportate con successo
+            True se successo, False altrimenti
         """
+        output_path = Path(output_path)
+        
         if not measures:
             print("Nessuna misura da esportare")
             return False
         
         try:
-            # Determina campi se non specificati
+            # Determina campi
             if fields is None:
-                # Usa tutti i campi dalla prima misura
+                # Usa tutti i campi della prima misura
                 fields = list(measures[0].keys())
             
-            with open(filepath, 'w', encoding='utf-8', newline='') as f:
+            # Crea directory se non esiste
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(output_path, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
                 writer.writeheader()
                 
@@ -145,284 +156,277 @@ class IOManager:
                     
                     writer.writerow(measure)
             
+            self.last_export_path = str(output_path)
+            print(f"Esportate {len(measures)} misure in CSV: {output_path}")
             return True
-        except (IOError, csv.Error) as e:
-            print(f"Errore export CSV: {e}")
+            
+        except (IOError, OSError, csv.Error) as e:
+            print(f"Errore export misure CSV: {e}")
             return False
     
-    def import_measures_csv(self, filepath: Path) -> Optional[List[Dict[str, Any]]]:
+    def import_measures_csv(self, input_path: Path) -> Optional[List[Dict]]:
         """
-        Importa misure da formato CSV
+        Importa misure da CSV
         
         Args:
-            filepath: Percorso file sorgente
-            
+            input_path: Path file input
+        
         Returns:
-            Lista di misure o None se errore
+            Lista misure o None se errore
         """
-        if not filepath.exists():
-            print(f"File non trovato: {filepath}")
+        input_path = Path(input_path)
+        
+        if not input_path.exists():
+            print(f"File non trovato: {input_path}")
             return None
         
-        measures = []
         try:
-            with open(filepath, 'r', encoding='utf-8', newline='') as f:
+            measures = []
+            
+            with open(input_path, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
                 
                 for row in reader:
-                    # Converti valori numerici
-                    measure = {}
-                    for key, value in row.items():
-                        # Prova a convertire in float
-                        try:
-                            measure[key] = float(value)
-                        except (ValueError, TypeError):
-                            measure[key] = value
-                    
-                    measures.append(measure)
+                    measures.append(dict(row))
             
+            self.last_import_path = str(input_path)
+            print(f"Importate {len(measures)} misure da CSV: {input_path}")
             return measures
-        except (IOError, csv.Error) as e:
-            print(f"Errore import CSV: {e}")
+            
+        except (IOError, OSError, csv.Error) as e:
+            print(f"Errore import misure CSV: {e}")
             return None
     
-    # ==================== CONFIGURAZIONI ====================
+    # =====================================================================
+    # EXPORT/IMPORT CONFIGURAZIONI
+    # =====================================================================
     
-    def export_config(self, config: Dict[str, Any], filepath: Path, 
+    def export_config(self, config: Dict, output_path: Path,
                      create_backup: bool = True) -> bool:
         """
         Esporta configurazione in formato JSON
         
         Args:
-            config: Dizionario configurazione
-            filepath: Percorso file di destinazione
+            config: Dict configurazione
+            output_path: Path file output
             create_backup: Se True, crea backup del file esistente
-            
+        
         Returns:
-            True se esportata con successo
+            True se successo, False altrimenti
         """
+        output_path = Path(output_path)
+        
         try:
-            # Crea backup se richiesto e file esiste
-            if create_backup and filepath.exists():
-                backup_path = filepath.with_suffix('.json.bak')
-                shutil.copy2(filepath, backup_path)
+            # Backup file esistente
+            if create_backup and output_path.exists():
+                timestamp = datetime.now().strftime(self.BACKUP_TIMESTAMP_FORMAT)
+                backup_path = output_path.with_suffix(f'.backup_{timestamp}.json')
+                shutil.copy2(output_path, backup_path)
+                print(f"Backup creato: {backup_path}")
             
-            # Assicura schema_version
-            if 'schema_version' not in config:
-                config['schema_version'] = '1.0.0'
-            
-            # Aggiungi metadata export
-            config['_export_metadata'] = {
-                'timestamp': datetime.now().isoformat(),
-                'version': config.get('schema_version', '1.0.0')
+            # Aggiungi metadata
+            export_data = {
+                "export_version": "1.0.0",
+                "export_date": datetime.now().isoformat(),
+                "config": config
             }
             
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(config, f, indent=2, ensure_ascii=False)
+            # Crea directory se non esiste
+            output_path.parent.mkdir(parents=True, exist_ok=True)
             
+            # Scrivi JSON con indent per leggibilità
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(export_data, f, indent=2, ensure_ascii=False)
+            
+            self.last_export_path = str(output_path)
+            print(f"Configurazione esportata in: {output_path}")
             return True
-        except IOError as e:
-            print(f"Errore export config: {e}")
+            
+        except (IOError, OSError) as e:
+            print(f"Errore export configurazione: {e}")
             return False
     
-    def import_config(self, filepath: Path, migrate: bool = True) -> Optional[Dict[str, Any]]:
+    def import_config(self, input_path: Path,
+                     migrate: bool = True) -> Optional[Dict]:
         """
-        Importa configurazione da file JSON
+        Importa configurazione da JSON
         
         Args:
-            filepath: Percorso file sorgente
-            migrate: Se True, esegue migrazione schema se necessario
-            
+            input_path: Path file input
+            migrate: Se True, migra automaticamente versioni vecchie
+        
         Returns:
-            Dizionario configurazione o None se errore
+            Dict configurazione o None se errore
         """
-        if not filepath.exists():
-            print(f"File non trovato: {filepath}")
+        input_path = Path(input_path)
+        
+        if not input_path.exists():
+            print(f"File non trovato: {input_path}")
             return None
         
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                config = json.load(f)
+            with open(input_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
             
-            # Rimuovi metadata export se presente
-            if '_export_metadata' in config:
-                del config['_export_metadata']
+            # Estrai configurazione
+            if "config" in data:
+                # Formato con metadata
+                config = data["config"]
+                export_version = data.get("export_version", "unknown")
+                print(f"Import da versione: {export_version}")
+            else:
+                # Formato legacy senza metadata
+                config = data
             
-            # Migrazione schema se richiesta
+            # Migrazione se richiesta
             if migrate:
-                config = self._migrate_config_schema(config)
+                config = self._migrate_config(config)
             
+            self.last_import_path = str(input_path)
+            print(f"Configurazione importata da: {input_path}")
             return config
-        except (IOError, json.JSONDecodeError) as e:
-            print(f"Errore import config: {e}")
+            
+        except (IOError, OSError, json.JSONDecodeError) as e:
+            print(f"Errore import configurazione: {e}")
             return None
     
-    def _migrate_config_schema(self, config: Dict[str, Any]) -> Dict[str, Any]:
+    def _migrate_config(self, config: Dict) -> Dict:
         """
-        Esegue migrazione schema configurazione
+        Migra configurazione da versioni vecchie
         
         Args:
             config: Configurazione da migrare
-            
+        
         Returns:
             Configurazione migrata
         """
-        current_version = config.get('schema_version', '0.0.0')
-        target_version = '1.0.0'
+        # Determina schema_version
+        schema_version = config.get("schema_version", config.get("version", "1.0.0"))
         
-        if current_version == target_version:
-            return config
+        print(f"Migrazione da schema {schema_version}")
         
-        # Migrazione 0.0.0 -> 1.0.0
-        if current_version == '0.0.0':
-            # Aggiungi campi richiesti per v1.0.0
-            if 'hardware' not in config:
-                config['hardware'] = {
-                    'encoder': {},
-                    'probes': [],
-                    'bluetooth': {},
-                    'display': {}
+        # Aggiungi campi mancanti con default
+        if "schema_version" not in config:
+            config["schema_version"] = "2.0.0"
+        
+        if "hardware" not in config:
+            config["hardware"] = {
+                "encoder": {
+                    "resolution": 0.01,
+                    "pulses_per_mm": 100,
+                    "debounce_ms": 5,
+                    "pin_a": 4,
+                    "pin_b": 5,
+                    "invert_direction": False
+                },
+                "bluetooth": {
+                    "enabled": True,
+                    "name": "MetroDigitale",
+                    "uuid": "00001101-0000-1000-8000-00805F9B34FB",
+                    "auto_connect": True
+                },
+                "display": {
+                    "width": 800,
+                    "height": 480,
+                    "brightness": 80
                 }
-            
-            if 'modes' not in config:
-                config['modes'] = []
-            
-            if 'ui_layout' not in config:
-                config['ui_layout'] = {
-                    'theme': 'dark',
-                    'units': 'mm',
-                    'decimals': 2
-                }
-            
-            if 'icons' not in config:
-                config['icons'] = {}
-            
-            config['schema_version'] = '1.0.0'
+            }
         
+        if "modes" not in config:
+            config["modes"] = []
+        
+        if "ui_layout" not in config:
+            config["ui_layout"] = {
+                "theme": "dark",
+                "units": "mm",
+                "decimals": 2
+            }
+        
+        if "icons" not in config:
+            config["icons"] = {}
+        
+        print(f"Configurazione migrata a schema {config['schema_version']}")
         return config
     
-    # ==================== UTILITY ====================
+    # =====================================================================
+    # UTILITY PERCORSI
+    # =====================================================================
     
-    def get_sd_path(self, filename: str) -> Path:
+    def get_sd_path(self, filename: str = "") -> Path:
         """
-        Ottiene path completo su microSD
+        Ottieni path su microSD
         
         Args:
-            filename: Nome file
-            
+            filename: Nome file opzionale
+        
         Returns:
             Path completo
         """
-        return self.default_sd_path / filename
+        return Path(self.SD_MOUNT_PATH) / filename
     
-    def get_usb_path(self, filename: str) -> Path:
+    def get_usb_path(self, filename: str = "") -> Path:
         """
-        Ottiene path completo su USB
+        Ottieni path su USB
         
         Args:
-            filename: Nome file
-            
+            filename: Nome file opzionale
+        
         Returns:
             Path completo
         """
-        return self.default_usb_path / filename
+        return Path(self.USB_MOUNT_PATH) / filename
     
-    def check_sd_available(self) -> bool:
+    def is_sd_available(self) -> bool:
+        """Verifica se microSD è disponibile"""
+        return Path(self.SD_MOUNT_PATH).exists()
+    
+    def is_usb_available(self) -> bool:
+        """Verifica se USB è disponibile"""
+        return Path(self.USB_MOUNT_PATH).exists()
+    
+    def list_export_destinations(self) -> List[Dict[str, Any]]:
         """
-        Verifica se microSD è disponibile
+        Elenca destinazioni disponibili per export
         
         Returns:
-            True se disponibile
+            Lista dict con info destinazioni
         """
-        return self.default_sd_path.exists()
-    
-    def check_usb_available(self) -> bool:
-        """
-        Verifica se USB è disponibile
+        destinations = []
         
-        Returns:
-            True se disponibile
-        """
-        return self.default_usb_path.exists()
-    
-    def list_files(self, directory: Path, pattern: str = "*") -> List[Path]:
-        """
-        Elenca file in directory
+        # Sempre disponibile: path locale
+        destinations.append({
+            "type": "local",
+            "name": "File Locale",
+            "path": str(Path.home()),
+            "available": True
+        })
         
-        Args:
-            directory: Directory da esplorare
-            pattern: Pattern glob (default: tutti)
-            
-        Returns:
-            Lista di path file
-        """
-        if not directory.exists():
-            return []
+        # microSD
+        destinations.append({
+            "type": "sd",
+            "name": "microSD",
+            "path": self.SD_MOUNT_PATH,
+            "available": self.is_sd_available()
+        })
         
-        try:
-            return list(directory.glob(pattern))
-        except Exception as e:
-            print(f"Errore listing files: {e}")
-            return []
-    
-    def create_example_measures(self, count: int = 10) -> List[Dict[str, Any]]:
-        """
-        Crea misure di esempio per testing
+        # USB OTG
+        destinations.append({
+            "type": "usb",
+            "name": "USB",
+            "path": self.USB_MOUNT_PATH,
+            "available": self.is_usb_available()
+        })
         
-        Args:
-            count: Numero di misure da creare
-            
-        Returns:
-            Lista di misure
-        """
-        measures = []
-        for i in range(count):
-            measures.append({
-                'id': i + 1,
-                'timestamp': datetime.now().isoformat(),
-                'value': 100.0 + i * 10.5,
-                'unit': 'mm',
-                'probe_type': 'interno' if i % 2 == 0 else 'esterno',
-                'material': 'alluminio',
-                'notes': f'Misura test {i + 1}'
-            })
-        
-        return measures
-    
-    def validate_config(self, config: Dict[str, Any]) -> tuple[bool, List[str]]:
-        """
-        Valida configurazione
-        
-        Args:
-            config: Configurazione da validare
-            
-        Returns:
-            Tupla (valida, lista_errori)
-        """
-        errors = []
-        
-        # Verifica campi obbligatori
-        required_fields = ['schema_version', 'hardware', 'modes', 'ui_layout']
-        for field in required_fields:
-            if field not in config:
-                errors.append(f"Campo obbligatorio mancante: {field}")
-        
-        # Verifica schema_version
-        if 'schema_version' in config:
-            version = config['schema_version']
-            if not isinstance(version, str):
-                errors.append("schema_version deve essere una stringa")
-        
-        # Verifica hardware
-        if 'hardware' in config:
-            hw = config['hardware']
-            if not isinstance(hw, dict):
-                errors.append("hardware deve essere un dizionario")
-        
-        # Verifica modes
-        if 'modes' in config:
-            modes = config['modes']
-            if not isinstance(modes, list):
-                errors.append("modes deve essere una lista")
-        
-        return len(errors) == 0, errors
+        return destinations
+
+
+# Istanza singleton
+_io_manager_instance = None
+
+
+def get_io_manager() -> IOManager:
+    """Ottieni istanza singleton del gestore I/O"""
+    global _io_manager_instance
+    if _io_manager_instance is None:
+        _io_manager_instance = IOManager()
+    return _io_manager_instance

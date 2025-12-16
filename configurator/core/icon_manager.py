@@ -1,217 +1,245 @@
 """
 Gestore icone locali per Metro Digitale Configurator
-Importa, cataloga e gestisce icone SVG/PNG/JPG locali
+Supporta import e caching di icone SVG, PNG, JPG
 """
 
 import json
 import shutil
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Tuple
 from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtSvg import QSvgRenderer
-from PyQt6.QtCore import QByteArray, QSize
+from PyQt6.QtCore import QByteArray, QSize, Qt
 
 
 class IconManager:
-    """Gestisce icone locali con import, caching e catalogazione"""
+    """Gestisce icone locali con import, registry e caching"""
     
-    def __init__(self, icons_dir: Optional[Path] = None, catalog_file: Optional[Path] = None):
+    def __init__(self, resources_path: Optional[Path] = None):
         """
         Inizializza gestore icone
         
         Args:
-            icons_dir: Directory dove salvare le icone (default: resources/icons/)
-            catalog_file: File JSON catalogo icone (default: resources/icons/icons.json)
+            resources_path: Path alla directory resources. Se None, usa default.
         """
-        if icons_dir is None:
+        if resources_path is None:
+            # Default: resources/ relativo a questo file
             base_dir = Path(__file__).parent.parent
-            icons_dir = base_dir / "resources" / "icons"
+            resources_path = base_dir / "resources"
         
-        if catalog_file is None:
-            catalog_file = icons_dir / "icons.json"
+        self.resources_path = Path(resources_path)
+        self.icons_path = self.resources_path / "icons"
+        self.registry_path = self.icons_path / "icons.json"
         
-        self.icons_dir = Path(icons_dir)
-        self.catalog_file = Path(catalog_file)
+        # Crea directory se non esiste
+        self.icons_path.mkdir(parents=True, exist_ok=True)
         
-        # Assicura esistenza directory
-        self.icons_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Cache in memoria
+        # Cache per pixmap
         self._pixmap_cache: Dict[str, QPixmap] = {}
         self._svg_cache: Dict[str, QSvgRenderer] = {}
         
-        # Carica catalogo
-        self.catalog: Dict[str, Dict[str, Any]] = self._load_catalog()
+        # Carica o crea registry
+        self.registry = self._load_registry()
     
-    def _load_catalog(self) -> Dict[str, Dict[str, Any]]:
-        """Carica catalogo icone da JSON"""
-        if self.catalog_file.exists():
+    def _load_registry(self) -> Dict:
+        """Carica registry icone da JSON"""
+        if self.registry_path.exists():
             try:
-                with open(self.catalog_file, 'r', encoding='utf-8') as f:
+                with open(self.registry_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except (json.JSONDecodeError, IOError) as e:
-                print(f"Errore caricamento catalogo icone: {e}")
+                print(f"Errore caricamento registry icone: {e}")
         
-        # Catalogo vuoto
-        return {}
+        # Registry vuoto di default
+        return {
+            "version": "1.0.0",
+            "icons": {}
+        }
     
-    def _save_catalog(self):
-        """Salva catalogo icone su JSON"""
+    def _save_registry(self):
+        """Salva registry icone su JSON"""
         try:
-            with open(self.catalog_file, 'w', encoding='utf-8') as f:
-                json.dump(self.catalog, f, indent=2, ensure_ascii=False)
+            with open(self.registry_path, 'w', encoding='utf-8') as f:
+                json.dump(self.registry, f, indent=2, ensure_ascii=False)
         except IOError as e:
-            print(f"Errore salvataggio catalogo icone: {e}")
+            print(f"Errore salvataggio registry icone: {e}")
     
-    def import_file(self, source_path: Path, icon_id: Optional[str] = None, 
-                   metadata: Optional[Dict[str, Any]] = None) -> Optional[str]:
+    def import_file(self, source_path: Path, icon_id: Optional[str] = None,
+                   category: str = "custom", description: str = "") -> Optional[str]:
         """
-        Importa file icona e registra nel catalogo
+        Importa file icona in resources/icons/
         
         Args:
-            source_path: Percorso file sorgente (SVG/PNG/JPG)
-            icon_id: ID univoco (default: nome file)
-            metadata: Metadati opzionali (tags, categoria, descrizione)
-            
+            source_path: Path al file sorgente (SVG/PNG/JPG)
+            icon_id: ID univoco per l'icona. Se None, usa nome file.
+            category: Categoria icona (es: "custom", "probe", "material")
+            description: Descrizione opzionale
+        
         Returns:
-            ID icona importata o None se errore
+            ID icona se successo, None altrimenti
         """
         source_path = Path(source_path)
         
-        # Verifica esistenza file
-        if not source_path.exists():
-            print(f"File non trovato: {source_path}")
-            return None
-        
-        # Verifica estensione
-        ext = source_path.suffix.lower()
-        if ext not in ['.svg', '.png', '.jpg', '.jpeg']:
-            print(f"Formato non supportato: {ext}")
+        # Valida estensione
+        valid_extensions = {'.svg', '.png', '.jpg', '.jpeg'}
+        if source_path.suffix.lower() not in valid_extensions:
+            print(f"Estensione non supportata: {source_path.suffix}")
             return None
         
         # Genera ID se non fornito
         if icon_id is None:
             icon_id = source_path.stem
         
-        # Genera nome file univoco se già esistente
-        dest_filename = f"{icon_id}{ext}"
-        dest_path = self.icons_dir / dest_filename
-        counter = 1
-        while dest_path.exists():
-            dest_filename = f"{icon_id}_{counter}{ext}"
-            dest_path = self.icons_dir / dest_filename
-            counter += 1
+        # Verifica duplicati
+        if icon_id in self.registry["icons"]:
+            print(f"ID icona già esistente: {icon_id}")
+            return None
         
-        # Copia file
+        # Copia file in resources/icons/
+        dest_filename = f"{icon_id}{source_path.suffix.lower()}"
+        dest_path = self.icons_path / dest_filename
+        
         try:
             shutil.copy2(source_path, dest_path)
         except IOError as e:
             print(f"Errore copia file: {e}")
             return None
         
-        # Registra nel catalogo
-        final_id = dest_filename.rsplit('.', 1)[0]  # Nome senza estensione
-        self.catalog[final_id] = {
-            'filename': dest_filename,
-            'format': ext[1:],  # Senza il punto
-            'original_name': source_path.name,
-            'metadata': metadata or {}
+        # Aggiungi al registry
+        self.registry["icons"][icon_id] = {
+            "filename": dest_filename,
+            "category": category,
+            "description": description,
+            "format": source_path.suffix.lower()[1:],  # senza il punto
+            "size": dest_path.stat().st_size
         }
         
-        self._save_catalog()
+        self._save_registry()
         
-        return final_id
+        print(f"Icona importata: {icon_id} -> {dest_filename}")
+        return icon_id
     
-    def list_local_icons(self, category: Optional[str] = None) -> List[str]:
+    def list_local_icons(self, category: Optional[str] = None) -> List[Dict]:
         """
-        Elenca icone locali disponibili
+        Elenca icone locali
         
         Args:
-            category: Filtra per categoria (opzionale)
-            
-        Returns:
-            Lista di ID icone
-        """
-        if category:
-            return [
-                icon_id for icon_id, data in self.catalog.items()
-                if data.get('metadata', {}).get('category') == category
-            ]
+            category: Filtra per categoria. Se None, mostra tutte.
         
-        return list(self.catalog.keys())
-    
-    def get_icon_info(self, icon_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Ottiene informazioni su icona
-        
-        Args:
-            icon_id: ID icona
-            
         Returns:
-            Dizionario con info o None se non trovata
+            Lista di dict con info icone
         """
-        return self.catalog.get(icon_id)
+        icons = []
+        
+        for icon_id, info in self.registry["icons"].items():
+            if category is None or info.get("category") == category:
+                icons.append({
+                    "id": icon_id,
+                    "filename": info.get("filename", ""),
+                    "category": info.get("category", ""),
+                    "description": info.get("description", ""),
+                    "format": info.get("format", ""),
+                    "size": info.get("size", 0)
+                })
+        
+        return icons
     
-    def get_pixmap(self, icon_id: str, size: Optional[QSize] = None) -> Optional[QPixmap]:
+    def get_icon_path(self, icon_id: str) -> Optional[Path]:
         """
-        Ottiene QPixmap per icona con caching
+        Ottieni path completo di un'icona
         
         Args:
             icon_id: ID icona
-            size: Dimensione desiderata (opzionale, per SVG)
-            
+        
         Returns:
-            QPixmap o None se errore
+            Path al file o None se non trovato
         """
-        icon_info = self.catalog.get(icon_id)
-        if not icon_info:
+        if icon_id not in self.registry["icons"]:
             return None
         
-        filename = icon_info['filename']
-        filepath = self.icons_dir / filename
-        
-        if not filepath.exists():
+        filename = self.registry["icons"][icon_id].get("filename")
+        if not filename:
             return None
         
-        # Cache key con dimensione
-        cache_key = f"{icon_id}_{size.width()}x{size.height()}" if size else icon_id
+        path = self.icons_path / filename
+        return path if path.exists() else None
+    
+    def get_pixmap(self, icon_id: str, size: Optional[Tuple[int, int]] = None) -> Optional[QPixmap]:
+        """
+        Ottieni QPixmap di un'icona con caching
         
-        # Verifica cache
+        Args:
+            icon_id: ID icona
+            size: Tupla (width, height) per resize. Se None, dimensione originale.
+        
+        Returns:
+            QPixmap o None se non trovato
+        """
+        # Chiave cache include dimensione
+        cache_key = f"{icon_id}_{size[0] if size else 'orig'}x{size[1] if size else 'orig'}"
+        
+        # Controlla cache
         if cache_key in self._pixmap_cache:
             return self._pixmap_cache[cache_key]
         
-        # Carica in base al formato
-        if icon_info['format'] == 'svg':
-            pixmap = self._load_svg_pixmap(filepath, size)
-        else:
-            pixmap = QPixmap(str(filepath))
-            if size and not pixmap.isNull():
-                pixmap = pixmap.scaled(size, aspectRatioMode=1)  # KeepAspectRatio
+        # Carica da file
+        icon_path = self.get_icon_path(icon_id)
+        if not icon_path:
+            return None
         
-        # Salva in cache
+        # Determina formato
+        icon_format = self.registry["icons"][icon_id].get("format", "")
+        
+        if icon_format == "svg":
+            # Render SVG
+            pixmap = self._render_svg(icon_path, size)
+        else:
+            # Carica PNG/JPG
+            pixmap = QPixmap(str(icon_path))
+            
+            # Resize se richiesto
+            if size and not pixmap.isNull():
+                pixmap = pixmap.scaled(
+                    size[0], size[1],
+                    aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+                    transformMode=Qt.TransformationMode.SmoothTransformation
+                )
+        
+        # Cache e ritorna
         if pixmap and not pixmap.isNull():
             self._pixmap_cache[cache_key] = pixmap
             return pixmap
         
         return None
     
-    def _load_svg_pixmap(self, filepath: Path, size: Optional[QSize]) -> Optional[QPixmap]:
-        """Carica SVG come QPixmap"""
+    def _render_svg(self, svg_path: Path, size: Optional[Tuple[int, int]] = None) -> Optional[QPixmap]:
+        """
+        Render SVG a QPixmap
+        
+        Args:
+            svg_path: Path al file SVG
+            size: Dimensione output. Se None, usa dimensione SVG.
+        
+        Returns:
+            QPixmap o None
+        """
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                svg_data = f.read()
-            
-            renderer = QSvgRenderer(QByteArray(svg_data.encode('utf-8')))
+            renderer = QSvgRenderer(str(svg_path))
             
             if not renderer.isValid():
                 return None
             
-            # Usa dimensione di default se non specificata
-            if size is None:
-                size = renderer.defaultSize()
+            # Determina dimensione
+            if size:
+                width, height = size
+            else:
+                svg_size = renderer.defaultSize()
+                width = svg_size.width()
+                height = svg_size.height()
             
-            pixmap = QPixmap(size)
-            pixmap.fill(0x00000000)  # Trasparente
+            # Crea pixmap e render
+            pixmap = QPixmap(width, height)
+            pixmap.fill(0)  # Trasparente
             
             from PyQt6.QtGui import QPainter
             painter = QPainter(pixmap)
@@ -220,57 +248,55 @@ class IconManager:
             
             return pixmap
         except Exception as e:
-            print(f"Errore caricamento SVG {filepath}: {e}")
+            print(f"Errore render SVG {svg_path}: {e}")
             return None
     
-    def get_svg_renderer(self, icon_id: str) -> Optional[QSvgRenderer]:
+    def get_svg(self, icon_id: str) -> Optional[QSvgRenderer]:
         """
-        Ottiene QSvgRenderer per icona SVG con caching
+        Ottieni QSvgRenderer di un'icona SVG con caching
         
         Args:
             icon_id: ID icona
-            
-        Returns:
-            QSvgRenderer o None se errore o non SVG
-        """
-        icon_info = self.catalog.get(icon_id)
-        if not icon_info or icon_info['format'] != 'svg':
-            return None
         
-        # Verifica cache
+        Returns:
+            QSvgRenderer o None se non SVG o non trovato
+        """
+        # Controlla cache
         if icon_id in self._svg_cache:
             return self._svg_cache[icon_id]
         
-        filename = icon_info['filename']
-        filepath = self.icons_dir / filename
+        # Verifica formato
+        if icon_id not in self.registry["icons"]:
+            return None
         
-        if not filepath.exists():
+        if self.registry["icons"][icon_id].get("format") != "svg":
+            return None
+        
+        # Carica SVG
+        icon_path = self.get_icon_path(icon_id)
+        if not icon_path:
             return None
         
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                svg_data = f.read()
-            
-            renderer = QSvgRenderer(QByteArray(svg_data.encode('utf-8')))
-            
+            renderer = QSvgRenderer(str(icon_path))
             if renderer.isValid():
                 self._svg_cache[icon_id] = renderer
                 return renderer
         except Exception as e:
-            print(f"Errore caricamento SVG renderer {filepath}: {e}")
+            print(f"Errore caricamento SVG {icon_id}: {e}")
         
         return None
     
-    def get_qicon(self, icon_id: str, size: Optional[QSize] = None) -> Optional[QIcon]:
+    def get_icon(self, icon_id: str, size: Optional[Tuple[int, int]] = None) -> Optional[QIcon]:
         """
-        Ottiene QIcon per uso in UI
+        Ottieni QIcon di un'icona
         
         Args:
             icon_id: ID icona
-            size: Dimensione (opzionale)
-            
+            size: Dimensione pixmap. Se None, usa originale.
+        
         Returns:
-            QIcon o None se errore
+            QIcon o None
         """
         pixmap = self.get_pixmap(icon_id, size)
         if pixmap:
@@ -279,59 +305,65 @@ class IconManager:
     
     def delete_icon(self, icon_id: str) -> bool:
         """
-        Elimina icona dal catalogo e dal filesystem
+        Elimina un'icona dal registry e dal filesystem
         
         Args:
             icon_id: ID icona da eliminare
-            
+        
         Returns:
-            True se eliminata con successo
+            True se eliminata, False altrimenti
         """
-        icon_info = self.catalog.get(icon_id)
-        if not icon_info:
+        if icon_id not in self.registry["icons"]:
             return False
         
-        filename = icon_info['filename']
-        filepath = self.icons_dir / filename
-        
-        # Rimuovi da filesystem
-        try:
-            if filepath.exists():
-                filepath.unlink()
-        except IOError as e:
-            print(f"Errore eliminazione file: {e}")
-            return False
-        
-        # Rimuovi da catalogo
-        del self.catalog[icon_id]
-        self._save_catalog()
+        # Rimuovi file
+        icon_path = self.get_icon_path(icon_id)
+        if icon_path and icon_path.exists():
+            try:
+                icon_path.unlink()
+            except OSError as e:
+                print(f"Errore eliminazione file {icon_path}: {e}")
+                return False
         
         # Rimuovi da cache
         self._pixmap_cache = {k: v for k, v in self._pixmap_cache.items() if not k.startswith(icon_id)}
         if icon_id in self._svg_cache:
             del self._svg_cache[icon_id]
         
+        # Rimuovi da registry
+        del self.registry["icons"][icon_id]
+        self._save_registry()
+        
+        print(f"Icona eliminata: {icon_id}")
         return True
+    
+    def get_categories(self) -> List[str]:
+        """
+        Ottieni lista categorie uniche
+        
+        Returns:
+            Lista categorie
+        """
+        categories = set()
+        for info in self.registry["icons"].values():
+            category = info.get("category", "custom")
+            categories.add(category)
+        return sorted(list(categories))
     
     def clear_cache(self):
-        """Pulisce cache in memoria"""
+        """Pulisce cache pixmap e SVG"""
         self._pixmap_cache.clear()
         self._svg_cache.clear()
-    
-    def update_metadata(self, icon_id: str, metadata: Dict[str, Any]) -> bool:
-        """
-        Aggiorna metadati icona
-        
-        Args:
-            icon_id: ID icona
-            metadata: Nuovi metadati
-            
-        Returns:
-            True se aggiornati con successo
-        """
-        if icon_id not in self.catalog:
-            return False
-        
-        self.catalog[icon_id]['metadata'] = metadata
-        self._save_catalog()
-        return True
+        print("Cache icone pulita")
+
+
+# Istanza singleton
+_icon_manager_instance = None
+
+
+def get_icon_manager() -> IconManager:
+    """Ottieni istanza singleton del gestore icone"""
+    global _icon_manager_instance
+    if _icon_manager_instance is None:
+        _icon_manager_instance = IconManager()
+    return _icon_manager_instance

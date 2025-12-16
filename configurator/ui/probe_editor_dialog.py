@@ -280,13 +280,13 @@ class ProbeCanvas(QWidget):
         # Linee verticali
         x = 0
         while x < width:
-            painter.drawLine(x, 0, x, height)
+            painter.drawLine(int(x), 0, int(x), int(height))
             x += self.grid_size
         
         # Linee orizzontali
         y = 0
         while y < height:
-            painter.drawLine(0, y, width, y)
+            painter.drawLine(0, int(y), int(width), int(y))
             y += self.grid_size
     
     def _draw_snap_indicator(self, painter: QPainter, pos: QPointF, snap_type: SnapType):
@@ -349,8 +349,8 @@ class ProbeCanvas(QWidget):
         center_y = self.height() // 2
         
         painter.setPen(QPen(QColor("#0088ff"), 1, Qt.PenStyle.DashLine))
-        painter.drawLine(center_x, 0, center_x, self.height())
-        painter.drawLine(0, center_y, self.width(), center_y)
+        painter.drawLine(int(center_x), 0, int(center_x), int(self.height()))
+        painter.drawLine(0, int(center_y), int(self.width()), int(center_y))
         
         # Etichette assi
         painter.setPen(QColor("#0088ff"))

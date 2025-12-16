@@ -198,132 +198,75 @@ class FermavetroConfig:
 
 
 @dataclass
-class HardwareConfig:
-    """Configurazione hardware del dispositivo"""
-    encoder: Dict = field(default_factory=lambda: {
-        'resolution': 0.01,
-        'pulses_per_mm': 100,
-        'debounce': 10,
-        'pin_a': 4,
-        'pin_b': 5,
-        'direction': 'normal'
-    })
-    probes: List[Dict] = field(default_factory=list)
-    bluetooth: Dict = field(default_factory=lambda: {
-        'name': 'MetroDigitale',
-        'uuid': '',
-        'auto_connect': False,
-        'destinations': []
-    })
-    display: Dict = field(default_factory=lambda: {
-        'width': 800,
-        'height': 480,
-        'brightness': 100
-    })
-    
-    def to_dict(self) -> Dict:
-        return {
-            'encoder': self.encoder,
-            'probes': self.probes,
-            'bluetooth': self.bluetooth,
-            'display': self.display
-        }
-    
-    @classmethod
-    def from_dict(cls, data: Dict) -> 'HardwareConfig':
-        return cls(
-            encoder=data.get('encoder', {}),
-            probes=data.get('probes', []),
-            bluetooth=data.get('bluetooth', {}),
-            display=data.get('display', {})
-        )
-
-
-@dataclass
-class ModeConfig:
-    """Configurazione modalità di misura"""
+class ModeWorkflowStep:
+    """Passo nel workflow di una modalità di misura"""
     id: str
-    name: str
-    category: str = "Generica"
-    icon: str = ""
-    description: str = ""
-    workflow: List[Dict] = field(default_factory=list)
-    workflow_notes: str = ""
-    formula: str = ""
-    unit: str = "mm"
-    decimals: int = 2
-    bt_enabled: bool = False
-    bt_format: str = "JSON"
-    bt_prefix: str = ""
-    bt_suffix: str = ""
-    bt_payload_template: str = ""
+    description: str
+    variable: str  # Variabile da acquisire (es: "L", "H")
+    probe_type: str = "internal"  # "internal", "external", "depth", "step"
+    constraints: Dict = field(default_factory=dict)  # Vincoli opzionali
     
     def to_dict(self) -> Dict:
         return {
             'id': self.id,
-            'name': self.name,
-            'category': self.category,
-            'icon': self.icon,
             'description': self.description,
-            'workflow': self.workflow,
-            'workflow_notes': self.workflow_notes,
-            'formula': self.formula,
-            'unit': self.unit,
-            'decimals': self.decimals,
-            'bt_enabled': self.bt_enabled,
-            'bt_format': self.bt_format,
-            'bt_prefix': self.bt_prefix,
-            'bt_suffix': self.bt_suffix,
-            'bt_payload_template': self.bt_payload_template
+            'variable': self.variable,
+            'probe_type': self.probe_type,
+            'constraints': self.constraints
         }
     
     @classmethod
-    def from_dict(cls, data: Dict) -> 'ModeConfig':
+    def from_dict(cls, data: Dict) -> 'ModeWorkflowStep':
         return cls(
             id=data['id'],
-            name=data['name'],
-            category=data.get('category', 'Generica'),
-            icon=data.get('icon', ''),
-            description=data.get('description', ''),
-            workflow=data.get('workflow', []),
-            workflow_notes=data.get('workflow_notes', ''),
-            formula=data.get('formula', ''),
-            unit=data.get('unit', 'mm'),
-            decimals=data.get('decimals', 2),
-            bt_enabled=data.get('bt_enabled', False),
-            bt_format=data.get('bt_format', 'JSON'),
-            bt_prefix=data.get('bt_prefix', ''),
-            bt_suffix=data.get('bt_suffix', ''),
-            bt_payload_template=data.get('bt_payload_template', '')
+            description=data['description'],
+            variable=data['variable'],
+            probe_type=data.get('probe_type', 'internal'),
+            constraints=data.get('constraints', {})
         )
 
 
 @dataclass
-class UILayout:
-    """Configurazione layout UI"""
-    theme: str = "dark"
-    units: str = "mm"
-    decimals: int = 2
-    language: str = "it"
-    screen_config: Dict = field(default_factory=dict)
+class MeasureMode:
+    """Modalità di misura con workflow e formule"""
+    id: str
+    nome: str
+    categoria: str
+    icona: str
+    workflow: List[ModeWorkflowStep] = field(default_factory=list)
+    formule: Dict[str, str] = field(default_factory=dict)  # {nome_risultato: formula}
+    send_bt: bool = True  # Invia automaticamente via Bluetooth
+    bt_payload_template: str = ""  # Template per payload BT
+    unita: str = "mm"
+    decimali: int = 2
     
     def to_dict(self) -> Dict:
         return {
-            'theme': self.theme,
-            'units': self.units,
-            'decimals': self.decimals,
-            'language': self.language,
-            'screen_config': self.screen_config
+            'id': self.id,
+            'nome': self.nome,
+            'categoria': self.categoria,
+            'icona': self.icona,
+            'workflow': [s.to_dict() for s in self.workflow],
+            'formule': self.formule,
+            'send_bt': self.send_bt,
+            'bt_payload_template': self.bt_payload_template,
+            'unita': self.unita,
+            'decimali': self.decimali
         }
     
     @classmethod
-    def from_dict(cls, data: Dict) -> 'UILayout':
+    def from_dict(cls, data: Dict) -> 'MeasureMode':
         return cls(
-            theme=data.get('theme', 'dark'),
-            units=data.get('units', 'mm'),
-            decimals=data.get('decimals', 2),
-            language=data.get('language', 'it'),
-            screen_config=data.get('screen_config', {})
+            id=data['id'],
+            nome=data['nome'],
+            categoria=data['categoria'],
+            icona=data['icona'],
+            workflow=[ModeWorkflowStep.from_dict(s) for s in data.get('workflow', [])],
+            formule=data.get('formule', {}),
+            send_bt=data.get('send_bt', True),
+            bt_payload_template=data.get('bt_payload_template', ''),
+            unita=data.get('unita', 'mm'),
+            decimali=data.get('decimali', 2)
         )
 
 
@@ -332,6 +275,7 @@ class ProgettoConfigurazione:
     """Progetto completo di configurazione Metro Digitale"""
     schema_version: str = "1.0.0"
     version: str = "1.0.0"
+    schema_version: str = "2.0.0"  # Nuova versione schema
     nome: str = "Nuovo Progetto"
     created: datetime = field(default_factory=datetime.now)
     modified: datetime = field(default_factory=datetime.now)
@@ -347,12 +291,17 @@ class ProgettoConfigurazione:
     tipologie: List[TipologiaInfisso] = field(default_factory=list)
     astine: List[AstinaConfig] = field(default_factory=list)
     fermavetri: List[FermavetroConfig] = field(default_factory=list)
+    modes: List[MeasureMode] = field(default_factory=list)  # Nuove modalità di misura
+    hardware: Dict = field(default_factory=dict)  # Configurazione hardware
+    ui_layout: Dict = field(default_factory=dict)  # Layout UI
+    icons: Dict = field(default_factory=dict)  # Registry icone locali
     impostazioni: Dict = field(default_factory=dict)
     
     def to_dict(self) -> Dict:
         return {
             'schema_version': self.schema_version,
             'version': self.version,
+            'schema_version': self.schema_version,
             'nome': self.nome,
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),
@@ -364,6 +313,10 @@ class ProgettoConfigurazione:
             'tipologie': [t.to_dict() for t in self.tipologie],
             'astine': [a.to_dict() for a in self.astine],
             'fermavetri': [f.to_dict() for f in self.fermavetri],
+            'modes': [m.to_dict() for m in self.modes],
+            'hardware': self.hardware,
+            'ui_layout': self.ui_layout,
+            'icons': self.icons,
             'impostazioni': self.impostazioni
         }
     
@@ -372,6 +325,7 @@ class ProgettoConfigurazione:
         return cls(
             schema_version=data.get('schema_version', '1.0.0'),
             version=data.get('version', '1.0.0'),
+            schema_version=data.get('schema_version', '2.0.0'),
             nome=data.get('nome', 'Progetto'),
             created=datetime.fromisoformat(data.get('created', datetime.now().isoformat())),
             modified=datetime.fromisoformat(data.get('modified', datetime.now().isoformat())),
@@ -383,5 +337,9 @@ class ProgettoConfigurazione:
             tipologie=[TipologiaInfisso.from_dict(t) for t in data.get('tipologie', [])],
             astine=[AstinaConfig.from_dict(a) for a in data.get('astine', [])],
             fermavetri=[FermavetroConfig.from_dict(f) for f in data.get('fermavetri', [])],
+            modes=[MeasureMode.from_dict(m) for m in data.get('modes', [])],
+            hardware=data.get('hardware', {}),
+            ui_layout=data.get('ui_layout', {}),
+            icons=data.get('icons', {}),
             impostazioni=data.get('impostazioni', {})
         )
