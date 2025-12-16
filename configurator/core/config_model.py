@@ -273,11 +273,20 @@ class MeasureMode:
 @dataclass
 class ProgettoConfigurazione:
     """Progetto completo di configurazione Metro Digitale"""
+    schema_version: str = "1.0.0"
     version: str = "1.0.0"
     schema_version: str = "2.0.0"  # Nuova versione schema
     nome: str = "Nuovo Progetto"
     created: datetime = field(default_factory=datetime.now)
     modified: datetime = field(default_factory=datetime.now)
+    
+    # Nuovi campi per architettura a 3 schermate
+    hardware: HardwareConfig = field(default_factory=HardwareConfig)
+    modes: List[ModeConfig] = field(default_factory=list)
+    ui_layout: UILayout = field(default_factory=UILayout)
+    icons: Dict = field(default_factory=dict)
+    
+    # Campi esistenti
     menus: List[MenuItem] = field(default_factory=list)
     tipologie: List[TipologiaInfisso] = field(default_factory=list)
     astine: List[AstinaConfig] = field(default_factory=list)
@@ -290,11 +299,16 @@ class ProgettoConfigurazione:
     
     def to_dict(self) -> Dict:
         return {
+            'schema_version': self.schema_version,
             'version': self.version,
             'schema_version': self.schema_version,
             'nome': self.nome,
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),
+            'hardware': self.hardware.to_dict(),
+            'modes': [m.to_dict() for m in self.modes],
+            'ui_layout': self.ui_layout.to_dict(),
+            'icons': self.icons,
             'menus': [m.to_dict() for m in self.menus],
             'tipologie': [t.to_dict() for t in self.tipologie],
             'astine': [a.to_dict() for a in self.astine],
@@ -309,11 +323,16 @@ class ProgettoConfigurazione:
     @classmethod
     def from_dict(cls, data: Dict) -> 'ProgettoConfigurazione':
         return cls(
+            schema_version=data.get('schema_version', '1.0.0'),
             version=data.get('version', '1.0.0'),
             schema_version=data.get('schema_version', '2.0.0'),
             nome=data.get('nome', 'Progetto'),
             created=datetime.fromisoformat(data.get('created', datetime.now().isoformat())),
             modified=datetime.fromisoformat(data.get('modified', datetime.now().isoformat())),
+            hardware=HardwareConfig.from_dict(data.get('hardware', {})) if 'hardware' in data else HardwareConfig(),
+            modes=[ModeConfig.from_dict(m) for m in data.get('modes', [])],
+            ui_layout=UILayout.from_dict(data.get('ui_layout', {})) if 'ui_layout' in data else UILayout(),
+            icons=data.get('icons', {}),
             menus=[MenuItem.from_dict(m) for m in data.get('menus', [])],
             tipologie=[TipologiaInfisso.from_dict(t) for t in data.get('tipologie', [])],
             astine=[AstinaConfig.from_dict(a) for a in data.get('astine', [])],
