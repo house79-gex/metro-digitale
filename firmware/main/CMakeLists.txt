@@ -21,6 +21,9 @@ idf_component_register(
         "measurement/measure_calculator.c"
         "measurement/mode_device_routing.c"
         "measurement/measure_sender.c"
+        # BLE multi-device system
+        "ble/ble_server.c"
+        "ble/ble_multi_device.c"
         # UI components
         "ui/ui_manager.c"
         "ui/ui_styles.c"
