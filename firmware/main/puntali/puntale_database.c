@@ -44,7 +44,8 @@ esp_err_t puntale_database_scan_sd_card(void) {
     
     esp_err_t ret = sd_card_list_files(SD_DIR_PUNTALI, &file_list, &count);
     if (ret != ESP_OK || count == 0) {
-        ESP_LOGI(TAG, "No STL files found on SD card");
+        ESP_LOGI(TAG, "No STL files found in directory %s (error: %s)", 
+                 SD_DIR_PUNTALI, esp_err_to_name(ret));
         return ESP_OK;
     }
     

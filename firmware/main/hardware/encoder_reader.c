@@ -129,6 +129,17 @@ esp_err_t encoder_reader_get_magnitude(uint16_t *magnitude) {
 }
 
 float encoder_reader_angle_to_mm(uint16_t angle, float calibration_factor) {
+    // Validate inputs
+    if (angle > AS5600_RESOLUTION) {
+        ESP_LOGW(TAG, "Invalid angle value: %d (max: %d)", angle, AS5600_RESOLUTION);
+        angle = AS5600_RESOLUTION;
+    }
+    
+    if (calibration_factor <= 0.0f) {
+        ESP_LOGE(TAG, "Invalid calibration factor: %.3f (must be positive)", calibration_factor);
+        return 0.0f;
+    }
+    
     // Convert angle to linear position
     // calibration_factor should be set based on mechanical setup
     // For example: pulley_diameter_mm * PI / 4096

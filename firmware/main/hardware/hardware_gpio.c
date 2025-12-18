@@ -182,7 +182,10 @@ void hardware_buzzer_tone(uint32_t frequency_hz, uint32_t duration_ms) {
     ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, LEDC_DUTY);
     ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
     
-    // If duration specified, schedule stop
+    // Note: duration_ms parameter controls blocking behavior:
+    // - If duration_ms > 0: blocks calling task (use from non-critical tasks only)
+    // - If duration_ms == 0: non-blocking, caller must call hardware_buzzer_stop()
+    // Consider using buzzer_feedback.c for non-blocking patterns
     if (duration_ms > 0) {
         vTaskDelay(pdMS_TO_TICKS(duration_ms));
         hardware_buzzer_stop();

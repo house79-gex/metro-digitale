@@ -140,6 +140,7 @@ void ble_multi_device_on_data_received(uint16_t conn_id, const uint8_t *data, ui
     // Simple JSON parsing (for full implementation, use cJSON)
     char *data_str = (char*)malloc(len + 1);
     if (data_str == NULL) {
+        ESP_LOGE(TAG, "Failed to allocate memory for received data (%d bytes)", len);
         return;
     }
     memcpy(data_str, data, len);
