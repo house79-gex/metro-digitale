@@ -17,6 +17,10 @@ idf_component_register(
         "puntali/puntale_types.c"
         "puntali/stl_parser.c"
         "puntali/puntale_database.c"
+        # Measurement system
+        "measurement/measure_calculator.c"
+        "measurement/mode_device_routing.c"
+        "measurement/measure_sender.c"
         # UI components
         "ui/ui_manager.c"
         "ui/ui_styles.c"
