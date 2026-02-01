@@ -27,6 +27,9 @@ idf_component_register(
         "storage/storage_manager.c"
         # Operational modes
         "modes/calibro_advanced.c"
+        "modes/mode_vetri.c"
+        "modes/mode_astine.c"
+        "modes/mode_fermavetri.c"
         # BLE multi-device system
         "ble/ble_server.c"
         "ble/ble_multi_device.c"
