@@ -10,7 +10,7 @@ idf_component_register(
         "hardware/hardware_gpio.c"
         "hardware/encoder_reader.c"
         "hardware/sd_card.c"
-        "hardware/button_send.c"
+        "hardware/buzzer.c"
         # Feedback system
         "feedback/buzzer_feedback.c"
         "feedback/led_feedback.c"

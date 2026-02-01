@@ -1,5 +1,5 @@
 #include "buzzer_feedback.h"
-#include "../hardware/hardware_gpio.h"
+#include "../hardware/buzzer.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -40,13 +40,13 @@ void buzzer_feedback_play_sequence(const uint32_t *frequencies, const uint32_t *
     for (size_t i = 0; i < count; i++) {
         if (frequencies[i] == 0) {
             // Rest/pause
-            hardware_buzzer_stop();
+            buzzer_stop();
             vTaskDelay(pdMS_TO_TICKS(durations[i]));
         } else {
-            hardware_buzzer_tone(frequencies[i], durations[i]);
+            buzzer_play_tone(frequencies[i], durations[i]);
         }
     }
-    hardware_buzzer_stop();
+    buzzer_stop();
 }
 
 void buzzer_feedback_play(FeedbackEvent event) {
@@ -88,5 +88,5 @@ void buzzer_feedback_play(FeedbackEvent event) {
 }
 
 void buzzer_feedback_stop(void) {
-    hardware_buzzer_stop();
+    buzzer_stop();
 }
