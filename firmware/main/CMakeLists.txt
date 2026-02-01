@@ -18,10 +18,20 @@ idf_component_register(
         "puntali/puntale_types.c"
         "puntali/stl_parser.c"
         "puntali/puntale_database.c"
+        "puntali/puntale_circular.c"
         # Measurement system
         "measurement/measure_calculator.c"
         "measurement/mode_device_routing.c"
         "measurement/measure_sender.c"
+        # Storage system
+        "storage/storage_manager.c"
+        # Operational modes
+        "modes/calibro_advanced.c"
+        "modes/mode_vetri.c"
+        "modes/mode_astine.c"
+        "modes/mode_fermavetri.c"
+        # Display drivers
+        "display/display_rgb.c"
         # BLE multi-device system
         "ble/ble_server.c"
         "ble/ble_multi_device.c"
@@ -36,6 +46,7 @@ idf_component_register(
         "ui/ui_settings.c"
         "ui/ui_rilievi_speciali.c"
         "ui/ui_tipologie.c"
+        "ui/ui_toast.c"
     INCLUDE_DIRS 
         "."
         "ui"
@@ -44,6 +55,9 @@ idf_component_register(
         "puntali"
         "ble"
         "measurement"
+        "storage"
+        "modes"
+        "display"
     REQUIRES 
         nvs_flash 
         bt 
