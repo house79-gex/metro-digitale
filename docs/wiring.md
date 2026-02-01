@@ -72,6 +72,26 @@ Encoder 5V → Level Shifter → ESP32-S3 3.3V
          GND
 ```
 
+### GPIO Esposti su Pin Header VIEWE Board
+
+La scheda VIEWE espone i seguenti GPIO su pin header per espansioni:
+
+| Pin | GPIO | Funzione Metro Digitale | Note |
+|-----|------|------------------------|------|
+| 1   | 5V   | Alimentazione da UPS | Power in |
+| 2   | GND  | Ground comune | Massa |
+| 3   | IO35 | Encoder Channel A | Via TXS0108E level shifter |
+| 4   | IO36 | Encoder Channel B | Via TXS0108E level shifter |
+| 12  | IO46 | **Buzzer Passivo PWM** | **← NUOVO (GPIO 46)** |
+| 13  | IO47 | Pulsante SEND fisico | Pull-up 10kΩ |
+| 15  | 3.3V | Alimentazione TXS0108E VCCA | Power out |
+| 16  | GND  | Ground | Massa |
+
+**Note importanti:**
+- GPIO 46 è dedicato al buzzer passivo e non deve essere usato per altre funzioni
+- GPIO 46 utilizza LEDC_TIMER_0 e LEDC_CHANNEL_0
+- Resistore 100Ω consigliato in serie con il buzzer
+
 ### LED Status
 
 | ESP32-S3 Pin | Funzione | Note |
@@ -150,13 +170,25 @@ GPIO ────┬────R (330Ω)────[LED]────GND
 #### Speaker/Buzzer
 | ESP32-S3 Pin | Componente | Note |
 |--------------|------------|------|
-| GPIO 45 | Buzzer + | PWM audio |
+| GPIO 46 | Buzzer Passivo + | PWM audio (NUOVO) |
 | GND | Buzzer - | Ground |
+
+**Schema Collegamento Buzzer:**
+```
+ESP32-S3 Board VIEWE:
+┌────────────────────────────────────┐
+│  Pin Header:                       │
+│                                    │
+│  IO46 (pin 12) ───┬─── 100Ω ───┬──→ Buzzer (+) Rosso
+│                   │             │
+│  GND (pin 2/16) ──┼─────────────┴──→ Buzzer (-) Nero
+└───────────────────┘
+```
 
 #### Vibration Motor
 | ESP32-S3 Pin | Componente | Note |
 |--------------|------------|------|
-| GPIO 46 | Motor (via MOSFET) | Controllo PWM |
+| GPIO 45 | Motor (via MOSFET) | Controllo PWM |
 
 ## Schema Completo ASCII
 
@@ -224,6 +256,12 @@ Prima di alimentare, verificare:
    - Scansionare con smartphone
    - Verificare connessione
 
+6. **Test Buzzer** (NUOVO)
+   - Eseguire `buzzer_test_all_patterns()`
+   - Verificare 10 pattern sonori diversi
+   - Testare slider volume in UI Settings
+   - Controllare polarità (+ su IO46, - su GND)
+
 ## Note di Sicurezza
 
 ⚠️ **ATTENZIONE:**
@@ -265,3 +303,12 @@ Prima di alimentare, verificare:
 - Controllare configurazione SDK
 - Verificare memoria disponibile
 - Testare esempio BLE scan
+
+### Buzzer non emette suono (NUOVO)
+- Verificare polarità buzzer (+ su IO46, - su GND)
+- Controllare resistore 100Ω in serie
+- Verificare volume in Settings (deve essere >0%)
+- Testare con `buzzer_test_all_patterns()`
+- Verificare che GPIO 46 non sia usato per altro
+- Controllare connessioni su pin header (pin 12)
+- Misurare tensione PWM su GPIO 46 con oscilloscopio
