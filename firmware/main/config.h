@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "driver/gpio.h"
+#include "driver/ledc.h"
 
 // Modalità operative
 typedef enum {
@@ -184,6 +186,15 @@ void config_add_variabile(TipologiaInfisso *tip, const char *nome,
 void config_add_elemento(TipologiaInfisso *tip, const char *nome,
                          const char *formula, uint8_t quantita_default);
 void config_set_tipologia_corrente(GlobalConfig *cfg, uint8_t idx);
+
+// ====== BUZZER PASSIVO ======
+#define BUZZER_PIN              GPIO_NUM_46  // Pin IO46 dal pin header VIEWE
+#define BUZZER_CHANNEL          LEDC_CHANNEL_0
+#define BUZZER_TIMER            LEDC_TIMER_0
+#define BUZZER_MODE             LEDC_LOW_SPEED_MODE
+#define BUZZER_RESOLUTION       LEDC_TIMER_10_BIT
+#define BUZZER_DUTY_CYCLE       512  // 50% duty cycle default
+#define BUZZER_ENABLED          1    // Set to 0 to disable buzzer
 
 // Variabili globali (extern)
 extern GlobalConfig g_config;

@@ -15,6 +15,7 @@
 #include "hardware/hardware_gpio.h"
 #include "hardware/encoder_reader.h"
 #include "hardware/sd_card.h"
+#include "hardware/buzzer.h"
 #include "feedback/buzzer_feedback.h"
 #include "feedback/led_feedback.h"
 #include "puntali/puntale_database.h"
@@ -99,6 +100,8 @@ void app_main(void) {
     ESP_LOGI(TAG, "=== Metro Digitale Multifunzione - Complete Firmware ===");
     ESP_LOGI(TAG, "Avvio sistema...");
     
+    esp_err_t ret;  // Declare ret variable at the start
+    
     // Crea mutex
     config_mutex = xSemaphoreCreateMutex();
     state_mutex = xSemaphoreCreateMutex();
@@ -116,6 +119,16 @@ void app_main(void) {
     ESP_LOGI(TAG, "Initializing hardware GPIO...");
     ESP_ERROR_CHECK(hardware_gpio_init());
     
+    // Initialize new buzzer driver on GPIO 46
+    ESP_LOGI(TAG, "Initializing buzzer driver...");
+    ret = buzzer_init();
+    if (ret == ESP_OK) {
+        // Play startup melody with new buzzer
+        buzzer_play_pattern(BUZZER_PATTERN_STARTUP);
+    } else {
+        ESP_LOGW(TAG, "Buzzer not available");
+    }
+    
     // Register button callback
     hardware_button_set_callback(on_send_button_pressed);
     
@@ -129,7 +142,7 @@ void app_main(void) {
     
     // Initialize AS5600 magnetic encoder
     ESP_LOGI(TAG, "Initializing AS5600 encoder...");
-    esp_err_t ret = encoder_reader_init();
+    ret = encoder_reader_init();
     if (ret != ESP_OK) {
         ESP_LOGW(TAG, "AS5600 encoder init failed, using fallback encoder");
         // Fallback to existing encoder implementation
