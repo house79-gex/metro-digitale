@@ -30,6 +30,8 @@ idf_component_register(
         "modes/mode_vetri.c"
         "modes/mode_astine.c"
         "modes/mode_fermavetri.c"
+        # Display drivers
+        "display/display_rgb.c"
         # BLE multi-device system
         "ble/ble_server.c"
         "ble/ble_multi_device.c"
@@ -44,6 +46,7 @@ idf_component_register(
         "ui/ui_settings.c"
         "ui/ui_rilievi_speciali.c"
         "ui/ui_tipologie.c"
+        "ui/ui_toast.c"
     INCLUDE_DIRS 
         "."
         "ui"
@@ -54,6 +57,7 @@ idf_component_register(
         "measurement"
         "storage"
         "modes"
+        "display"
     REQUIRES 
         nvs_flash 
         bt 
