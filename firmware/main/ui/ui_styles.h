@@ -7,6 +7,7 @@
 #define COLOR_BG_PRIMARY    lv_color_hex(0x1a1a2e)
 #define COLOR_BG_SECONDARY  lv_color_hex(0x16213e)
 #define COLOR_BG_CARD       lv_color_hex(0x0f3460)
+#define COLOR_PRIMARY       lv_color_hex(0x00ff88)
 #define COLOR_ACCENT        lv_color_hex(0xe94560)
 #define COLOR_TEXT_PRIMARY  lv_color_hex(0xffffff)
 #define COLOR_TEXT_SECONDARY lv_color_hex(0xb0b0b0)

@@ -187,6 +187,9 @@ void config_add_elemento(TipologiaInfisso *tip, const char *nome,
                          const char *formula, uint8_t quantita_default);
 void config_set_tipologia_corrente(GlobalConfig *cfg, uint8_t idx);
 
+// ====== DISPLAY RGB ======
+#define LCD_PIN_BL              GPIO_NUM_45  // Backlight pin
+
 // ====== BUZZER PASSIVO ======
 #define BUZZER_PIN              GPIO_NUM_46  // Pin IO46 dal pin header VIEWE
 #define BUZZER_CHANNEL          LEDC_CHANNEL_0

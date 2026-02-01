@@ -32,6 +32,9 @@ idf_component_register(
         "modes/mode_fermavetri.c"
         # Display drivers
         "display/display_rgb.c"
+        "display/touch_gt911.c"
+        # Hardware components
+        "hardware/button_send.c"
         # BLE multi-device system
         "ble/ble_server.c"
         "ble/ble_multi_device.c"
@@ -47,6 +50,14 @@ idf_component_register(
         "ui/ui_rilievi_speciali.c"
         "ui/ui_tipologie.c"
         "ui/ui_toast.c"
+        # UI advanced components
+        "ui/gesture_handler.c"
+        "ui/wizard_zero.c"
+        "ui/screen_calibro_advanced.c"
+        "ui/screen_vetri_wizard.c"
+        "ui/screen_astine.c"
+        "ui/screen_settings.c"
+        "ui/bottom_nav.c"
     INCLUDE_DIRS 
         "."
         "ui"
