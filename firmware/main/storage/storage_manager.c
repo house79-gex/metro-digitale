@@ -8,6 +8,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
+#include <errno.h>
+#include <inttypes.h>
 
 static const char *TAG = "STORAGE_MGR";
 
@@ -32,7 +34,7 @@ static bool ensure_directory_exists(const char *path) {
             ESP_LOGI(TAG, "Directory creata: %s", path);
             return true;
         } else {
-            ESP_LOGE(TAG, "Errore creazione directory %s", path);
+            ESP_LOGE(TAG, "Errore creazione directory %s: %s", path, strerror(errno));
             return false;
         }
     }
@@ -321,7 +323,7 @@ uint32_t storage_list_files(const char *directory, char **files, uint32_t max_fi
     
     closedir(dir);
     
-    ESP_LOGI(TAG, "Trovati %lu file in %s", count, directory);
+    ESP_LOGI(TAG, "Trovati %" PRIu32 " file in %s", count, directory);
     return count;
 }
 

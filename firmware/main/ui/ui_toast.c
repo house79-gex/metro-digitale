@@ -1,6 +1,7 @@
 #include "ui_toast.h"
 #include "esp_log.h"
 #include <string.h>
+#include <inttypes.h>
 
 static const char *TAG = "UI_TOAST";
 
@@ -27,7 +28,7 @@ void ui_show_toast(const char *message) {
 void ui_show_toast_duration(const char *message, uint32_t duration_ms) {
     if (!message) return;
     
-    ESP_LOGI(TAG, "Toast (%lums): %s", duration_ms, message);
+    ESP_LOGI(TAG, "Toast (%" PRIu32 "ms): %s", duration_ms, message);
     
     // TODO: Implement with custom duration
 }

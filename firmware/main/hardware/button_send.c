@@ -139,7 +139,7 @@ static void button_task(void *arg) {
             }
         }
         
-        vTaskDelay(pdMS_TO_TICKS(10)); // Poll ogni 10ms
+        vTaskDelay(pdMS_TO_TICKS(20)); // Poll ogni 20ms (ridotto da 10ms per efficienza)
     }
 }
 

@@ -2,6 +2,7 @@
 #include "config.h"
 #include "esp_log.h"
 #include "driver/ledc.h"
+#include <inttypes.h>
 
 static const char *TAG = "DISPLAY_RGB";
 
@@ -68,7 +69,7 @@ void display_backlight_set(uint8_t brightness) {
     ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
     ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
     
-    ESP_LOGD(TAG, "Backlight impostato a %d%% (duty %lu/255)", brightness, duty);
+    ESP_LOGD(TAG, "Backlight impostato a %d%% (duty %" PRIu32 "/255)", brightness, duty);
 }
 
 uint8_t display_backlight_get(void) {

@@ -155,7 +155,7 @@ void mode_vetri_reset(mode_vetri_state_t *state) {
 }
 
 const material_config_t* mode_vetri_get_material_config(material_type_t material) {
-    if (material < 0 || material > 3) {
+    if (material > MATERIAL_CUSTOM) {
         return &g_materials[0]; // Default Alluminio
     }
     
