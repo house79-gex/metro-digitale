@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📐 Metro Digitale v2.0 - UI Preview Interattiva</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-panel: #16213e;
+            --primary: #00ff88;
+            --secondary: #00aaff;
+            --success: #00ff88;
+            --warning: #ff9900;
+            --text-white: #ffffff;
+            --text-gray: #888888;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), var(--bg-panel));
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .controls button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 170, 255, 0.4);
+        }
+
+        .controls button.active {
+            background: var(--primary);
+            color: black;
+        }
+
+        .device {
+            background: #000;
+            border-radius: 20px;
+            padding: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .screen {
+            width: 800px;
+            height: 480px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen-content {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            display: none;
+        }
+
+        .screen-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title {
+            font-size: 28px;
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .value-display {
+            font-size: 48px;
+            color: var(--success);
+            text-align: center;
+            margin: 40px 0;
+            font-weight: bold;
+        }
+
+        .unit {
+            font-size: 20px;
+            color: var(--text-gray);
+            margin-left: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: auto;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: black;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn.secondary {
+            background: #444;
+            color: white;
+        }
+
+        .stats-panel {
+            background: var(--bg-panel);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+
+        .stats-panel h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .wizard-step {
+            background: var(--bg-panel);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .wizard-step h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .wizard-step p {
+            line-height: 1.8;
+            color: var(--text-gray);
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.5s;
+        }
+
+        .display-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 40px 0;
+        }
+
+        .display-value {
+            text-align: center;
+        }
+
+        .display-value .label {
+            font-size: 18px;
+            color: var(--text-gray);
+            margin-bottom: 10px;
+        }
+
+        .display-value .value {
+            font-size: 32px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .arrow {
+            font-size: 48px;
+            color: var(--warning);
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #111;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-gray);
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item .icon {
+            font-size: 24px;
+        }
+
+        .nav-item .label {
+            font-size: 12px;
+        }
+
+        .info {
+            text-align: center;
+            color: var(--text-gray);
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📐 Metro Digitale v2.0 - UI Preview Interattiva</h1>
+    
+    <div class="controls">
+        <button class="active" onclick="showScreen('home')">🏠 Home</button>
+        <button onclick="showScreen('calibro')">📐 Calibro Avanzato</button>
+        <button onclick="showScreen('vetri')">🪟 Vetri L×H</button>
+        <button onclick="showScreen('astine')">📏 Astine</button>
+        <button onclick="showScreen('settings')">⚙️ Settings</button>
+        <button onclick="showScreen('wizard')">🎯 Wizard Zero</button>
+    </div>
+
+    <div class="device">
+        <div class="screen">
+            <!-- Home Screen -->
+            <div id="home" class="screen-content active">
+                <div class="title">METRO DIGITALE v2.0</div>
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px;">
+                    <div style="font-size: 20px; color: var(--text-gray);">Seleziona una modalità operativa:</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 600px;">
+                        <div class="btn" onclick="showScreen('calibro')">📐 CALIBRO</div>
+                        <div class="btn" onclick="showScreen('vetri')">🪟 VETRI</div>
+                        <div class="btn" onclick="showScreen('astine')">📏 ASTINE</div>
+                        <div class="btn secondary" onclick="showScreen('settings')">⚙️ SETTINGS</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calibro Advanced Screen -->
+            <div id="calibro" class="screen-content">
+                <div class="title">CALIBRO DIGITALE</div>
+                <div class="value-display">
+                    <span id="calibro-value">125.47</span><span class="unit">mm</span>
+                </div>
+                <div style="text-align: center; color: var(--text-gray); margin-bottom: 20px;">
+                    Tipo: Esterna
+                </div>
+                <div class="stats-panel">
+                    <h3>STATISTICHE</h3>
+                    <div class="stat-row"><span>Min:</span><span>120.15 mm</span></div>
+                    <div class="stat-row"><span>Max:</span><span>130.82 mm</span></div>
+                    <div class="stat-row"><span>Media:</span><span>125.50 mm</span></div>
+                    <div class="stat-row"><span>Count:</span><span>47</span></div>
+                </div>
+                <div class="buttons">
+                    <button class="btn" onclick="showScreen('wizard')">ZERO</button>
+                    <button class="btn secondary">HOLD</button>
+                    <button class="btn secondary">RESET</button>
+                    <button class="btn secondary" onclick="showScreen('home')">INDIETRO</button>
+                </div>
+            </div>
+
+            <!-- Vetri Wizard Screen -->
+            <div id="vetri" class="screen-content">
+                <div class="title">VETRI L×H</div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <span style="color: var(--text-gray);">Materiale: </span>
+                    <span style="color: var(--primary); font-weight: bold;">Alluminio</span>
+                </div>
+                <div class="display-row">
+                    <div class="display-value">
+                        <div class="label">LARGHEZZA (L)</div>
+                        <div class="value">1250.5 mm</div>
+                    </div>
+                    <div class="display-value">
+                        <div class="label">ALTEZZA (H)</div>
+                        <div class="value">1800.0 mm</div>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="btn">MISURA L</button>
+                    <button class="btn">MISURA H</button>
+                    <button class="btn">SALVA</button>
+                    <button class="btn secondary" onclick="showScreen('home')">INDIETRO</button>
+                </div>
+            </div>
+
+            <!-- Astine Screen -->
+            <div id="astine" class="screen-content">
+                <div class="title">ASTINE</div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <span style="color: var(--text-gray);">Gruppo: </span>
+                    <span style="color: #9b59b6; font-weight: bold;">Anta Ribalta</span>
+                </div>
+                <div class="display-row">
+                    <div class="display-value">
+                        <div class="label">GREZZA</div>
+                        <div class="value">2050.0 mm</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="display-value">
+                        <div class="label">TAGLIO</div>
+                        <div class="value" style="color: var(--success);">2047.0 mm</div>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="btn">MISURA</button>
+                    <button class="btn">SALVA</button>
+                    <button class="btn secondary" onclick="showScreen('home')">INDIETRO</button>
+                </div>
+            </div>
+
+            <!-- Settings Screen -->
+            <div id="settings" class="screen-content">
+                <div class="title">IMPOSTAZIONI</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1;">
+                    <div class="stats-panel">
+                        <h3>STORAGE</h3>
+                        <div class="stat-row"><span>SD Card:</span><span style="color: var(--success);">✓ OK</span></div>
+                        <div class="stat-row"><span>BLE:</span><span style="color: var(--success);">✓ Connesso</span></div>
+                        <div class="stat-row"><span>USB:</span><span style="color: var(--text-gray);">✗ Non presente</span></div>
+                    </div>
+                    <div class="stats-panel">
+                        <h3>BATTERIA</h3>
+                        <div class="stat-row"><span>Livello:</span><span style="color: var(--success);">85%</span></div>
+                        <div class="stat-row"><span>Voltaggio:</span><span>3.9V</span></div>
+                        <div class="stat-row"><span>Autonomia:</span><span>~8h</span></div>
+                    </div>
+                    <div class="stats-panel">
+                        <h3>DISPLAY</h3>
+                        <div class="stat-row"><span>Luminosità:</span><span>80%</span></div>
+                        <div class="stat-row"><span>Timeout:</span><span>60s</span></div>
+                    </div>
+                    <div class="stats-panel">
+                        <h3>BUZZER</h3>
+                        <div class="stat-row"><span>Volume:</span><span>70%</span></div>
+                        <button class="btn" style="margin-top: 10px; width: 100%;">TEST</button>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="btn secondary" onclick="showScreen('home')">INDIETRO</button>
+                </div>
+            </div>
+
+            <!-- Wizard Zero Screen -->
+            <div id="wizard" class="screen-content">
+                <div class="title">WIZARD AZZERAMENTO</div>
+                <div class="wizard-step">
+                    <h2 id="wizard-title">Benvenuto</h2>
+                    <p id="wizard-text">Questa procedura guidata ti aiuterà ad azzerare il calibro digitale.<br><br>Premi AVANTI per iniziare.</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="wizard-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="btn secondary" onclick="wizardCancel()">ANNULLA</button>
+                    <button class="btn" onclick="wizardNext()">AVANTI</button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="showScreen('home')">
+                    <div class="icon">🏠</div>
+                    <div class="label">Home</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('calibro')">
+                    <div class="icon">📐</div>
+                    <div class="label">Calibro</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('vetri')">
+                    <div class="icon">🪟</div>
+                    <div class="label">Vetri</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('astine')">
+                    <div class="icon">📏</div>
+                    <div class="label">Astine</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('settings')">
+                    <div class="icon">⚙️</div>
+                    <div class="label">Settings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info">
+        <p><strong>Metro Digitale v2.0</strong> - Preview UI Interattiva</p>
+        <p>Usa i pulsanti sopra o la bottom navigation per navigare tra le schermate</p>
+        <p>Implementa: Touch GT911, Gesture Handler, Wizard Zero, Screens Avanzati, Bottom Nav</p>
+    </div>
+
+    <script>
+        let wizardStep = 0;
+        const wizardSteps = [
+            { title: "Benvenuto", text: "Questa procedura guidata ti aiuterà ad azzerare il calibro digitale.<br><br>Premi AVANTI per iniziare.", progress: 0 },
+            { title: "Preparazione", text: "1. Pulisci accuratamente i puntali<br>2. Assicurati che siano integri<br>3. Rimuovi eventuali residui<br><br>Premi AVANTI quando pronto.", progress: 25 },
+            { title: "Posizionamento Zero", text: "Chiudi completamente i puntali fino al contatto.<br><br>Quando sei sicuro della posizione, premi AZZERA.", progress: 50 },
+            { title: "Verifica", text: "Verifica della calibrazione in corso...<br><br>Controllo tolleranza 0.1mm", progress: 75 },
+            { title: "Completato!", text: "Azzeramento completato con successo!<br><br>Il calibro è ora pronto all'uso.", progress: 100 }
+        ];
+
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen-content').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show selected screen
+            document.getElementById(screenId).classList.add('active');
+            
+            // Update control buttons
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update bottom nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            if (screenId === 'home') document.querySelectorAll('.nav-item')[0].classList.add('active');
+            if (screenId === 'calibro') document.querySelectorAll('.nav-item')[1].classList.add('active');
+            if (screenId === 'vetri') document.querySelectorAll('.nav-item')[2].classList.add('active');
+            if (screenId === 'astine') document.querySelectorAll('.nav-item')[3].classList.add('active');
+            if (screenId === 'settings') document.querySelectorAll('.nav-item')[4].classList.add('active');
+            
+            // Reset wizard if shown
+            if (screenId === 'wizard') {
+                wizardStep = 0;
+                updateWizard();
+            }
+            
+            // Simulate value update for calibro
+            if (screenId === 'calibro') {
+                simulateMeasurement();
+            }
+        }
+
+        function wizardNext() {
+            if (wizardStep < wizardSteps.length - 1) {
+                wizardStep++;
+                updateWizard();
+                
+                // Auto-advance from verify step
+                if (wizardStep === 3) {
+                    setTimeout(() => {
+                        wizardNext();
+                    }, 2000);
+                }
+            } else {
+                showScreen('calibro');
+            }
+        }
+
+        function wizardCancel() {
+            showScreen('calibro');
+        }
+
+        function updateWizard() {
+            const step = wizardSteps[wizardStep];
+            document.getElementById('wizard-title').textContent = step.title;
+            document.getElementById('wizard-text').innerHTML = step.text;
+            document.getElementById('wizard-progress').style.width = step.progress + '%';
+        }
+
+        function simulateMeasurement() {
+            setInterval(() => {
+                const value = 120 + Math.random() * 15;
+                document.getElementById('calibro-value').textContent = value.toFixed(2);
+            }, 1000);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') showScreen('calibro');
+            if (e.key === 'ArrowRight') showScreen('vetri');
+            if (e.key === 'ArrowUp') showScreen('home');
+            if (e.key === 'ArrowDown') showScreen('settings');
+        });
+    </script>
+</body>
+</html>
