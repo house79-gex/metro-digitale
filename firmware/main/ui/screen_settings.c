@@ -37,7 +37,7 @@ static void slider_volume_changed(lv_event_t *e) {
 }
 
 static void btn_test_buzzer_clicked(lv_event_t *e) {
-    buzzer_beep(1000, 200); // 1000Hz per 200ms
+    buzzer_play_tone(1000, 200); // 1000Hz per 200ms
     ESP_LOGI(TAG, "Test buzzer");
 }
 
