@@ -5,6 +5,12 @@ firmware/sdkconfig.old
 firmware/*.bin
 firmware/*.elf
 firmware/*.map
+firmware/main/build/
+firmware/.vscode/
+
+# Test artifacts
+firmware/tests/build/
+firmware/tests/sd_test/
 
 # Flutter/Dart
 app_android/.dart_tool/
@@ -65,3 +71,4 @@ configurator/dist/
 # Temporary files
 *.tmp
 *.bak
+/tmp/

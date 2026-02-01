@@ -1,207 +1,198 @@
-# 📐 Metro Digitale Multifunzione
+# 📐 Metro Digitale Multifunzione v2.0
 
-[![ESP32](https://img.shields.io/badge/ESP32-S3-blue.svg)](https://www.espressif.com/en/products/socs/esp32-s3)
-[![LVGL](https://img.shields.io/badge/LVGL-8.3-green.svg)](https://lvgl.io/)
-[![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)](https://flutter.dev/)
-[![Bluetooth](https://img.shields.io/badge/Bluetooth-BLE-lightblue.svg)](https://www.bluetooth.com/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+## Panoramica
+Metro digitale professionale con **puntali circolari da 30mm** per misure di distanza esterne e interne. Basato su ESP32-S3 con display touch 5" (800×480) integrato e encoder magnetico lineare ad alta precisione (0.005mm).
 
-Metro digitale professionale multifunzione basato su ESP32-S3 con display touch da 5" (800x480) e encoder magnetico lineare ad alta precisione (0.005mm).
+## ✨ Caratteristiche Principali
+- ✅ **Puntali Circolari 30mm**: Misure esterne e interne con compensazione automatica diametro
+- ✅ **4 Modalità Operative**: Calibro Avanzato, Vetri L×H, Astine con Profili, Fermavetri
+- ✅ **Wizard Assistiti**: Azzeramento guidato passo-passo con verifica
+- ✅ **Storage Multi-Target**: SD Card, Export Bluetooth, USB OTG (pendrive)
+- ✅ **UI Touch Avanzata**: Gesture swipe, animazioni, feedback tattile
+- ✅ **Statistiche Real-Time**: Min, Max, Media, Deviazione Standard
+- ✅ **Export Multipli**: JSON, CSV (Excel), Binary
+- ✅ **Integrazione BLE**: App Android + Troncatrice Blitz CNC
 
-## ✨ Funzionalità Principali
-
-- ✅ **Modalità Fermavetro**: Rileva misure fermavetri e invia alla troncatrice CNC via Bluetooth
-- ✅ **Modalità Vetri**: Misura Larghezza × Altezza con gioco automatico per materiale (Alluminio -12mm, Legno -6mm, PVC -10mm)
-- ✅ **Modalità Astine**: Profili configurabili organizzati per gruppi con offset personalizzabili
-- ✅ **Modalità Calibro**: Interfaccia minimale ed essenziale per uso come calibro digitale puro
-- ✅ **Comunicazione BLE**: Invio dati a troncatrice CNC e app Android
-- ✅ **App Android**: Raggruppa misure simili e genera report PDF
-
-## 🔧 Hardware Richiesto
+## 🔧 Hardware
 
 ### Componenti Principali
-- **ESP32-S3-WROOM-1** (modulo con 8MB Flash, 8MB PSRAM)
-- **Display Touch 5"** capacitivo 800x480 con controller GT911
-- **Encoder Magnetico Lineare** ad alta precisione (risoluzione 0.005mm)
-  - Esempio: encoder magnetico con interfaccia quadratura
-- **Batteria LiPo** 3.7V 2000mAh con circuito di ricarica
-- **Pulsanti** e **LED** di stato
+- **Modulo ESP32-S3 5" integrato** (display + touch inclusi)
+  - CPU: Dual-core Xtensa @ 240MHz
+  - RAM: 8MB PSRAM + 512KB SRAM
+  - Flash: 16MB
+  - Display: 5" TFT 800×480 RGB parallelo
+  - Touch: GT911 capacitivo I2C
+  
+- **Encoder Magnetico Lineare**
+  - Modello: SINO HYMSEANN o compatibile
+  - Risoluzione: 0.005mm (5µm)
+  - Output: Quadratura A/B (5V TTL)
+  - Corsa: 0-2000mm
+  
+- **Puntali Circolari**
+  - Diametro: 30mm
+  - Materiale: Acciaio temprato
+  - Coppia: Fisso (SX) + Mobile (DX)
+  
+- **Level Shifter TXS0108E**
+  - 8 canali bidirezionali 3.3V ↔ 5V
+  - Per interfaccia encoder 5V → ESP32 3.3V
+  
+- **Modulo UPS Type-C 18650**
+  - Batterie: 2× 18650 Li-Ion (6000mAh)
+  - Output: 5V @ 3A
+  - UPS seamless (0ms switchover)
+  - Autonomia: 3.5-4 ore uso intenso
 
-### Collegamenti Principali
-- Display: SPI + I2C (touch)
-- Encoder: GPIO con PCNT (Pulse Counter)
-- Bluetooth: integrato ESP32-S3
-- Alimentazione: LiPo con regolatore 3.3V
+### Schema Collegamenti
+```
+[Modulo UPS] 5V OUT ──┬──→ TXS0108E VCCB
+                      ├──→ Encoder VCC (5V)
+                      └──→ ESP32-S3 VIN (5V)
+                           ↓ LDO interno
+                           3.3V OUT ──→ TXS0108E VCCA
 
-Per dettagli completi vedere [docs/hardware.md](docs/hardware.md) e [docs/wiring.md](docs/wiring.md).
+[Encoder] A (5V) ──→ TXS0108E B1 → A1 ──→ ESP32 GPIO 21
+[Encoder] B (5V) ──→ TXS0108E B2 → A2 ──→ ESP32 GPIO 43
+
+[Pulsante SEND] ──→ ESP32 GPIO 47 (pull-up 10kΩ)
+```
 
 ## 🚀 Quick Start
 
-### Firmware ESP32-S3
-
+### 1. Firmware ESP32-S3
 ```bash
-# Installare ESP-IDF v5.0+
 cd firmware
-
-# Configurare il progetto
 idf.py set-target esp32s3
-idf.py menuconfig
-
-# Compilare e flashare
+idf.py menuconfig  # Configura PSRAM, Flash 16MB, Partition table
 idf.py build
 idf.py -p /dev/ttyUSB0 flash monitor
 ```
 
-### App Android (Flutter)
+### 2. Calibrazione Iniziale
+1. Accendi il dispositivo
+2. Tocca "⚙️ Impostazioni" → "🧙 Calibra Puntali"
+3. Segui il wizard azzeramento:
+   - Pulisci puntali
+   - Porta a contatto completo
+   - Conferma zero
+   - Verifica (muovi e ritorna a zero)
+4. Conferma completamento
 
-```bash
-cd app_android
-
-# Installare dipendenze
-flutter pub get
-
-# Eseguire su dispositivo
-flutter run
-```
-
-### Integrazione Troncatrice BLITZ
-
-```bash
-cd blitz_integration
-
-# Installare dipendenze Python
-pip install -r requirements.txt
-
-# Eseguire il receiver Bluetooth
-python bluetooth_receiver.py
-```
+### 3. Prima Misura
+1. Tocca "📐 Calibro" nella bottom nav
+2. Seleziona tipo: "◉ Esterna" o "○ Interna"
+3. Posiziona lo strumento sul pezzo
+4. Premi pulsante fisico "SEND" per salvare
+5. Visualizza statistiche con "📊 STAT"
 
 ## 📱 Modalità Operative
 
-### 1. Modalità Fermavetro
-Misura rapida di fermavetri con invio automatico alla troncatrice CNC via Bluetooth.
-- Supporto per puntali fissi/mobili configurabili
-- Compensazione automatica offset puntali
-- Trigger START troncatrice
+### 1. Calibro Avanzato
+Modalità misura universale con statistiche professionali.
+- **Misure Supportate**: Esterna, Interna
+- **Unità**: mm, cm, inch, frazionari (1/64")
+- **Funzioni**: Hold, Zero assistito, Statistiche, Tolleranza
+- **Export**: Salvataggio automatico su SD + invio BLE
 
-### 2. Modalità Vetri
-Misura Larghezza × Altezza con gestione giochi materiali.
-- **Alluminio**: -12mm (6mm per lato)
-- **Legno**: -6mm (3mm per lato)
-- **PVC**: -10mm (5mm per lato)
-- Invio misure a app Android per raggruppamento e report PDF
+### 2. Vetri L×H
+Misura dimensioni vetri con gioco materiale automatico.
+- **Materiali**: Alluminio (-12mm), Legno (-6mm), PVC (-10mm)
+- **Wizard**: Selezione materiale → Misura L → Misura H → Review → Save
+- **Output**: Dimensioni lorde + nette calcolate
+- **Invio**: JSON a app Android per report PDF
 
-### 3. Modalità Astine
-Gestione profili astine per serramenti organizzati per gruppi:
-- **Anta Ribalta** (viola): Inferiore AR, Superiore AR, Laterale AR, Cremonese AR
-- **Persiana** (blu): Inferiore Persiana, Superiore Persiana
-- **Cremonese Normale** (verde): Cremonese Std, Cremonese Corta
-- **Personalizzati** (giallo): Profili custom configurabili
+### 3. Astine
+Gestione profili astine con offset personalizzabili.
+- **Gruppi**: Anta Ribalta (4 profili), Persiana (2), Cremonese (2), Custom (2)
+- **Calcolo**: Lunghezza grezza + offset profilo = lunghezza taglio
+- **Colori**: Viola (AR), Blu (Persiana), Verde (Cremonese), Giallo (Custom)
 
-Ogni profilo ha offset personalizzabile e può essere attivato/disattivato.
+### 4. Fermavetri
+Invio diretto misure a troncatrice Blitz CNC.
+- **Auto-start**: Trigger automatico taglio su Blitz
+- **Modalità**: Semi-automatico o Automatico
+- **Protocollo**: JSON BLE specifico per Blitz
 
-### 4. Modalità Calibro
-Interfaccia minimale per uso come calibro digitale di precisione.
-- Display grande e chiaro
-- Zero rapido
-- Lettura in mm con precisione 0.01mm
+## 💾 Storage e Export
 
-## 📊 Protocollo Comunicazione BLE
+### Storage Disponibili
+- **SD Card**: Salvataggio automatico JSONL append-mode
+- **Bluetooth**: Transfer sessioni a smartphone/PC
+- **USB OTG**: Export su pendrive USB-C
+- **NVS Interno**: Configurazioni e calibrazioni
 
-### UUID Servizio
-`12345678-1234-1234-1234-123456789abc`
+### Formati Export
+- **JSON**: Human-readable, completo di metadati
+- **CSV**: Excel-compatible, per analisi dati
+- **Binary**: Compatto, per backup
 
-### Formato JSON
-
-**Invio a troncatrice CNC:**
-```json
-{
-  "type": "fermavetro",
-  "misura_mm": 1250.5,
-  "auto_start": true,
-  "mode": "semi_auto"
-}
+### Struttura Directory SD
+```
+/sd/
+├── sessions/       # Misure giornaliere (YYYYMMDD.jsonl)
+├── exports/        # Export manuali (CSV, JSON)
+└── backup/         # Backup configurazioni
 ```
 
-**Invio a app Android:**
-```json
-{
-  "larghezza_raw": 1200.0,
-  "altezza_raw": 1500.0,
-  "larghezza_netta": 1188.0,
-  "altezza_netta": 1488.0,
-  "materiale": "Alluminio",
-  "quantita": 1,
-  "gioco": 12.0
-}
-```
+## 🎮 Controlli
 
-Vedere [docs/protocol.md](docs/protocol.md) per documentazione completa.
+### Pulsante Fisico SEND
+- **Click**: Salva misura + invio BLE
+- **Long Press (>1s)**: Menu rapido
+- **Double Click**: Zero veloce (senza wizard)
 
-## 🎨 Anteprima Interfaccia
+### Gesture Touch
+- **Swipe Left/Right**: Cambio modalità
+- **Swipe Up**: Menu impostazioni
+- **Swipe Down**: Quick actions
+- **Long Press Display**: Zero rapido
 
-Un'anteprima HTML interattiva completa dell'interfaccia è disponibile in:
-```
-preview/ui_preview.html
-```
+## 📊 Specifiche Tecniche
 
-Aprire il file in un browser per esplorare tutte le schermate e funzionalità.
+### Precisione
+- Risoluzione encoder: 0.00125mm (dopo decodifica x4)
+- Precisione sistema: ±0.01mm su 1000mm
+- Ripetibilità: ±0.005mm
 
-## 📖 Documentazione
+### Performance
+- Refresh display: 30 FPS
+- Sampling encoder: 100Hz
+- Touch sampling: 50Hz
+- BLE latency: <50ms
 
-- [Hardware e Componenti](docs/hardware.md)
+### Alimentazione
+- Batterie: 2× 18650 (6000mAh @ 3.7V)
+- Consumo: ~4W (uso intenso)
+- Autonomia: 3.5-4 ore
+- Ricarica: USB-C 5V/3A (2-3 ore)
+
+## 🔗 Integrazioni
+
+### App Android (Flutter)
+- Ricezione misure via BLE
+- Raggruppamento automatico misure simili
+- Generazione report PDF
+- Export e condivisione
+
+### Troncatrice Blitz CNC
+- Invio misure direct-to-machine
+- Trigger automatico taglio
+- Modalità semi-auto e automatica
+
+## 📖 Documentazione Completa
+- [Hardware Dettagliato](docs/hardware.md)
 - [Schema Collegamenti](docs/wiring.md)
-- [Protocollo Comunicazione](docs/protocol.md)
-- [Integrazione BLITZ](blitz_integration/README.md)
+- [Protocollo BLE](docs/protocol.md)
+- [Modalità Operative](docs/modes.md)
+- [Storage e Export](docs/storage.md)
 
-## 🏗️ Struttura Progetto
-
-```
-metro-digitale/
-├── README.md                    # Documentazione principale
-├── LICENSE                      # MIT License
-├── firmware/                    # Codice ESP32-S3 con LVGL
-│   ├── CMakeLists.txt
-│   ├── sdkconfig.defaults
-│   └── main/                    # Codice sorgente principale
-├── app_android/                 # App Flutter
-│   ├── pubspec.yaml
-│   └── lib/                     # Codice Dart
-├── blitz_integration/           # Integrazione troncatrice BLITZ
-│   ├── bluetooth_receiver.py
-│   └── semi_auto_bluetooth_mixin.py
-├── docs/                        # Documentazione tecnica
-│   ├── hardware.md
-│   ├── wiring.md
-│   └── protocol.md
-└── preview/                     # Anteprima interfaccia
-    └── ui_preview.html
-```
-
-## 🤝 Contribuire
-
-I contributi sono benvenuti! Per favore:
-1. Fork del repository
-2. Creare un branch per la feature (`git checkout -b feature/AmazingFeature`)
-3. Commit delle modifiche (`git commit -m 'Add some AmazingFeature'`)
-4. Push al branch (`git push origin feature/AmazingFeature`)
-5. Aprire una Pull Request
+## 🛠️ Troubleshooting
+Vedi [docs/troubleshooting.md](docs/troubleshooting.md)
 
 ## 📄 Licenza
-
-Questo progetto è rilasciato sotto licenza MIT. Vedere il file [LICENSE](LICENSE) per i dettagli.
-
-## 👨‍💻 Autore
-
-Progetto Metro Digitale Multifunzione
-
-## 🙏 Ringraziamenti
-
-- ESP-IDF framework by Espressif
-- LVGL graphics library
-- Flutter framework by Google
-- Comunità open source
+MIT License - Vedi [LICENSE](LICENSE)
 
 ---
 
-**Nota**: Questo è un progetto professionale per uso in ambiente industriale. Testare accuratamente prima dell'uso in produzione.
+**Versione 2.0** - Architettura completamente ridefinita con puntali circolari, storage multi-target e UI touch avanzata.
