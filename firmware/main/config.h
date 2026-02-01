@@ -3,6 +3,60 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "driver/gpio.h"
+
+// ============================================================================
+// HARDWARE CONFIGURATION - ESP32-S3 5" Integrated Module
+// ============================================================================
+
+// Encoder pins (updated for ESP32-S3 integrated module)
+#define ENCODER_PIN_A      GPIO_NUM_21   // Changed from GPIO_NUM_4
+#define ENCODER_PIN_B      GPIO_NUM_43   // Changed from GPIO_NUM_5
+
+// Physical SEND button
+#define BUTTON_SEND_PIN    GPIO_NUM_47
+
+// Display RGB Parallel (GPIO 1-16, 39-42, 45, 48)
+#define LCD_PIN_R0         GPIO_NUM_1
+#define LCD_PIN_R1         GPIO_NUM_2
+#define LCD_PIN_R2         GPIO_NUM_3
+#define LCD_PIN_R3         GPIO_NUM_4
+#define LCD_PIN_R4         GPIO_NUM_5
+#define LCD_PIN_G0         GPIO_NUM_6
+#define LCD_PIN_G1         GPIO_NUM_7
+#define LCD_PIN_G2         GPIO_NUM_8
+#define LCD_PIN_G3         GPIO_NUM_9
+#define LCD_PIN_G4         GPIO_NUM_10
+#define LCD_PIN_G5         GPIO_NUM_11
+#define LCD_PIN_B0         GPIO_NUM_12
+#define LCD_PIN_B1         GPIO_NUM_13
+#define LCD_PIN_B2         GPIO_NUM_14
+#define LCD_PIN_B3         GPIO_NUM_15
+#define LCD_PIN_B4         GPIO_NUM_16
+#define LCD_PIN_HSYNC      GPIO_NUM_39
+#define LCD_PIN_VSYNC      GPIO_NUM_40
+#define LCD_PIN_DE         GPIO_NUM_41
+#define LCD_PIN_PCLK       GPIO_NUM_42
+#define LCD_PIN_BL         GPIO_NUM_45   // Backlight PWM
+#define LCD_PIN_DISP       GPIO_NUM_48   // Display enable
+
+// Touch GT911 I2C
+#define TOUCH_I2C_SDA      GPIO_NUM_18
+#define TOUCH_I2C_SCL      GPIO_NUM_8
+#define TOUCH_I2C_INT      GPIO_NUM_4
+
+// SD Card SPI (updated pins)
+#define SD_PIN_CS          GPIO_NUM_10
+#define SD_PIN_MOSI        GPIO_NUM_11
+#define SD_PIN_MISO        GPIO_NUM_13
+#define SD_PIN_CLK         GPIO_NUM_12
+
+// Display resolution
+#define LCD_WIDTH          800
+#define LCD_HEIGHT         480
+#define LCD_PIXEL_CLOCK_HZ (18 * 1000 * 1000)  // 18MHz
+
+// ============================================================================
 
 // Modalità operative
 typedef enum {
